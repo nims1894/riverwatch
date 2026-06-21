@@ -3,109 +3,161 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>RiverWatch</title>
+    <title>RiverWatch</title>
 
-<link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
 
-<div class="container">
+    <!-- Intro -->
 
-    <div class="title">
+    <div id="intro" class="container">
 
-        RiverWatch
+        <div class="title">
+            RiverWatch
+        </div>
 
-    </div>
+        <div class="subtitle">
+            Financial Operation Center
+        </div>
 
-
-    <div class="subtitle">
-
-        Financial Operation Center
-
-    </div>
-
-
-
-    <div class="operator">
-
-        Operator : NIMS
-
-        <span class="online">
-
-            ● ONLINE
-
-        </span>
-
-    </div>
+        <div class="version">
+            Version 0.1.1
+        </div>
 
 
+        <div class="operator">
 
-    <div class="line"></div>
+            Operator : NIMS
 
+            <span class="online">
 
+                ● ONLINE
 
-    <div class="philosophy">
+            </span>
 
-        <p>Don't predict the river.</p>
-
-        <p>Watch the river,</p>
-
-        <p>and set a heading by the map.</p>
-
-    </div>
+        </div>
 
 
-
-    <div class="line"></div>
-
+        <div class="line"></div>
 
 
-    <button onclick="showDashboard()">
+        <div class="philosophy">
 
-        ENTER DASHBOARD
+            <p>Don't predict the river.</p>
 
-    </button>
+            <p>Watch the river,</p>
 
-    <div id="dashboard">
+            <p>and set a heading by the map.</p>
 
-    <div class="dashboard-title">
+        </div>
 
-        Portfolio Health
+
+        <div class="line"></div>
+
+
+        <button onclick="showDashboard()">
+
+            ENTER DASHBOARD
+
+        </button>
 
     </div>
 
 
-    <div class="health">
 
-        92%
+    <!-- Dashboard -->
+
+
+    <div id="dashboard" class="container">
+
+
+        <div class="title">
+
+            RiverWatch
+
+        </div>
+
+
+        <div class="subtitle">
+
+            Financial Operation Center
+
+        </div>
+
+
+        <div class="operator">
+
+            Operator : NIMS
+
+            <span class="online">
+
+                ● ONLINE
+
+            </span>
+
+        </div>
+
+
+
+        <div class="line"></div>
+
+
+
+        <div class="dashboard-title">
+
+            Portfolio Health
+
+        </div>
+
+
+        <div class="health">
+
+            92%
+
+        </div>
+
+
+
+        <div class="dashboard-title">
+
+            Sensor Health
+
+        </div>
+
+
+
+        <div class="health">
+
+            100%
+
+        </div>
+
+
+        <div class="line"></div>
+
+
+
+        <button onclick="showIntro()">
+
+            BACK
+
+        </button>
+
+
 
     </div>
 
 
-    <div class="dashboard-title">
 
-        Sensor Health
-
-    </div>
-
-
-    <div class="health">
-
-        100%
-
-    </div>
-
-
-</div>
-
-</div>
+<script src="script.js"></script>
 
 
 </body>
