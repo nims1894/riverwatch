@@ -133,3 +133,37 @@ background:#00B8D9;
 
 
 }
+
+#dashboard{
+
+display:none;
+
+margin-top:60px;
+
+text-align:center;
+
+}
+
+
+
+.dashboard-title{
+
+font-size:18px;
+
+color:#AAB4C3;
+
+margin-top:30px;
+
+}
+
+
+
+.health{
+
+font-size:42px;
+
+font-weight:bold;
+
+margin-top:10px;
+
+}

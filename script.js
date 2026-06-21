@@ -1,1 +1,5 @@
-console.log("RiverWatch v0.1");
+function showDashboard(){
+
+document.getElementById("dashboard").style.display="block";
+
+}
