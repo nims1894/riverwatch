@@ -1,42 +1,50 @@
 # RiverWatch Roadmap
 
-## v0.1
+## v0.1.1
 
 * Intro Screen
-* Dashboard Transition
+* Dashboard transition
 
-## v0.2
+## v0.1.2
 
-Portfolio Health Widget
+* Mission Panel
 
-## v0.3
+## v0.1.3
 
-Portfolio Alignment Table
+* Portfolio Health
+* Portfolio Alignment
+* data.js
 
-## v0.4
+## v0.1.3a
 
-GoogleFinance Integration
+* Last Sync
 
-## v0.5
+## v0.1.4
 
-River Score
+Planned
 
-## v0.6
+* Status color automation
+* Discipline Score progress bar
+* Individual holdings expansion
 
-Tax Efficiency
+## v0.2.0
 
-## v0.7
+Planned
 
-Emotion Log
+* Market price integration
+* FX integration
+* Portfolio valuation
 
-## v0.8
+## v0.3.0
 
-PWA Support
+Planned
+
+* Action Log
+* Rebalance history
+* Decision tracking
 
 ## v1.0
 
-Financial Operation Center
+Target
 
----
-
-Build the boat before building the fleet.
+Personal Financial Mission Control

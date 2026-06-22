@@ -1,165 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>RiverWatch</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
 
-
-    <!-- Intro -->
-
-    <div id="intro" class="container">
-
-        <div class="title">
-            RiverWatch
-        </div>
-
-        <div class="subtitle">
-            Financial Operation Center
-        </div>
-
-        <div class="version">
-            Version 0.1.1
-        </div>
-
+    <!-- Intro Screen -->
+    <section id="intro" class="screen intro-screen">
+        <div class="brand">RiverWatch</div>
+        <div class="subtitle">Financial Operation Center</div>
+        <div class="version">Version 0.1.3a</div>
 
         <div class="operator">
-
-            Operator : NIMS
-
-            <span class="online">
-
-                ● ONLINE
-
-            </span>
-
+            Operator : NIMS <span class="online">● ONLINE</span>
         </div>
 
-
         <div class="line"></div>
-
 
         <div class="philosophy">
-
             <p>Don't predict the river.</p>
-
             <p>Watch the river,</p>
-
             <p>and set a heading by the map.</p>
-
         </div>
-
 
         <div class="line"></div>
 
+        <button onclick="showDashboard()">ENTER DASHBOARD</button>
+    </section>
 
-        <button onclick="showDashboard()">
+    <!-- Dashboard Screen -->
+    <section id="dashboard" class="screen dashboard-screen hidden">
 
-            ENTER DASHBOARD
+        <header class="topbar">
+            <div>
+                <div class="brand-small">RiverWatch</div>
+                <div class="subtitle-small">Financial Operation Center</div>
+            </div>
 
-        </button>
+            <div>
+                <div class="operator-small">
+                    Operator : NIMS <span class="online">● ONLINE</span>
+                </div>
+                <div class="last-sync">
+                    Last Sync <span id="lastSync"></span>
+                </div>
+            </div>
+        </header>
 
-    </div>
+        <main class="dashboard-grid">
 
+            <section class="card mission-card">
+                <div class="label">Mission</div>
+                <div class="mission-text" id="mission">Stay the Course</div>
 
+                <div class="label">Status</div>
+                <div class="status-text" id="status">ON TRACK</div>
 
-    <!-- Dashboard -->
+                <div class="mini-grid">
+                    <div>
+                        <div class="label">Current Strategy</div>
+                        <div class="value" id="currentStrategy">NO ACTION</div>
+                    </div>
 
+                    <div>
+                        <div class="label">Days Since Action</div>
+                        <div class="value" id="daysSinceAction">36</div>
+                    </div>
 
-    <div id="dashboard" class="container">
+                    <div>
+                        <div class="label">Last Rebalance</div>
+                        <div class="value" id="lastRebalance">2026.05.17</div>
+                    </div>
 
+                    <div>
+                        <div class="label">Discipline Score</div>
+                        <div class="value" id="disciplineScore">100%</div>
+                    </div>
+                </div>
+            </section>
 
-        <div class="title">
+            <section class="card health-card">
+                <div class="label">Portfolio Health</div>
+                <div class="health-value">
+                    <span id="portfolioHealth">92</span>%
+                </div>
 
-            RiverWatch
+                <div class="progress">
+                    <div id="healthBar" class="progress-fill"></div>
+                </div>
 
-        </div>
+                <div class="health-meta">
+                    <span>Target <b id="targetHealth">95%</b></span>
+                    <span>Gap <b id="healthGap">-3%</b></span>
+                </div>
+            </section>
 
+            <section class="card alignment-card">
+                <div class="label">Portfolio Alignment</div>
 
-        <div class="subtitle">
+                <div class="alignment-header">
+                    <span>Asset</span>
+                    <span>Target</span>
+                    <span>Current</span>
+                    <span>Status</span>
+                </div>
 
-            Financial Operation Center
+                <div id="holdingsList" class="holdings-list"></div>
+            </section>
 
-        </div>
+            <section class="card philosophy-card">
+                <div class="label">RW Philosophy</div>
+                <p>Don't predict the river.</p>
+                <p>Watch the river,</p>
+                <p>and set a heading by the map.</p>
+            </section>
 
+        </main>
 
-        <div class="operator">
+        <button class="back-button" onclick="showIntro()">BACK TO INTRO</button>
 
-            Operator : NIMS
+    </section>
 
-            <span class="online">
-
-                ● ONLINE
-
-            </span>
-
-        </div>
-
-
-
-        <div class="line"></div>
-
-
-
-        <div class="dashboard-title">
-
-            Portfolio Health
-
-        </div>
-
-
-        <div class="health">
-
-            92%
-
-        </div>
-
-
-
-        <div class="dashboard-title">
-
-            Sensor Health
-
-        </div>
-
-
-
-        <div class="health">
-
-            100%
-
-        </div>
-
-
-        <div class="line"></div>
-
-
-
-        <button onclick="showIntro()">
-
-            BACK
-
-        </button>
-
-
-
-    </div>
-
-
-
-<script src="script.js"></script>
-
+    <script src="data.js"></script>
+    <script src="script.js"></script>
 
 </body>
-
 </html>

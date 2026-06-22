@@ -1,33 +1,31 @@
-# RiverWatch Changelog
+# Changelog
 
-## v0.1.0
+## 2026-06-22
 
-2026.06.21
+### v0.1.3a
 
-Initial Intro Screen
+Added
 
-Operator : NIMS 🟢 ONLINE
+* Last Sync information
+* Mission Panel
+* Portfolio Health widget
+* Portfolio Alignment widget
+* data.js separation
 
-Added Philosophy Page
+Changed
 
-Added Enter Dashboard Button
+* Mission definition
 
----
-
-## v0.1.1
-
-2026.06.21
-
-Dashboard Transition
-
-Portfolio Health Placeholder
-
-Sensor Health Placeholder
-
-BACK Button
-
----
+Stay the Course
 
 Status
 
-🟢 OPERATIONAL
+ON TRACK
+
+Operator
+
+NIMS 🟢 ONLINE
+
+Notes
+
+First operational prototype completed.

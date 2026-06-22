@@ -1,40 +1,45 @@
 # RiverWatch
 
-*A personal financial operation center built by NIMS.*
-
----
-
-## Mission
-
-Preserve and grow wealth through disciplined execution,
-not through prediction.
+Personal Financial Operating System
 
 ---
 
 ## Philosophy
 
-Don't predict the river.
-
-Watch the river,
-
-and set a heading by the map.
-
----
-
-## Principles
-
-- Build the boat before building the fleet.
-- Make it look professional enough that people assume it already exists.
-- Emotion is recorded. Decision follows predefined rules.
+> Don't predict the river.
+>
+> Watch the river,
+>
+> and set a heading by the map.
 
 ---
 
-## Status
+## Mission
 
-Version : v0.1.1
+Stay the Course
 
-Operator : NIMS 🟢 ONLINE
+---
 
-Launch Date : 2026.06.21
+## Current Status
 
-Status : 🟢 OPERATIONAL
+ON TRACK
+
+---
+
+## Features
+
+### v0.1.3a
+
+* Intro Screen
+* Mission Panel
+* Portfolio Health
+* Portfolio Alignment
+* Manual data management (`data.js`)
+* Last Sync information
+* Responsive UI (PC / Mobile)
+
+---
+
+## Operator
+
+NIMS 🟢 ONLINE
