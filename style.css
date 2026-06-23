@@ -1,573 +1,187 @@
 :root {
-    --bg: #0E1117;
-    --panel: #151B26;
-    --panel2: #1A2230;
-    --panel3: #202A3A;
-    --cyan: #00B8D9;
-    --green: #00C853;
-    --yellow: #FFD600;
-    --orange: #FF9800;
-    --red: #FF5252;
-    --text: #F5F7FA;
-    --muted: #8A96A8;
-    --line: rgba(255,255,255,0.10);
+    --bg:#0E1117;
+    --panel:#151B26;
+    --panel2:#1A2230;
+    --line:rgba(255,255,255,0.10);
+    --cyan:#00B8D9;
+    --green:#00C853;
+    --yellow:#FFD600;
+    --orange:#FF9800;
+    --red:#FF5252;
+    --text:#F5F7FA;
+    --muted:#8A96A8;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+*{ margin:0; padding:0; box-sizing:border-box; }
 
-body {
-    min-height: 100vh;
-    background: radial-gradient(circle at top, #132033 0%, var(--bg) 45%, #090B10 100%);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
-.screen {
-    min-height: 100vh;
-    padding: 30px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-/* ========================================================================
- * Intro Screen
- * ====================================================================== */
-
-.intro-screen {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.boat-mark {
-    font-size: 58px;
-    margin-bottom: 14px;
-}
-
-.brand {
-    font-size: 42px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.subtitle {
-    margin-top: 10px;
-    color: var(--muted);
-}
-
-.version {
-    margin-top: 5px;
-    font-size: 13px;
-    color: var(--muted);
-}
-
-.operator {
-    margin-top: 25px;
-}
-
-.online {
-    color: var(--green);
-}
-
-.line {
-    width: 420px;
-    max-width: 80vw;
-    height: 1px;
-    background: rgba(255,255,255,0.15);
-    margin: 30px 0;
-}
-
-.philosophy {
-    line-height: 1.8;
-    color: var(--text);
-}
-
-button {
-    margin-top: 30px;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 2px;
-    background: var(--cyan);
-    color: white;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-}
-
-button:hover {
-    filter: brightness(1.08);
-}
-
-/* ========================================================================
- * Dashboard Layout
- * ====================================================================== */
-
-.dashboard-screen {
-    max-width: 1200px;
-    margin: auto;
-}
-
-.topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    background: rgba(21,27,38,0.92);
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.boat-mark-small {
-    font-size: 34px;
-}
-
-.brand-small {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.subtitle-small {
-    font-size: 13px;
-    color: var(--muted);
-}
-
-.operator-small {
-    font-size: 14px;
-    text-align: right;
-}
-
-.last-sync {
-    margin-top: 6px;
-    font-size: 12px;
-    color: var(--muted);
-    text-align: right;
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.card {
-    background: rgba(21,27,38,0.96);
-    padding: 25px;
-    border: 1px solid rgba(255,255,255,0.05);
-}
-
-.mission-card,
-.health-card-wide {
-    grid-column: span 2;
-}
-
-.label {
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-}
-
-/* ========================================================================
- * Mission Card
- * ====================================================================== */
-
-.mission-text {
-    font-size: 28px;
-    margin-bottom: 20px;
-}
-
-.status-text {
-    font-size: 48px;
-    line-height: 1.05;
-    font-weight: 800;
-    color: var(--green);
-    margin-bottom: 25px;
-}
-
-.mini-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-}
-
-.value {
-    font-size: 18px;
-    font-weight: 700;
-}
-
-/* ========================================================================
- * Health Cards
- * ====================================================================== */
-
-.health-value {
-    font-size: 56px;
-    line-height: 1;
-    font-weight: 800;
-    color: var(--green);
-    margin-bottom: 14px;
+body{
+    background:linear-gradient(180deg,#08111f 0%, var(--bg) 100%);
+    color:var(--text);
+    font-family:Arial, Helvetica, sans-serif;
     font-variant-numeric: tabular-nums;
 }
 
-.health-label {
-    color: var(--cyan);
-    font-weight: 700;
-    margin-bottom: 20px;
+.screen{ min-height:100vh; padding:30px; }
+.hidden{ display:none !important; }
+
+.intro-screen{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 
-.progress {
-    height: 12px;
-    background: #243040;
-    overflow: hidden;
+.boat-icon{ font-size:54px; margin-bottom:10px; }
+.brand{ font-size:42px; font-weight:700; }
+.subtitle{ margin-top:10px; color:var(--muted); }
+.version{ margin-top:5px; font-size:13px; color:var(--muted); }
+.operator{ margin-top:25px; }
+.online{ color:var(--green); }
+.line{ width:420px; height:1px; background:rgba(255,255,255,0.15); margin:30px 0; }
+.philosophy{ line-height:1.8; }
+
+button{
+    margin-top:30px;
+    padding:12px 30px;
+    border:none;
+    background:var(--cyan);
+    color:white;
+    cursor:pointer;
+    border-radius:2px;
+    font-weight:700;
+}
+button:hover{ filter:brightness(1.08); }
+
+.dashboard-screen{ max-width:1240px; margin:auto; }
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px;
+    background:rgba(21,27,38,0.92);
+    border:1px solid var(--line);
+}
+.brand-wrap{ display:flex; align-items:center; gap:14px; }
+.boat-icon-small{ font-size:38px; }
+.brand-small{ font-size:24px; font-weight:700; }
+.subtitle-small{ font-size:13px; color:var(--muted); margin-top:4px; }
+.topbar-right{ text-align:right; }
+.operator-small{ font-size:14px; }
+.last-sync{ margin-top:6px; font-size:12px; color:var(--muted); }
+#dataSource{ color:var(--yellow); font-weight:700; }
+#dataSource.auto{ color:var(--green); }
+#dataSource.fallback{ color:var(--yellow); }
+
+.dashboard-grid{
+    display:grid;
+    grid-template-columns:1.15fr 1fr 1fr;
+    gap:20px;
+    margin-top:20px;
 }
 
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--cyan), var(--green));
+.card{
+    background:rgba(21,27,38,0.94);
+    padding:25px;
+    border:1px solid var(--line);
 }
 
-.health-meta {
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    color: var(--muted);
+.mission-card{ grid-column:span 3; }
+.voyage-card{ grid-row:span 2; }
+.allocation-card{ grid-column:span 2; }
+.logbook-card{ grid-column:span 2; }
+
+.label{
+    color:var(--muted);
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-bottom:10px;
 }
 
-.health-meta b {
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-}
+.mission-text{ font-size:28px; margin-bottom:20px; }
+.status-text{ font-size:44px; font-weight:bold; color:var(--green); margin-bottom:25px; }
+.status-text.watch{ color:var(--yellow); }
+.status-text.adapt{ color:var(--orange); }
+.status-text.recover{ color:var(--red); }
 
-.health-meta.stacked {
-    flex-direction: column;
-}
+.mini-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:15px; }
+.value{ font-size:18px; font-weight:700; }
 
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-top: 12px;
-}
+.health-value{ font-size:56px; font-weight:bold; color:var(--green); margin-bottom:4px; }
+.status-sub{ color:var(--green); font-size:13px; font-weight:700; margin-bottom:18px; }
 
-.metrics-grid div {
-    background: var(--panel2);
-    border: 1px solid rgba(255,255,255,0.04);
-    padding: 14px;
+.metric-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.metric-grid div,
+.metric-list div{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    padding:10px;
 }
-
-.metrics-grid span {
-    display: block;
-    color: var(--muted);
-    font-size: 12px;
-    margin-bottom: 8px;
-}
-
-.metrics-grid b {
-    display: block;
-    font-size: 18px;
-    font-variant-numeric: tabular-nums;
-}
-
-/* ========================================================================
- * Allocation Table
- * ====================================================================== */
-
-.alignment-card {
-    grid-column: span 2;
-}
+.metric-grid span,
+.metric-list span{ display:block; color:var(--muted); font-size:12px; margin-bottom:6px; }
+.metric-grid b,
+.metric-list b{ display:block; text-align:right; font-size:16px; }
+.metric-list{ display:grid; gap:8px; }
 
 .alignment-header,
-.holding-row,
-.allocation-header {
-    display: grid;
-    grid-template-columns: 1.8fr 0.8fr 0.8fr 0.9fr 1fr;
-    column-gap: 14px;
-    align-items: center;
+.holding-row{
+    display:grid;
+    grid-template-columns:1.6fr 0.85fr 0.85fr 0.85fr 1fr;
+    align-items:center;
+    gap:10px;
 }
-
-.alignment-header {
-    font-size: 12px;
-    color: var(--muted);
-    padding-bottom: 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.10);
+.alignment-header{
+    font-size:12px;
+    color:var(--muted);
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(255,255,255,0.1);
 }
-
-.holding-row {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-}
-
-.holding-row:last-child {
-    border-bottom: none;
-}
-
-/* Numeric columns: Current, Target, Deviation */
-.alignment-header span:nth-child(2),
-.alignment-header span:nth-child(3),
-.alignment-header span:nth-child(4),
+.holding-row{ padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
 .holding-row span:nth-child(2),
 .holding-row span:nth-child(3),
-.holding-row span:nth-child(4) {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+.holding-row span:nth-child(4),
+.alignment-header span:nth-child(2),
+.alignment-header span:nth-child(3),
+.alignment-header span:nth-child(4){ text-align:right; }
+
+.badge{ padding:4px 8px; font-size:11px; text-align:center; border-radius:2px; font-weight:700; }
+.badge.normal,.badge.on-target{ color:var(--green); }
+.badge.under,.badge.watch{ color:var(--yellow); }
+.badge.over,.badge.adapt{ color:var(--orange); }
+.badge.recover{ color:var(--red); }
+
+.action-value{ font-size:32px; font-weight:800; color:var(--green); margin:10px 0 14px; }
+.action-reason{ color:var(--muted); line-height:1.6; }
+.captain-card p,.philosophy-card p{ line-height:1.8; }
+.small-muted{ color:var(--muted); font-size:12px; margin-top:12px; }
+
+.logbook-list{ display:grid; gap:10px; }
+.log-entry{ border:1px solid rgba(255,255,255,0.06); padding:12px; background:rgba(255,255,255,0.03); }
+.log-entry-top{ display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; }
+.log-entry-date{ font-weight:700; }
+.log-entry-status{ color:var(--green); font-weight:700; }
+.log-entry-body{ color:var(--muted); font-size:13px; line-height:1.6; }
+
+.back-button{ display:block; margin:30px auto; }
+
+@media(max-width:900px){
+    .dashboard-grid{ grid-template-columns:1fr; }
+    .mission-card,.allocation-card,.logbook-card,.voyage-card{ grid-column:span 1; grid-row:auto; }
+    .mini-grid{ grid-template-columns:1fr 1fr; }
+    .topbar{ flex-direction:column; align-items:flex-start; gap:16px; }
+    .topbar-right{ text-align:left; }
+    .status-text{ font-size:36px; }
+    .health-value{ font-size:42px; }
+    .alignment-header,.holding-row{ grid-template-columns:1.3fr 0.8fr 0.8fr 0.8fr 0.9fr; font-size:13px; }
 }
 
-.badge {
-    display: inline-block;
-    justify-self: start;
-    padding: 4px 8px;
-    border-radius: 999px;
-    font-size: 11px;
-    text-align: center;
-    font-weight: 700;
-}
-
-.badge.normal,
-.badge.on,
-.badge.ok {
-    color: var(--green);
-    background: rgba(0,200,83,0.10);
-}
-
-.badge.under,
-.badge.watch,
-.badge.minor {
-    color: var(--yellow);
-    background: rgba(255,214,0,0.10);
-}
-
-.badge.over,
-.badge.review,
-.badge.adapt {
-    color: var(--orange);
-    background: rgba(255,152,0,0.12);
-}
-
-.badge.alert,
-.badge.off,
-.badge.recover {
-    color: var(--red);
-    background: rgba(255,82,82,0.12);
-}
-
-/* ========================================================================
- * Action / Reasoning
- * ====================================================================== */
-
-.action-value {
-    font-size: 34px;
-    line-height: 1.1;
-    font-weight: 800;
-    color: var(--green);
-    margin-bottom: 22px;
-}
-
-.note-label {
-    margin-top: 18px;
-}
-
-.reason-list {
-    margin-left: 18px;
-    line-height: 1.7;
-    color: var(--text);
-}
-
-.captain-note {
-    color: var(--text);
-    line-height: 1.7;
-}
-
-/* ========================================================================
- * Doctrine / Logbook
- * ====================================================================== */
-
-.philosophy-card {
-    line-height: 1.8;
-}
-
-.philosophy-card p,
-#dashboardDoctrine p {
-    margin-bottom: 5px;
-}
-
-.logbook-card {
-    line-height: 1.6;
-}
-
-.log-entry {
-    padding: 14px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-.log-entry:last-child {
-    border-bottom: none;
-}
-
-.log-date {
-    color: var(--cyan);
-    font-weight: 700;
-    margin-bottom: 8px;
-}
-
-.log-summary {
-    color: var(--muted);
-    font-size: 13px;
-    margin-bottom: 8px;
-}
-
-.log-note {
-    color: var(--text);
-    font-size: 14px;
-}
-
-/* ========================================================================
- * Utilities
- * ====================================================================== */
-
-.number,
-.numeric {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-}
-
-.back-button {
-    display: block;
-    margin: 30px auto;
-}
-
-/* ========================================================================
- * Responsive
- * ====================================================================== */
-
-@media (max-width: 900px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .mission-card,
-    .health-card-wide,
-    .alignment-card {
-        grid-column: span 1;
-    }
-
-    .metrics-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 768px) {
-    .screen {
-        padding: 18px;
-    }
-
-    .topbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .operator-small,
-    .last-sync {
-        text-align: left;
-    }
-
-    .mini-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .status-text {
-        font-size: 38px;
-    }
-
-    .health-value {
-        font-size: 42px;
-    }
-
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .alignment-header,
-    .holding-row,
-    .allocation-header {
-        grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr 0.9fr;
-        column-gap: 8px;
-        font-size: 12px;
-    }
-
-    .badge {
-        font-size: 10px;
-        padding: 3px 6px;
-    }
-}
-
-@media (max-width: 520px) {
-    .brand {
-        font-size: 34px;
-    }
-
-    .line {
-        width: 320px;
-    }
-
-    .mini-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .alignment-header {
-        display: none;
-    }
-
-    .holding-row {
-        grid-template-columns: 1fr 1fr;
-        row-gap: 6px;
-    }
-
-    .holding-row span:nth-child(1) {
-        grid-column: span 2;
-        font-weight: 700;
-    }
-
-    .holding-row span:nth-child(2)::before {
-        content: "Current ";
-        color: var(--muted);
-        font-weight: 400;
-    }
-
-    .holding-row span:nth-child(3)::before {
-        content: "Target ";
-        color: var(--muted);
-        font-weight: 400;
-    }
-
-    .holding-row span:nth-child(4)::before {
-        content: "Δ ";
-        color: var(--muted);
-        font-weight: 400;
-    }
-
-    .holding-row span:nth-child(2),
-    .holding-row span:nth-child(3),
-    .holding-row span:nth-child(4) {
-        text-align: left;
-    }
-
-    .holding-row span:nth-child(5) {
-        grid-column: span 2;
-    }
+@media(max-width:560px){
+    .screen{ padding:18px; }
+    .line{ width:280px; }
+    .mini-grid,.metric-grid{ grid-template-columns:1fr; }
+    .alignment-header,.holding-row{ grid-template-columns:1fr 0.8fr 0.8fr; }
+    .alignment-header span:nth-child(4),.alignment-header span:nth-child(5),
+    .holding-row span:nth-child(4),.holding-row span:nth-child(5){ display:none; }
 }

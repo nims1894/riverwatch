@@ -2,52 +2,51 @@
 
 ## 2026-06-23
 
+### v0.2.3
+
+Added
+
+- Google Sheet CSV Hub integration
+- marketEngine.js
+- AUTO / FALLBACK data source display
+- BNO as Inflation Proxy
+
+Changed
+
+- Brent Oil manual metric replaced by BNO ETF proxy
+- Market automation strategy changed from direct Yahoo fetch to Google Sheet Hub
+
+Notes
+
+- Use local server such as `python -m http.server 8080` for local fetch testing.
+
+---
+
 ### v0.2.1
 
 Added
 
-* Policy-driven River Matrix structure
-* River Metric Weight configuration with automatic normalization
-* Boat Health calculation structure
-  * Configuration Alignment
-  * Suitability
-  * Growth Suitability
-  * Defensive Suitability
-  * Maneuverability
-* Decision Engine PoC
-* Render function separation in `script.js`
-
-Changed
-
-* Refactored `data.js` into CONST / POLICY / MANUAL / AUTO / CALC sections
-* Updated USDKRW matrix for current 1,500+ KRW environment
-* Kept low-frequency metrics such as AI CAPEX and NVDA DC Revenue as manual inputs
-
-Notes
-
-Sprint #006 moved from static dashboard toward policy-driven calculation engine.
+- CONST / POLICY / MANUAL / AUTO / CALC data structure
+- River Metric Weight policy
+- Boat Health Weight policy
+- Render function separation
 
 ---
-
-## 2026-06-23
 
 ### v0.2.0
 
 Added
 
-* Voyage Health
-* River Health
-* Boat Health
-* Current Allocation vs Boat Configuration
-* Recommended Action
-* Captain's Note
-* Voyage Logbook
-* RiverWatch Doctrine
+- River Health
+- Boat Health
+- Voyage Health
+- Recommended Action
+- Captain's Note
+- Voyage Logbook
 
 Changed
 
-* Replaced Portfolio Health with three-axis Health architecture
-* Updated philosophy to Observe / Adapt / Continue
+- Philosophy updated to Doctrine: Observe / Adapt / Continue
 
 ---
 
@@ -57,25 +56,15 @@ Changed
 
 Added
 
-* Last Sync information
-* Mission Panel
-* Portfolio Health widget
-* Portfolio Alignment widget
-* data.js separation
+- Last Sync information
+- Mission Panel
+- Portfolio Health widget
+- Portfolio Alignment widget
+- data.js separation
 
 Changed
 
-* Mission definition
-
-Stay the Course
-
-Status
-
-ON TRACK
-
-Operator
-
-NIMS 🟢 ONLINE
+- Mission definition
 
 Notes
 

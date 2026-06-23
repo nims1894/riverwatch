@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,10 +10,10 @@
 
     <!-- Intro Screen -->
     <section id="intro" class="screen intro-screen">
-        <div class="boat-mark">⛵</div>
+        <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
-        <div class="subtitle">Personal Financial Mission Control</div>
-        <div class="version">Version 0.2.1</div>
+        <div class="subtitle">A personal doctrine execution system for reaching the Open Sea.</div>
+        <div class="version">Version 0.2.3</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -21,7 +21,7 @@
 
         <div class="line"></div>
 
-        <div class="philosophy" id="introDoctrine">
+        <div class="philosophy">
             <p>Observe the River.</p>
             <p>Adapt the Boat.</p>
             <p>Continue the Voyage.</p>
@@ -36,20 +36,20 @@
     <section id="dashboard" class="screen dashboard-screen hidden">
 
         <header class="topbar">
-            <div class="topbar-left">
-                <div class="boat-mark-small">⛵</div>
+            <div class="brand-wrap">
+                <div class="boat-icon-small">⛵</div>
                 <div>
                     <div class="brand-small">RiverWatch</div>
-                    <div class="subtitle-small" id="subtitleSmall">Personal Financial Mission Control</div>
+                    <div class="subtitle-small">A personal doctrine execution system for reaching the Open Sea.</div>
                 </div>
             </div>
 
-            <div>
+            <div class="topbar-right">
                 <div class="operator-small">
                     Operator : NIMS <span class="online">● ONLINE</span>
                 </div>
                 <div class="last-sync">
-                    Last Sync <span id="lastSync"></span>
+                    Last Sync <span id="lastSync"></span> · <span id="dataSource">FALLBACK</span>
                 </div>
             </div>
         </header>
@@ -70,67 +70,85 @@
                     </div>
 
                     <div>
-                        <div class="label">Voyage</div>
-                        <div class="value" id="voyageMini">96</div>
+                        <div class="label">Days Since Action</div>
+                        <div class="value" id="daysSinceAction">36</div>
                     </div>
 
                     <div>
-                        <div class="label">River</div>
-                        <div class="value" id="riverMini">88</div>
+                        <div class="label">Last Rebalance</div>
+                        <div class="value" id="lastRebalance">2026.05.17</div>
                     </div>
 
                     <div>
-                        <div class="label">Boat</div>
-                        <div class="value" id="boatMini">93</div>
+                        <div class="label">Doctrine Compliance</div>
+                        <div class="value" id="doctrineCompliance">100%</div>
                     </div>
                 </div>
             </section>
 
-            <section class="card voyage-card health-card-wide">
+            <section class="card health-card voyage-card">
                 <div class="label">🧭 Voyage Health</div>
                 <div class="health-value"><span id="voyageHealth">96</span></div>
-                <div class="health-label" id="voyageLabel">On Voyage</div>
+                <div class="status-sub" id="voyageStatus">ON VOYAGE</div>
 
-                <div class="metrics-grid">
-                    <div><span>Current Position</span><b id="currentPosition">-</b></div>
-                    <div><span>Expected Position</span><b id="expectedPosition">-</b></div>
-                    <div><span>Open Sea Target</span><b id="openSeaTarget">-</b></div>
-                    <div><span>Projected Asset</span><b id="projectedAsset">-</b></div>
-                    <div><span>ETA</span><b id="eta">-</b></div>
-                    <div><span>Remaining</span><b id="remaining">-</b></div>
+                <div class="metric-grid">
+                    <div>
+                        <span>Current Position</span>
+                        <b id="currentPosition">-</b>
+                    </div>
+                    <div>
+                        <span>Expected Position</span>
+                        <b id="expectedPosition">-</b>
+                    </div>
+                    <div>
+                        <span>Open Sea Target</span>
+                        <b id="openSeaTarget">-</b>
+                    </div>
+                    <div>
+                        <span>ETA</span>
+                        <b id="eta">-</b>
+                    </div>
+                    <div>
+                        <span>Remaining</span>
+                        <b id="remainingTime">-</b>
+                    </div>
+                    <div>
+                        <span>Projected Asset</span>
+                        <b id="projectedAsset">-</b>
+                    </div>
                 </div>
             </section>
 
             <section class="card health-card">
                 <div class="label">🌊 River Health</div>
                 <div class="health-value"><span id="riverHealth">88</span></div>
-                <div class="health-label" id="riverLabel">Strong Current</div>
+                <div class="status-sub" id="riverStatus">STRONG CURRENT</div>
 
-                <div class="health-meta stacked">
-                    <span>Growth Favorability <b id="growthFavorability">84</b></span>
-                    <span>Defensive Favorability <b id="defensiveFavorability">38</b></span>
-                </div>
+                <div class="metric-list" id="riverMetricList"></div>
             </section>
 
             <section class="card health-card">
                 <div class="label">⛵ Boat Health</div>
-                <div class="health-value"><span id="boatHealth">93</span></div>
-                <div class="health-label" id="boatLabel">Well Positioned</div>
+                <div class="health-value"><span id="boatHealth">91</span></div>
+                <div class="status-sub" id="boatStatus">WELL POSITIONED</div>
 
-                <div class="health-meta stacked">
-                    <span>Alignment <b id="boatAlignment">92</b></span>
-                    <span>Suitability <b id="boatSuitability">94</b></span>
+                <div class="metric-list">
+                    <div><span>Alignment</span><b id="alignmentScore">-</b></div>
+                    <div><span>Suitability</span><b id="suitabilityScore">-</b></div>
+                    <div><span>Growth Suitability</span><b id="growthSuitability">-</b></div>
+                    <div><span>Defensive Suitability</span><b id="defensiveSuitability">-</b></div>
+                    <div><span>Maneuverability</span><b id="maneuverability">-</b></div>
                 </div>
             </section>
 
-            <section class="card alignment-card">
+            <section class="card allocation-card">
                 <div class="label">Current Allocation vs Boat Configuration</div>
 
                 <div class="alignment-header allocation-header">
                     <span>Asset</span>
                     <span>Current</span>
                     <span>Target</span>
-                    <span>Deviation</span>
+                    <span>Delta</span>
                     <span>Status</span>
                 </div>
 
@@ -140,22 +158,25 @@
             <section class="card action-card">
                 <div class="label">Recommended Action</div>
                 <div class="action-value" id="actionValue">NO ACTION</div>
+                <div class="action-reason" id="actionReason">The river remains favorable. The boat is well configured. Continue the voyage.</div>
+            </section>
 
-                <div class="label note-label">Reason</div>
-                <ul id="reasonList" class="reason-list"></ul>
+            <section class="card captain-card">
+                <div class="label">Captain's Note</div>
+                <p id="captainNote">Architecture stabilized. Proceed to implementation.</p>
+            </section>
 
-                <div class="label note-label">Captain's Note</div>
-                <p id="captainNote" class="captain-note">-</p>
+            <section class="card logbook-card">
+                <div class="label">📖 Voyage Logbook</div>
+                <div id="logbookList" class="logbook-list"></div>
             </section>
 
             <section class="card philosophy-card">
                 <div class="label">Doctrine</div>
-                <div id="dashboardDoctrine"></div>
-            </section>
-
-            <section class="card logbook-card">
-                <div class="label">Voyage Logbook</div>
-                <div id="logbookList"></div>
+                <p>Observe the River.</p>
+                <p>Adapt the Boat.</p>
+                <p>Continue the Voyage.</p>
+                <p class="small-muted">Automate what changes often. Manualize what changes rarely. Never increase complexity for insignificant gains.</p>
             </section>
 
         </main>
@@ -165,6 +186,7 @@
     </section>
 
     <script src="data.js"></script>
+    <script src="marketEngine.js"></script>
     <script src="script.js"></script>
 
 </body>

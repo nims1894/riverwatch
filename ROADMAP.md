@@ -1,68 +1,68 @@
 # RiverWatch Roadmap
 
-## v0.1.1
-
-* Intro Screen
-* Dashboard transition
-
-## v0.1.2
-
-* Mission Panel
-
-## v0.1.3
-
-* Portfolio Health
-* Portfolio Alignment
-* data.js
-
 ## v0.1.3a
 
-* Last Sync
+Completed
+
+- Intro Screen
+- Mission Panel
+- Portfolio Health
+- Portfolio Alignment
+- data.js separation
+- Last Sync
 
 ## v0.2.0
 
-* Voyage Health
-* River Health
-* Boat Health
-* Recommended Action
-* Voyage Logbook
-* Doctrine UI
+Completed
+
+- Doctrine update
+- River / Boat / Voyage Health architecture
+- Current Allocation vs Boat Configuration
+- Recommended Action
+- Captain's Note
+- Voyage Logbook
 
 ## v0.2.1
 
-* data.js policy architecture
-* River Matrix structure
-* River Metric Weight normalization
-* Boat Health calculation structure
-* Decision Engine PoC
-* script.js render function separation
+Completed
+
+- data.js CONST / POLICY / MANUAL / AUTO / CALC structure
+- render function separation
+- Boat Health weight policy
+- River metric weight policy
 
 ## v0.2.2
 
-Planned
+Completed
 
-* Voyage Health calculation engine
-* Current asset / expected position calculation
-* ETA calculation
-* Open Sea Progress refinement
+- Yahoo Finance PoC
+- Direct fetch fallback evaluation
+
+## v0.2.3
+
+Completed
+
+- Google Sheet CSV Hub
+- AUTO / FALLBACK display
+- BNO as Inflation Proxy
 
 ## v0.3.0
 
 Planned
 
-* Market price integration PoC
-* FX integration
-* VIX integration
-* GoogleFinance or Yahoo data test
+- Actual holdings input after 2026.06.24 buy
+- Portfolio valuation engine
+- Current allocation from shares and market price
+- Voyage Health calculation engine
 
 ## v0.4.0
 
 Planned
 
-* Action Log
-* Rebalance history
-* Decision tracking
-* Captain's Note persistence
+- River Matrix calculation
+- Growth Favorability
+- Defensive Favorability
+- Boat Suitability calculation
 
 ## v1.0
 
