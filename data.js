@@ -179,10 +179,10 @@ const riverwatch = {
      * ======================================================================*/
     manual: {
         // [MANUAL] Voyage target / contribution
-        openSeaTarget: 880000000,      // 1.60B = 16억원
+        openSeaTarget: 800000000,      // 1.60B = 16억원
         targetDate: "2040.12",
         expectedCAGR: 0.11,
-        monthlyContribution: 1500000,   // KRW / month
+        monthlyContribution: 1200000,   // KRW / month
         lastRebalance: "2026.06.23",        // [MANUAL] Captain input
         buildPhaseEnd: "2026.07.31",      // [MANUAL] Portfolio construction phase end
 
