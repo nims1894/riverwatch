@@ -10,9 +10,10 @@
 
     <!-- Intro Screen -->
     <section id="intro" class="screen intro-screen">
+        <div class="boat-mark">⛵</div>
         <div class="brand">RiverWatch</div>
-        <div class="subtitle">Financial Operation Center</div>
-        <div class="version">Version 0.1.3a</div>
+        <div class="subtitle">Personal Financial Mission Control</div>
+        <div class="version">Version 0.2.1</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -20,10 +21,10 @@
 
         <div class="line"></div>
 
-        <div class="philosophy">
-            <p>Don't predict the river.</p>
-            <p>Watch the river,</p>
-            <p>and set a heading by the map.</p>
+        <div class="philosophy" id="introDoctrine">
+            <p>Observe the River.</p>
+            <p>Adapt the Boat.</p>
+            <p>Continue the Voyage.</p>
         </div>
 
         <div class="line"></div>
@@ -35,9 +36,12 @@
     <section id="dashboard" class="screen dashboard-screen hidden">
 
         <header class="topbar">
-            <div>
-                <div class="brand-small">RiverWatch</div>
-                <div class="subtitle-small">Financial Operation Center</div>
+            <div class="topbar-left">
+                <div class="boat-mark-small">⛵</div>
+                <div>
+                    <div class="brand-small">RiverWatch</div>
+                    <div class="subtitle-small" id="subtitleSmall">Personal Financial Mission Control</div>
+                </div>
             </div>
 
             <div>
@@ -57,65 +61,101 @@
                 <div class="mission-text" id="mission">Stay the Course</div>
 
                 <div class="label">Status</div>
-                <div class="status-text" id="status">ON TRACK</div>
+                <div class="status-text" id="status">STAY THE COURSE</div>
 
                 <div class="mini-grid">
                     <div>
-                        <div class="label">Current Strategy</div>
-                        <div class="value" id="currentStrategy">NO ACTION</div>
+                        <div class="label">Recommended Action</div>
+                        <div class="value" id="recommendedAction">NO ACTION</div>
                     </div>
 
                     <div>
-                        <div class="label">Days Since Action</div>
-                        <div class="value" id="daysSinceAction">36</div>
+                        <div class="label">Voyage</div>
+                        <div class="value" id="voyageMini">96</div>
                     </div>
 
                     <div>
-                        <div class="label">Last Rebalance</div>
-                        <div class="value" id="lastRebalance">2026.05.17</div>
+                        <div class="label">River</div>
+                        <div class="value" id="riverMini">88</div>
                     </div>
 
                     <div>
-                        <div class="label">Discipline Score</div>
-                        <div class="value" id="disciplineScore">100%</div>
+                        <div class="label">Boat</div>
+                        <div class="value" id="boatMini">93</div>
                     </div>
+                </div>
+            </section>
+
+            <section class="card voyage-card health-card-wide">
+                <div class="label">🧭 Voyage Health</div>
+                <div class="health-value"><span id="voyageHealth">96</span></div>
+                <div class="health-label" id="voyageLabel">On Voyage</div>
+
+                <div class="metrics-grid">
+                    <div><span>Current Position</span><b id="currentPosition">-</b></div>
+                    <div><span>Expected Position</span><b id="expectedPosition">-</b></div>
+                    <div><span>Open Sea Target</span><b id="openSeaTarget">-</b></div>
+                    <div><span>Projected Asset</span><b id="projectedAsset">-</b></div>
+                    <div><span>ETA</span><b id="eta">-</b></div>
+                    <div><span>Remaining</span><b id="remaining">-</b></div>
                 </div>
             </section>
 
             <section class="card health-card">
-                <div class="label">Portfolio Health</div>
-                <div class="health-value">
-                    <span id="portfolioHealth">92</span>%
-                </div>
+                <div class="label">🌊 River Health</div>
+                <div class="health-value"><span id="riverHealth">88</span></div>
+                <div class="health-label" id="riverLabel">Strong Current</div>
 
-                <div class="progress">
-                    <div id="healthBar" class="progress-fill"></div>
+                <div class="health-meta stacked">
+                    <span>Growth Favorability <b id="growthFavorability">84</b></span>
+                    <span>Defensive Favorability <b id="defensiveFavorability">38</b></span>
                 </div>
+            </section>
 
-                <div class="health-meta">
-                    <span>Target <b id="targetHealth">95%</b></span>
-                    <span>Gap <b id="healthGap">-3%</b></span>
+            <section class="card health-card">
+                <div class="label">⛵ Boat Health</div>
+                <div class="health-value"><span id="boatHealth">93</span></div>
+                <div class="health-label" id="boatLabel">Well Positioned</div>
+
+                <div class="health-meta stacked">
+                    <span>Alignment <b id="boatAlignment">92</b></span>
+                    <span>Suitability <b id="boatSuitability">94</b></span>
                 </div>
             </section>
 
             <section class="card alignment-card">
-                <div class="label">Portfolio Alignment</div>
+                <div class="label">Current Allocation vs Boat Configuration</div>
 
-                <div class="alignment-header">
+                <div class="alignment-header allocation-header">
                     <span>Asset</span>
-                    <span>Target</span>
                     <span>Current</span>
+                    <span>Target</span>
+                    <span>Deviation</span>
                     <span>Status</span>
                 </div>
 
-                <div id="holdingsList" class="holdings-list"></div>
+                <div id="allocationList" class="holdings-list"></div>
+            </section>
+
+            <section class="card action-card">
+                <div class="label">Recommended Action</div>
+                <div class="action-value" id="actionValue">NO ACTION</div>
+
+                <div class="label note-label">Reason</div>
+                <ul id="reasonList" class="reason-list"></ul>
+
+                <div class="label note-label">Captain's Note</div>
+                <p id="captainNote" class="captain-note">-</p>
             </section>
 
             <section class="card philosophy-card">
-                <div class="label">RW Philosophy</div>
-                <p>Don't predict the river.</p>
-                <p>Watch the river,</p>
-                <p>and set a heading by the map.</p>
+                <div class="label">Doctrine</div>
+                <div id="dashboardDoctrine"></div>
+            </section>
+
+            <section class="card logbook-card">
+                <div class="label">Voyage Logbook</div>
+                <div id="logbookList"></div>
             </section>
 
         </main>
