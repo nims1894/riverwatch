@@ -8,15 +8,25 @@ A personal doctrine execution system for reaching the Open Sea.
 * Adapt the Boat.
 * Continue the Voyage.
 
-## v0.2.9
+## v0.3.1
 
-This release connects the Decision Engine to the three core health indicators.
+This release completes the main River / Boat / Voyage dashboard flow and adds Captain Recommendation logic.
 
 ### Core Health
 
-* River Health: market environment
-* Boat Health: portfolio configuration and suitability
+* River Health: market environment and river bias
+* Boat Health: portfolio allocation, suitability, structure, and discipline
 * Voyage Health: arrival estimate against Open Sea target
+
+### Captain Recommendation
+
+The Decision Engine now supports:
+
+* BUILD PHASE / CONTINUE BUILDING
+* RECOVER COURSE / INCREASE EFFORT
+* ADAPT THE BOAT / REBALANCE
+* KEEP WATCH / REVIEW
+* STAY THE COURSE / NO ACTION
 
 ### MarketHub
 

@@ -17,15 +17,18 @@ Voyage Health Engine.
 ### M5 - The System Recommends
 Decision Engine connected to Health scores.
 
+### M6 - Captain Recommendation
+Build Phase logic and action narrative.
+
 ## Next
 
-### v0.3.0
-* Captain Approved Baseline lock
-* Recommendation Engine refinement
-* UI polishing
+### v0.3.x
 * GitHub Pages validation
+* Captain Approved Baseline freeze
+* Recommendation wording refinement
 
 ### Future
 * Logbook auto snapshot
 * Captain Discipline expansion
 * Transaction history / avg-price automation
+* Open Sea Probability

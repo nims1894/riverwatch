@@ -101,8 +101,8 @@ button:hover{ filter:brightness(1.08); }
 }
 
 .health-icon{
-    font-size:22px;
-    margin-right:8px;
+    font-size:28px;
+    margin-right:10px;
     vertical-align:-3px;
     letter-spacing:0;
 }
@@ -131,6 +131,39 @@ button:hover{ filter:brightness(1.08); }
 .metric-grid b,
 .metric-list b{ display:block; text-align:right; font-size:16px; }
 .metric-list{ display:grid; gap:8px; }
+
+.voyage-flow{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.voyage-step{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.05);
+    padding:11px;
+}
+
+.voyage-step span{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:6px;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.voyage-step b{
+    display:block;
+    text-align:right;
+    font-size:16px;
+}
+
+.subtle-step{
+    background:rgba(0,184,217,0.04);
+}
+
+
 
 .alignment-header,
 .holding-row{

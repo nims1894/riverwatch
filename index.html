@@ -13,7 +13,7 @@
         <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
         <div class="subtitle">A personal doctrine execution system for reaching the Open Sea.</div>
-        <div class="version">Version 0.2.9</div>
+        <div class="version">Version 0.3.1</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -91,46 +91,38 @@
                 <div class="health-value"><span id="voyageHealth">96</span></div>
                 <div class="status-sub" id="voyageStatus">ON VOYAGE</div>
 
-                <div class="metric-grid">
-                    <div>
+                <div class="voyage-flow">
+                    <div class="voyage-step">
                         <span>Current Position</span>
                         <b id="currentPosition">-</b>
                     </div>
-                    <div>
-                        <span>Open Sea Target</span>
-                        <b id="openSeaTarget">-</b>
+                    <div class="voyage-step">
+                        <span>Remaining</span>
+                        <b id="remainingTime">-</b>
                     </div>
-                    <div>
-                        <span>Base Arrival</span>
+                    <div class="voyage-step">
+                        <span>Expected Arrival</span>
                         <b id="baseArrival">-</b>
                     </div>
-                    <div>
+                    <div class="voyage-step subtle-step">
+                        <span>Adjustment</span>
+                        <b id="totalAdjustment">-</b>
+                    </div>
+                    <div class="voyage-step">
                         <span>Adjusted Arrival</span>
                         <b id="adjustedArrival">-</b>
                     </div>
-                    <div>
+                    <div class="voyage-step">
+                        <span>Open Sea Target</span>
+                        <b id="openSeaTarget">-</b>
+                    </div>
+                    <div class="voyage-step">
                         <span>Voyage Drift</span>
                         <b id="voyageDrift">-</b>
                     </div>
-                    <div>
-                        <span>Effective CAGR</span>
-                        <b id="effectiveCAGR">-</b>
-                    </div>
-                    <div>
-                        <span>Base CAGR</span>
-                        <b id="baseCAGR">-</b>
-                    </div>
-                    <div>
-                        <span>River Adj.</span>
-                        <b id="riverAdjustment">-</b>
-                    </div>
-                    <div>
-                        <span>Boat Adj.</span>
-                        <b id="boatAdjustment">-</b>
-                    </div>
-                    <div>
-                        <span>Remaining</span>
-                        <b id="remainingTime">-</b>
+                    <div class="voyage-step subtle-step">
+                        <span>Gap to Destination</span>
+                        <b id="voyageGap">-</b>
                     </div>
                 </div>
             </section>

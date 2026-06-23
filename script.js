@@ -1,5 +1,5 @@
 /****************************************************************************************
- * RiverWatch Script v0.2.9
+ * RiverWatch Script v0.3.1
  * - Loads Google Sheet CSV Hub data before dashboard rendering
  * - Falls back safely to data.js dummy values if AUTO load fails
  * - Adds River Health Engine v1.1, Boat Health Engine v1.1, Voyage Health Engine v1.1
@@ -49,6 +49,7 @@ function runCalculationEngines() {
     calculatePortfolioPosition();
     calculateBoatHealth();
     calculateVoyageHealth();
+    riverwatch.calc.daysSinceAction = calculateDaysSinceAction();
     updateDecisionEngine();
 }
 
@@ -508,7 +509,8 @@ function getVoyageStatus(score) {
     if (score >= 95) return "AHEAD OF COURSE";
     if (score >= 85) return "ON COURSE";
     if (score >= 75) return "MINOR CORRECTION";
-    if (score >= 65) return "OFF COURSE";
+    if (score >= 60) return "OFF COURSE";
+    if (score >= 40) return "MAJOR CORRECTION";
     return "LOST AT SEA";
 }
 
@@ -516,23 +518,28 @@ function updateDecisionEngine() {
     const river = Number(riverwatch.calc.riverHealth ?? 0);
     const boat = Number(riverwatch.calc.boatHealth ?? 0);
     const voyage = Number(riverwatch.calc.voyageHealth ?? 0);
+    const alignment = Number(riverwatch.calc.allocationAlignment ?? 0);
+    const inBuildPhase = isInBuildPhase() && alignment < 85;
 
     let status = "STAY THE COURSE";
     let action = "NO ACTION";
 
-    if (voyage < 80) {
+    if (inBuildPhase) {
+        status = "BUILD PHASE";
+        action = "CONTINUE BUILDING";
+    } else if (voyage < 60) {
         status = "RECOVER COURSE";
         action = "INCREASE EFFORT";
     } else if (boat < 70) {
         status = "ADAPT THE BOAT";
-        action = "ADAPT BOAT";
-    } else if (boat < 80) {
-        status = "ADAPT THE BOAT";
-        action = "REVIEW";
-    } else if (river < 60) {
-        status = "KEEP WATCH";
-        action = "WATCH";
+        action = "REBALANCE";
     } else if (river < 70) {
+        status = "KEEP WATCH";
+        action = "REVIEW";
+    } else if (river >= 80 && boat >= 85 && voyage >= 85) {
+        status = "STAY THE COURSE";
+        action = "NO ACTION";
+    } else {
         status = "KEEP WATCH";
         action = "REVIEW";
     }
@@ -543,16 +550,38 @@ function updateDecisionEngine() {
 }
 
 function buildDecisionReason(river, boat, voyage, status, action) {
+    if (status === "BUILD PHASE") {
+        return `Portfolio construction phase in progress. Target allocation expected by ${formatBuildPhaseEnd()}. No corrective action required. Stay the Course. — RiverWatch`;
+    }
     if (status === "RECOVER COURSE") {
-        return `Voyage Health is ${voyage}. The current plan is behind the Open Sea target. Recommended action: ${action}.`;
+        return `Voyage Health is ${voyage}. The current plan is materially behind the Open Sea target. Recommended action: ${action}.`;
     }
     if (status === "ADAPT THE BOAT") {
         return `Boat Health is ${boat}. The boat is not sufficiently aligned or suitable for the current river. Recommended action: ${action}.`;
     }
     if (status === "KEEP WATCH") {
-        return `River Health is ${river}. The current is weakening, but the boat and voyage remain acceptable. Recommended action: ${action}.`;
+        return `River ${river}, Boat ${boat}, Voyage ${voyage}. Conditions require observation before adaptation. Recommended action: ${action}.`;
     }
     return `River ${river}, Boat ${boat}, Voyage ${voyage}. The system remains within course. Continue the voyage.`;
+}
+
+
+function isInBuildPhase() {
+    const endText = riverwatch.manual.buildPhaseEnd;
+    if (!endText || typeof endText !== "string") return false;
+    const parts = endText.split(".").map(Number);
+    if (parts.length < 3 || parts.some(Number.isNaN)) return false;
+    const end = new Date(parts[0], parts[1] - 1, parts[2]);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return todayStart <= end;
+}
+
+function formatBuildPhaseEnd() {
+    const endText = riverwatch.manual.buildPhaseEnd || "2026.07.31";
+    const parts = endText.split(".");
+    if (parts.length >= 2) return `${parts[0]}.${parts[1]}`;
+    return endText;
 }
 
 function renderDashboard() {
@@ -596,23 +625,25 @@ function getMissionStatusClass(status) {
     const value = String(status || "").toUpperCase();
     if (value.includes("RECOVER")) return "recover";
     if (value.includes("ADAPT")) return "adapt";
+    if (value.includes("BUILD")) return "watch";
     if (value.includes("WATCH")) return "watch";
     return "";
 }
 
 function renderVoyageHealth() {
+    const totalAdjustment = (Number(riverwatch.calc.riverAdjustment ?? 0) + Number(riverwatch.calc.boatAdjustment ?? 0)) * 100;
+    const voyageGap = Math.max(0, Number(riverwatch.calc.openSeaTarget ?? 0) - Number(riverwatch.calc.adjustedArrival ?? 0));
+
     setText("voyageHealth", riverwatch.calc.voyageHealth);
-    setText("voyageStatus", getVoyageStatus(riverwatch.calc.voyageHealth));
+    setText("voyageStatus", `${getVoyageStatus(riverwatch.calc.voyageHealth)} (${riverwatch.calc.voyageHealth})`);
     setText("currentPosition", formatKRWB(riverwatch.calc.currentPosition));
-    setText("openSeaTarget", formatKRWB(riverwatch.calc.openSeaTarget));
-    setText("baseArrival", formatKRWB(riverwatch.calc.baseArrival));
-    setText("adjustedArrival", formatKRWB(riverwatch.calc.adjustedArrival));
-    setText("voyageDrift", formatSigned(riverwatch.calc.voyageDrift) + "%");
-    setText("effectiveCAGR", formatPercentValue(riverwatch.calc.effectiveCAGR * 100));
-    setText("baseCAGR", formatPercentValue(riverwatch.calc.baseCAGR * 100));
-    setText("riverAdjustment", formatSigned(riverwatch.calc.riverAdjustment * 100) + "%");
-    setText("boatAdjustment", formatSigned(riverwatch.calc.boatAdjustment * 100) + "%");
     setText("remainingTime", riverwatch.calc.remainingTime);
+    setText("baseArrival", formatKRWB(riverwatch.calc.baseArrival));
+    setText("totalAdjustment", formatSigned(totalAdjustment) + "%");
+    setText("adjustedArrival", formatKRWB(riverwatch.calc.adjustedArrival));
+    setText("openSeaTarget", formatKRWB(riverwatch.calc.openSeaTarget));
+    setText("voyageDrift", formatSigned(riverwatch.calc.voyageDrift) + "%");
+    setText("voyageGap", formatKRWB(voyageGap));
 }
 
 function renderRiverHealth() {
@@ -632,8 +663,8 @@ function renderRiverHealth() {
         ["AI CAPEX", `${String(riverwatch.manual.aiCapexTrend || "-").toUpperCase()} (${scoreText(scores.aiCapex)})`],
         ["NVDA DC Rev", `${riverwatch.manual.nvdaDcRevenueGrowth}% (${scoreText(scores.nvdaDcRevenue)})`],
         ["M2", `${String(riverwatch.manual.m2Trend || "-").toUpperCase()} (${scoreText(scores.m2)})`],
-        ["Growth Environment", riverwatch.calc.growthFavorability],
-        ["Defensive Environment", riverwatch.calc.defensiveFavorability]
+        ["Growth Environment", `${getEnvironmentLabel(riverwatch.calc.growthFavorability)} (${riverwatch.calc.growthFavorability})`],
+        ["Defensive Environment", `${getEnvironmentLabel(riverwatch.calc.defensiveFavorability)} (${riverwatch.calc.defensiveFavorability})`]
     ];
 
     metrics.forEach(([label, value]) => {
@@ -646,10 +677,10 @@ function renderRiverHealth() {
 function renderBoatHealth() {
     setText("boatHealth", riverwatch.calc.boatHealth);
     setText("boatStatus", getBoatStatus(riverwatch.calc.boatHealth));
-    setText("allocationAlignment", riverwatch.calc.allocationAlignment);
-    setText("riverSuitability", riverwatch.calc.riverSuitability);
-    setText("structuralIntegrity", riverwatch.calc.structuralIntegrity);
-    setText("captainDiscipline", riverwatch.calc.captainDiscipline);
+    setText("allocationAlignment", `${getAlignmentLabel(riverwatch.calc.allocationAlignment)} (${riverwatch.calc.allocationAlignment})`);
+    setText("riverSuitability", `${getSuitabilityLabel(riverwatch.calc.riverSuitability)} (${riverwatch.calc.riverSuitability})`);
+    setText("structuralIntegrity", `${getIntegrityLabel(riverwatch.calc.structuralIntegrity)} (${riverwatch.calc.structuralIntegrity})`);
+    setText("captainDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
     setText("boatArchetype", riverwatch.calc.boatArchetype);
     setText("growthExposure", formatPercentValue(riverwatch.calc.growthExposure));
     setText("defensiveExposure", formatPercentValue(riverwatch.calc.defensiveExposure));
@@ -710,6 +741,77 @@ function renderLogbook() {
         `;
         list.appendChild(div);
     });
+}
+
+function calculateDaysSinceAction() {
+    const dateText = riverwatch.manual.lastRebalance || riverwatch.calc.lastRebalance;
+    if (!dateText || typeof dateText !== "string") return 0;
+
+    const parts = dateText.split(".").map(Number);
+    if (parts.length < 3 || parts.some(Number.isNaN)) return 0;
+
+    const rebalance = new Date(parts[0], parts[1] - 1, parts[2]);
+    const today = new Date();
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const diffMs = todayStart - rebalance;
+
+    return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)));
+}
+
+function getEnvironmentLabel(score) {
+    const value = Number(score ?? 0);
+    if (value >= 80) return "HIGHLY FAVORABLE";
+    if (value >= 60) return "FAVORABLE";
+    if (value >= 55) return "SLIGHTLY FAVORABLE";
+    if (value >= 45) return "NEUTRAL";
+    if (value >= 35) return "SLIGHTLY UNFAVORABLE";
+    if (value >= 20) return "UNFAVORABLE";
+    return "HIGHLY UNFAVORABLE";
+}
+
+function getAlignmentLabel(score) {
+    const value = Number(score ?? 0);
+    if (value >= 90) return "ON TARGET";
+    if (value >= 80) return "NEAR TARGET";
+    if (value >= 65) return "DRIFTING";
+    if (value >= 50) return "OFF TARGET";
+    return "MISALIGNED";
+}
+
+function getSuitabilityLabel(score) {
+    const value = Number(score ?? 0);
+    if (value >= 90) return "EXCELLENT MATCH";
+    if (value >= 80) return "GOOD MATCH";
+    if (value >= 65) return "ACCEPTABLE MATCH";
+    if (value >= 50) return "POOR MATCH";
+    return "MISMATCH";
+}
+
+function getIntegrityLabel(score) {
+    const value = Number(score ?? 0);
+    if (value >= 90) return "ROBUST";
+    if (value >= 80) return "SOUND DESIGN";
+    if (value >= 70) return "ACCEPTABLE";
+    if (value >= 60) return "FRAGILE";
+    return "UNSTABLE";
+}
+
+function getDisciplineLabel(score) {
+    const value = Number(score ?? 0);
+    if (value >= 95) return "DISCIPLINED";
+    if (value >= 80) return "CONSISTENT";
+    if (value >= 60) return "INCONSISTENT";
+    return "ERRATIC";
+}
+
+function getVoyageDriftLabel(drift) {
+    const value = Number(drift ?? 0);
+    if (value > 20) return "COMFORTABLE MARGIN";
+    if (value >= 10) return "ON TRACK";
+    if (value >= 0) return "NARROW MARGIN";
+    if (value >= -10) return "SLIGHTLY BEHIND";
+    if (value >= -20) return "BEHIND SCHEDULE";
+    return "SIGNIFICANT GAP";
 }
 
 function setText(id, value) {
