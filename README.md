@@ -8,7 +8,7 @@ A personal doctrine execution system for reaching the Open Sea.
 * Adapt the Boat.
 * Continue the Voyage.
 
-## v0.3.1
+## v0.3.2
 
 This release completes the main River / Boat / Voyage dashboard flow and adds Captain Recommendation logic.
 
@@ -42,3 +42,9 @@ Google Sheet CSV Hub provides AUTO values for:
 
 The MANUAL section in `data.js` is controlled by the Captain.
 Do not modify without Captain approval.
+
+### Dashboard polish
+
+* Equal-height health cards
+* Balanced lower dashboard layout
+* River Bias and Effective CAGR visible in the main health area

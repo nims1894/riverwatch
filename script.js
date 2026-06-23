@@ -1,5 +1,5 @@
 /****************************************************************************************
- * RiverWatch Script v0.3.1
+ * RiverWatch Script v0.3.2
  * - Loads Google Sheet CSV Hub data before dashboard rendering
  * - Falls back safely to data.js dummy values if AUTO load fails
  * - Adds River Health Engine v1.1, Boat Health Engine v1.1, Voyage Health Engine v1.1
@@ -640,6 +640,7 @@ function renderVoyageHealth() {
     setText("remainingTime", riverwatch.calc.remainingTime);
     setText("baseArrival", formatKRWB(riverwatch.calc.baseArrival));
     setText("totalAdjustment", formatSigned(totalAdjustment) + "%");
+    setText("effectiveCAGR", formatPercentValue(riverwatch.calc.effectiveCAGR * 100));
     setText("adjustedArrival", formatKRWB(riverwatch.calc.adjustedArrival));
     setText("openSeaTarget", formatKRWB(riverwatch.calc.openSeaTarget));
     setText("voyageDrift", formatSigned(riverwatch.calc.voyageDrift) + "%");
@@ -664,7 +665,8 @@ function renderRiverHealth() {
         ["NVDA DC Rev", `${riverwatch.manual.nvdaDcRevenueGrowth}% (${scoreText(scores.nvdaDcRevenue)})`],
         ["M2", `${String(riverwatch.manual.m2Trend || "-").toUpperCase()} (${scoreText(scores.m2)})`],
         ["Growth Environment", `${getEnvironmentLabel(riverwatch.calc.growthFavorability)} (${riverwatch.calc.growthFavorability})`],
-        ["Defensive Environment", `${getEnvironmentLabel(riverwatch.calc.defensiveFavorability)} (${riverwatch.calc.defensiveFavorability})`]
+        ["Defensive Environment", `${getEnvironmentLabel(riverwatch.calc.defensiveFavorability)} (${riverwatch.calc.defensiveFavorability})`],
+        ["River Bias", getRiverBiasLabel(riverwatch.calc.growthFavorability, riverwatch.calc.defensiveFavorability)]
     ];
 
     metrics.forEach(([label, value]) => {
@@ -767,6 +769,19 @@ function getEnvironmentLabel(score) {
     if (value >= 35) return "SLIGHTLY UNFAVORABLE";
     if (value >= 20) return "UNFAVORABLE";
     return "HIGHLY UNFAVORABLE";
+}
+
+
+function getRiverBiasLabel(growth, defensive) {
+    const g = Number(growth ?? 50);
+    const d = Number(defensive ?? 50);
+    const diff = g - d;
+
+    if (diff >= 20) return "GROWTH FAVORED";
+    if (diff >= 8) return "SLIGHT GROWTH BIAS";
+    if (diff <= -20) return "DEFENSIVE FAVORED";
+    if (diff <= -8) return "SLIGHT DEFENSIVE BIAS";
+    return "BALANCED";
 }
 
 function getAlignmentLabel(score) {

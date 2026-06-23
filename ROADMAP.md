@@ -20,9 +20,16 @@ Decision Engine connected to Health scores.
 ### M6 - Captain Recommendation
 Build Phase logic and action narrative.
 
+## Current
+
+### v0.3.2
+* Health-card equalization
+* Lower dashboard layout rebalance
+* River Bias / Effective CAGR visibility
+
 ## Next
 
-### v0.3.x
+### v0.3.2
 * GitHub Pages validation
 * Captain Approved Baseline freeze
 * Recommendation wording refinement

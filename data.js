@@ -1,5 +1,5 @@
 /****************************************************************************
- * RiverWatch Data Configuration v0.3.0
+ * RiverWatch Data Configuration v0.3.2
  *
  * [CONST]  : 거의 변경하지 않는 독트린/문구
  * [POLICY] : 사용자가 수정 가능한 판단 기준과 가중치
@@ -22,7 +22,7 @@ const riverwatch = {
      * [CONST] Doctrine
      * ======================================================================*/
     const: {
-        version: "0.3.0",
+        version: "0.3.2",
         mission: "Stay the Course",
         subtitle: "A personal doctrine execution system for reaching the Open Sea.",
         operator: "NIMS",
@@ -179,7 +179,7 @@ const riverwatch = {
      * ======================================================================*/
     manual: {
         // [MANUAL] Voyage target / contribution
-        openSeaTarget: 1600000000,      // 1.60B = 16억원
+        openSeaTarget: 880000000,      // 1.60B = 16억원
         targetDate: "2040.12",
         expectedCAGR: 0.11,
         monthlyContribution: 1500000,   // KRW / month
