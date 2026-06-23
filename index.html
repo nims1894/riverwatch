@@ -13,7 +13,7 @@
         <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
         <div class="subtitle">A personal doctrine execution system for reaching the Open Sea.</div>
-        <div class="version">Version 0.2.3</div>
+        <div class="version">Version 0.2.9</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -87,7 +87,7 @@
             </section>
 
             <section class="card health-card voyage-card">
-                <div class="label">🧭 Voyage Health</div>
+                <div class="label"><span class="health-icon">🧭</span> Voyage Health</div>
                 <div class="health-value"><span id="voyageHealth">96</span></div>
                 <div class="status-sub" id="voyageStatus">ON VOYAGE</div>
 
@@ -97,30 +97,46 @@
                         <b id="currentPosition">-</b>
                     </div>
                     <div>
-                        <span>Expected Position</span>
-                        <b id="expectedPosition">-</b>
-                    </div>
-                    <div>
                         <span>Open Sea Target</span>
                         <b id="openSeaTarget">-</b>
                     </div>
                     <div>
-                        <span>ETA</span>
-                        <b id="eta">-</b>
+                        <span>Base Arrival</span>
+                        <b id="baseArrival">-</b>
+                    </div>
+                    <div>
+                        <span>Adjusted Arrival</span>
+                        <b id="adjustedArrival">-</b>
+                    </div>
+                    <div>
+                        <span>Voyage Drift</span>
+                        <b id="voyageDrift">-</b>
+                    </div>
+                    <div>
+                        <span>Effective CAGR</span>
+                        <b id="effectiveCAGR">-</b>
+                    </div>
+                    <div>
+                        <span>Base CAGR</span>
+                        <b id="baseCAGR">-</b>
+                    </div>
+                    <div>
+                        <span>River Adj.</span>
+                        <b id="riverAdjustment">-</b>
+                    </div>
+                    <div>
+                        <span>Boat Adj.</span>
+                        <b id="boatAdjustment">-</b>
                     </div>
                     <div>
                         <span>Remaining</span>
                         <b id="remainingTime">-</b>
                     </div>
-                    <div>
-                        <span>Projected Asset</span>
-                        <b id="projectedAsset">-</b>
-                    </div>
                 </div>
             </section>
 
             <section class="card health-card">
-                <div class="label">🌊 River Health</div>
+                <div class="label"><span class="health-icon">🌊</span> River Health</div>
                 <div class="health-value"><span id="riverHealth">88</span></div>
                 <div class="status-sub" id="riverStatus">STRONG CURRENT</div>
 
@@ -128,16 +144,20 @@
             </section>
 
             <section class="card health-card">
-                <div class="label">⛵ Boat Health</div>
+                <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
                 <div class="health-value"><span id="boatHealth">91</span></div>
-                <div class="status-sub" id="boatStatus">WELL POSITIONED</div>
+                <div class="status-sub" id="boatStatus">WELL CONFIGURED</div>
 
                 <div class="metric-list">
-                    <div><span>Alignment</span><b id="alignmentScore">-</b></div>
-                    <div><span>Suitability</span><b id="suitabilityScore">-</b></div>
-                    <div><span>Growth Suitability</span><b id="growthSuitability">-</b></div>
-                    <div><span>Defensive Suitability</span><b id="defensiveSuitability">-</b></div>
-                    <div><span>Maneuverability</span><b id="maneuverability">-</b></div>
+                    <div><span>Allocation Alignment</span><b id="allocationAlignment">-</b></div>
+                    <div><span>River Suitability</span><b id="riverSuitability">-</b></div>
+                    <div><span>Structural Integrity</span><b id="structuralIntegrity">-</b></div>
+                    <div><span>Captain Discipline</span><b id="captainDiscipline">-</b></div>
+                    <div><span>Boat Archetype</span><b id="boatArchetype">-</b></div>
+                    <div><span>Growth Exposure</span><b id="growthExposure">-</b></div>
+                    <div><span>Defensive Exposure</span><b id="defensiveExposure">-</b></div>
+                    <div><span>Cost Basis</span><b id="costBasis">-</b></div>
+                    <div><span>Boat Return</span><b id="boatReturn">-</b></div>
                 </div>
             </section>
 

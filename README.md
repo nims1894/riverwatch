@@ -2,70 +2,33 @@
 
 A personal doctrine execution system for reaching the Open Sea.
 
----
-
-## Mission
-
-**Stay the Course**
-
----
-
 ## Doctrine
 
-> Observe the River.  
-> Adapt the Boat.  
-> Continue the Voyage.
+* Observe the River.
+* Adapt the Boat.
+* Continue the Voyage.
 
----
+## v0.2.9
 
-## Core Health Architecture
+This release connects the Decision Engine to the three core health indicators.
 
-### 🧭 Voyage Health
+### Core Health
 
-Checks whether the voyage toward the Open Sea is on plan.
+* River Health: market environment
+* Boat Health: portfolio configuration and suitability
+* Voyage Health: arrival estimate against Open Sea target
 
-### 🌊 River Health
+### MarketHub
 
-Checks whether the external environment remains favorable.
+Google Sheet CSV Hub provides AUTO values for:
 
-### ⛵ Boat Health
+* USDKRW
+* VIX
+* BNO
+* QQQM / SPYM / SCHD / IAUM / BITQ
+* NVDA / MSFT / GOOGL / PLTR
 
-Checks whether the portfolio configuration is suitable for the current river.
+### Captain Input Zone
 
----
-
-## Market Data Hub
-
-RiverWatch v0.2.3 uses a Google Sheet CSV Hub.
-
-Automatic fields:
-
-- USDKRW
-- VIX
-- QQQM
-- SPYM
-- SCHD
-- IAUM
-- BITQ
-- BNO
-
-Manual fields:
-
-- AI CAPEX
-- NVDA Data Center Revenue
-- M2 trend
-- Fed state
-
----
-
-## Development Doctrine
-
-> Automate what changes often.  
-> Manualize what changes rarely.  
-> Never increase complexity for insignificant gains.
-
----
-
-## Version
-
-v0.2.3
+The MANUAL section in `data.js` is controlled by the Captain.
+Do not modify without Captain approval.

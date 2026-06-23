@@ -1,5 +1,5 @@
 /****************************************************************************
- * RiverWatch Market Engine v0.2.3
+ * RiverWatch Market Engine v0.2.4
  * Google Sheet CSV Hub Reader
  ****************************************************************************/
 
@@ -37,14 +37,21 @@ const RiverWatchMarketEngine = (() => {
             throw new Error("CSV parsed but no usable market data found.");
         }
 
-        if (csvData.USDKRW !== undefined) riverwatch.auto.usdkrw = csvData.USDKRW;
-        if (csvData.VIX !== undefined) riverwatch.auto.vix = csvData.VIX;
-        if (csvData.BNO !== undefined) riverwatch.auto.bno = csvData.BNO;
-        if (csvData.QQQM !== undefined) riverwatch.auto.QQQM = csvData.QQQM;
-        if (csvData.SPYM !== undefined) riverwatch.auto.SPYM = csvData.SPYM;
-        if (csvData.SCHD !== undefined) riverwatch.auto.SCHD = csvData.SCHD;
-        if (csvData.IAUM !== undefined) riverwatch.auto.IAUM = csvData.IAUM;
-        if (csvData.BITQ !== undefined) riverwatch.auto.BITQ = csvData.BITQ;
+        riverwatch.auto.marketPrices = riverwatch.auto.marketPrices || {};
+
+        Object.keys(csvData).forEach(key => {
+            const value = csvData[key];
+            if (key === "USDKRW") riverwatch.auto.usdkrw = value;
+            else if (key === "VIX") riverwatch.auto.vix = value;
+            else if (key === "BNO") riverwatch.auto.bno = value;
+            else if (key === "BNO_30D") riverwatch.auto.bno30d = value;
+            else {
+                // Any ticker-like key is stored as a market price.
+                // Example: QQQM, SPYM, SCHD, IAUM, BITQ, NVDA, MSFT, GOOGL, PLTR.
+                riverwatch.auto.marketPrices[key] = value;
+                riverwatch.auto[key] = value;
+            }
+        });
 
         riverwatch.auto.dataSource = "AUTO";
         riverwatch.auto.lastSync = nowString();

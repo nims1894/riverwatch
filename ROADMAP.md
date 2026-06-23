@@ -1,71 +1,31 @@
 # RiverWatch Roadmap
 
-## v0.1.3a
+## Completed
 
-Completed
+### M1 - The River Speaks
+Google Sheet MarketHub integration.
 
-- Intro Screen
-- Mission Panel
-- Portfolio Health
-- Portfolio Alignment
-- data.js separation
-- Last Sync
+### M2 - The River Thinks
+River Health Engine.
 
-## v0.2.0
+### M3 - The Boat Knows Itself
+Boat Health and portfolio calculation engine.
 
-Completed
+### M4 - The Voyage Estimates Arrival
+Voyage Health Engine.
 
-- Doctrine update
-- River / Boat / Voyage Health architecture
-- Current Allocation vs Boat Configuration
-- Recommended Action
-- Captain's Note
-- Voyage Logbook
+### M5 - The System Recommends
+Decision Engine connected to Health scores.
 
-## v0.2.1
+## Next
 
-Completed
+### v0.3.0
+* Captain Approved Baseline lock
+* Recommendation Engine refinement
+* UI polishing
+* GitHub Pages validation
 
-- data.js CONST / POLICY / MANUAL / AUTO / CALC structure
-- render function separation
-- Boat Health weight policy
-- River metric weight policy
-
-## v0.2.2
-
-Completed
-
-- Yahoo Finance PoC
-- Direct fetch fallback evaluation
-
-## v0.2.3
-
-Completed
-
-- Google Sheet CSV Hub
-- AUTO / FALLBACK display
-- BNO as Inflation Proxy
-
-## v0.3.0
-
-Planned
-
-- Actual holdings input after 2026.06.24 buy
-- Portfolio valuation engine
-- Current allocation from shares and market price
-- Voyage Health calculation engine
-
-## v0.4.0
-
-Planned
-
-- River Matrix calculation
-- Growth Favorability
-- Defensive Favorability
-- Boat Suitability calculation
-
-## v1.0
-
-Target
-
-Personal Financial Mission Control
+### Future
+* Logbook auto snapshot
+* Captain Discipline expansion
+* Transaction history / avg-price automation
