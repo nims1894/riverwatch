@@ -1,18 +1,17 @@
 /****************************************************************************
- * RiverWatch Data Configuration v0.3.2
+ * RiverWatch Data Configuration v0.4.0-cab004
  *
  * [CONST]  : 거의 변경하지 않는 독트린/문구
  * [POLICY] : 사용자가 수정 가능한 판단 기준과 가중치
- * [MANUAL] : 사용자가 직접 입력하는 목표/보유/수동 지표
+ * [MANUAL] : Fallback target configuration
  * [AUTO]   : Google Sheet CSV Hub 또는 향후 API 자동 입력값
  * [CALC]   : 계산 결과 기본값. 엔진 실패 시 fallback으로 사용
  *
  * ===========================================================================
  * CAPTAIN INPUT ZONE
- * - 대장님이 직접 입력/관리하는 값은 [MANUAL] 영역입니다.
+ * - Google Sheet v2.0이 SSOT이며 [MANUAL]은 fallback 영역입니다.
  * - Captain Approved Baseline 확정 후 ChatGPT는 승인 없이 [MANUAL] 값을 변경하지 않습니다.
- * - 수량(shares), 평단(avgPriceUSD), 현금(cashKRW)만 입력하면 Current Position,
- *   Cost Basis, Boat Return, Allocation, Voyage Health는 자동 계산됩니다.
+ * - Portfolio / ManualConfig는 Google Sheet에서 우선 로딩됩니다.
  * ===========================================================================
  ****************************************************************************/
 
@@ -22,7 +21,7 @@ const riverwatch = {
      * [CONST] Doctrine
      * ======================================================================*/
     const: {
-        version: "0.3.2",
+        version: "0.4.0-cab005.2",
         mission: "Stay the Course",
         subtitle: "A personal doctrine execution system for reaching the Open Sea.",
         operator: "NIMS",
@@ -45,14 +44,17 @@ const riverwatch = {
         marketDataHub: {
             enabled: true,
             provider: "Google Sheet CSV Hub",
-            csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0",
+            marketCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0",
+            portfolioCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1022059028",
+            manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
+            csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 5000
         },
 
         riverMetricWeights: {
             fedRate: 25,
             vix: 20,
-            bno: 15,
+            oil: 15,
             usdkrw: 10,
             aiCapex: 15,
             nvdaDcRevenue: 10,
@@ -74,12 +76,13 @@ const riverwatch = {
                 { max: 35, score: 62, label: "Fear rising" },
                 { max: Infinity, score: 40, label: "Stress" }
             ],
-            bnoChange30d: [
-                { max: -10, score: 92, label: "Inflation cooling strongly" },
-                { max: -5, score: 86, label: "Inflation cooling" },
-                { max: 5, score: 80, label: "Neutral" },
-                { max: 10, score: 65, label: "Inflation pressure rising" },
-                { max: Infinity, score: 45, label: "Inflation pressure high" }
+            oilPressure: [
+                { max: 50, score: 50, growth: -2, defensive: 2, label: "Recession risk" },
+                { max: 65, score: 70, growth: -1, defensive: 1, label: "Demand softening" },
+                { max: 85, score: 95, growth: 2, defensive: -1, label: "Normal growth zone" },
+                { max: 100, score: 75, growth: -1, defensive: 1, label: "Inflation pressure" },
+                { max: 120, score: 50, growth: -2, defensive: 2, label: "Energy shock" },
+                { max: Infinity, score: 20, growth: -3, defensive: 3, label: "Severe oil stress" }
             ],
             fedRateState: {
                 cutting: { score: 95, growth: 3, defensive: -2, label: "Cutting cycle" },
@@ -164,36 +167,22 @@ const riverwatch = {
                 { max: 35, growth: -2, defensive: 2, label: "Fear rising" },
                 { max: Infinity, growth: -3, defensive: 3, label: "Stress" }
             ],
-            bnoChange30d: [
-                { max: -10, growth: 2, defensive: -2, label: "Inflation cooling strongly" },
-                { max: -5, growth: 1, defensive: -1, label: "Inflation cooling" },
-                { max: 5, growth: 0, defensive: 0, label: "Neutral" },
-                { max: 10, growth: -1, defensive: 1, label: "Inflation pressure rising" },
-                { max: Infinity, growth: -2, defensive: 2, label: "Inflation pressure high" }
+            oilPressure: [
+                { max: 50, growth: -2, defensive: 2, label: "Recession risk" },
+                { max: 65, growth: -1, defensive: 1, label: "Demand softening" },
+                { max: 85, growth: 2, defensive: -1, label: "Normal growth zone" },
+                { max: 100, growth: -1, defensive: 1, label: "Inflation pressure" },
+                { max: 120, growth: -2, defensive: 2, label: "Energy shock" },
+                { max: Infinity, growth: -3, defensive: 3, label: "Severe oil stress" }
             ]
         }
     },
 
     /* ========================================================================
-     * [MANUAL] CAPTAIN INPUT ZONE - 대장님 직접 수정 영역
+     * [MANUAL] Fallback target configuration
+     * Google Sheet v2.0이 우선이며, 이 영역은 비상 fallback으로만 사용합니다.
      * ======================================================================*/
     manual: {
-        // [MANUAL] Voyage target / contribution
-        openSeaTarget: 1600000000,      // 1.60B = 16억원
-        targetDate: "2040.12",
-        expectedCAGR: 0.11,
-        monthlyContribution: 1200000,   // KRW / month
-        lastRebalance: "2026.06.23",        // [MANUAL] Captain input
-        buildPhaseEnd: "2026.07.31",      // [MANUAL] Portfolio construction phase end
-
-        // [MANUAL] River inputs that do not need daily automation
-        aiCapexTrend: "increasing",
-        nvdaDcRevenueGrowth: 40,
-        fedRateState: "pause",
-        m2Trend: "stable",
-        bnoReference30d: 40.00, // Google Sheet에 BNO_30D가 있으면 AUTO가 우선됨.
-
-        // [MANUAL] Boat target configuration
         boatConfiguration: {
             QQQM: 40,
             SPYM: 25,
@@ -201,31 +190,46 @@ const riverwatch = {
             IAUM: 8,
             BITQ: 2,
             INDIVIDUAL: 10
-        },
-
-        // [MANUAL] Portfolio input.
-        // 수량과 평단만 입력하면 Current Position / Cost Basis / Return / Allocation은 자동 계산됩니다.
-        portfolio: {
-            cashKRW: 0,
-
-            etfs: [
-                { ticker: "QQQM", shares: 65, avgPriceUSD: 252.2707 },
-                { ticker: "SPYM", shares: 20, avgPriceUSD: 86.7 },
-                { ticker: "SCHD", shares: 4, avgPriceUSD: 32.335 },
-                { ticker: "IAUM", shares: 40, avgPriceUSD: 45.14 },
-                { ticker: "BITQ", shares: 1, avgPriceUSD: 28.61 }
-            ],
-
-            // 개별주는 수량/평단만 입력합니다.
-            // 현재가는 Google Sheet CSV Hub에서 AUTO로 가져옵니다.
-            individualStocks: [
-                { ticker: "NVDA", shares: 20, avgPriceUSD: 188.1556 },
-                { ticker: "MSFT", shares: 10, avgPriceUSD: 400.922 },
-                { ticker: "GOOGL", shares: 10, avgPriceUSD: 308.245 },
-                { ticker: "PLTR", shares: 30, avgPriceUSD: 149.5867 }
-            ]
         }
     },
+
+    /* ========================================================================
+     * [MANUAL CONFIG] Fallback captain inputs
+     * Google Sheet ManualConfig 탭이 SSOT입니다.
+     * ======================================================================*/
+    manualConfig: {
+        BrentPrice: 77.1,
+        aiCapexTrend: "increasing",
+        nvdaDcRevenueGrowth: 40,
+        fedRateState: "pause",
+        m2Trend: "stable",
+        cashKRW: 0,
+        lastActionDate: "2026.06.23",
+        portfolioBuildEndDate: "2026.07.31",
+        openSeaTargetKRW: 1600000000,
+        targetDate: "2040.12.31",
+        expectedCAGR: 11.0,
+        monthlyContributionKRW: 1200000,
+        boatAdjustment: 0.0,
+        voyagePhaseMode: "AUTO"
+    },
+
+    /* ========================================================================
+     * [PORTFOLIO] Fallback holdings
+     * Google Sheet Portfolio 탭이 SSOT입니다.
+     * avgCostKRW = 매수 당시 환율까지 반영한 원화 평단가입니다.
+     * ======================================================================*/
+    portfolio: [
+        { ticker: "QQQM", shares: 65, avgCostKRW: 386089, targetWeight: 40 },
+        { ticker: "SPYM", shares: 20, avgCostKRW: 132678, targetWeight: 25 },
+        { ticker: "SCHD", shares: 4, avgCostKRW: 49498, targetWeight: 15 },
+        { ticker: "IAUM", shares: 40, avgCostKRW: 69096, targetWeight: 8 },
+        { ticker: "BITQ", shares: 1, avgCostKRW: 43006, targetWeight: 2 },
+        { ticker: "NVDA", shares: 20, avgCostKRW: 289240, targetWeight: 0 },
+        { ticker: "MSFT", shares: 10, avgCostKRW: 616207, targetWeight: 0 },
+        { ticker: "GOOGL", shares: 10, avgCostKRW: 473879, targetWeight: 0 },
+        { ticker: "PLTR", shares: 30, avgCostKRW: 230025, targetWeight: 0 }
+    ],
 
     /* ========================================================================
      * [AUTO] CSV Hub 실패 시 fallback 값
@@ -233,10 +237,15 @@ const riverwatch = {
     auto: {
         lastSync: "2026.06.23 13:30",
         dataSource: "FALLBACK",
+        syncStatus: {
+            MarketData: false,
+            Portfolio: false,
+            ManualConfig: false
+        },
+        syncErrors: {},
         usdkrw: 1538.25,
         vix: 17.28,
-        bno: 43.12,
-        bno30d: null,
+        BrentPrice: 77.1,
         marketPrices: {},
         QQQM: 303.90,
         SPYM: 86.70,
@@ -280,6 +289,11 @@ const riverwatch = {
         effectiveCAGR: 0.1125,
         eta: "2040.12",
         remainingTime: "14y 6m",
+        voyagePhase: "BUILD_PHASE",
+        assetProgress: 0,
+        timeProgress: 0,
+        voyageProgress: 0,
+        extraTimeRequired: "-",
 
         allocationHoldings: [],
         allocationAlignment: 92,

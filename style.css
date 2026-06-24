@@ -72,7 +72,15 @@ button:hover{ filter:brightness(1.08); }
 .last-sync{ margin-top:6px; font-size:12px; color:var(--muted); }
 #dataSource{ color:var(--yellow); font-weight:700; }
 #dataSource.auto{ color:var(--green); }
+#dataSource.online{ color:var(--green); }
 #dataSource.fallback{ color:var(--yellow); }
+#dataSource.partial{ color:var(--orange); }
+.sync-detail{
+    margin-top:4px;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:0.3px;
+}
 
 .dashboard-grid{
     display:grid;
@@ -90,7 +98,7 @@ button:hover{ filter:brightness(1.08); }
 
 .mission-card{ grid-column:span 3; }
 .voyage-card{ grid-column:span 1; }
-.allocation-card{ grid-column:span 2; }
+.allocation-card{ grid-column:span 3; }
 .action-card{ grid-column:span 1; }
 .captain-card{ grid-column:span 1; }
 .logbook-card{ grid-column:span 2; }
@@ -234,7 +242,7 @@ button:hover{ filter:brightness(1.08); }
 
 @media(max-width:900px){
     .dashboard-grid{ grid-template-columns:1fr; }
-    .mission-card,.allocation-card,.action-card,.captain-card,.logbook-card,.philosophy-card,.voyage-card{ grid-column:span 1; grid-row:auto; }
+    .mission-card,.allocation-card,.action-card,.captain-card,.logbook-card,.bridge-card,.philosophy-card,.voyage-card{ grid-column:span 1; grid-row:auto; }
     .health-card{ min-height:auto; }
     .health-card .metric-list,.health-card .voyage-flow{ grid-template-rows:auto; }
     .mini-grid{ grid-template-columns:1fr 1fr; }
@@ -252,4 +260,125 @@ button:hover{ filter:brightness(1.08); }
     .alignment-header,.holding-row{ grid-template-columns:1fr 0.8fr 0.8fr; }
     .alignment-header span:nth-child(4),.alignment-header span:nth-child(5),
     .holding-row span:nth-child(4),.holding-row span:nth-child(5){ display:none; }
+}
+
+/* CAB-005.2 Boat Configuration emphasis */
+.allocation-card{
+    order:4;
+}
+.bridge-card{
+    order:5;
+}
+.philosophy-card{
+    order:6;
+}
+.allocation-card .label{
+    margin-bottom:14px;
+}
+.allocation-card .holding-row{
+    min-height:44px;
+}
+.allocation-card .holding-row span:first-child{
+    font-weight:800;
+}
+
+/* CAB-005 Captain's Bridge */
+.bridge-card{
+    grid-column:span 3;
+}
+
+.bridge-grid{
+    display:grid;
+    grid-template-columns:1.15fr 0.95fr 1fr;
+    gap:16px;
+}
+
+.bridge-section{
+    background:rgba(255,255,255,0.03);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:16px;
+    min-height:145px;
+}
+
+.bridge-recovery{
+    grid-column:span 3;
+}
+
+.bridge-title{
+    color:var(--muted);
+    font-size:12px;
+    letter-spacing:1.3px;
+    text-transform:uppercase;
+    margin-bottom:12px;
+    font-weight:700;
+}
+
+.bridge-note p{
+    color:var(--text);
+    line-height:1.75;
+}
+
+.snapshot-date{
+    font-size:16px;
+    font-weight:800;
+    margin-bottom:16px;
+}
+
+.snapshot-metrics{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+}
+
+.snapshot-metrics div,
+.recovery-grid div{
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.05);
+    padding:12px;
+}
+
+.snapshot-metrics span,
+.recovery-grid span,
+.recovery-grid small{
+    display:block;
+    color:var(--muted);
+    font-size:12px;
+    margin-bottom:6px;
+}
+
+.recovery-grid small{
+    font-size:11px;
+    margin-bottom:10px;
+}
+
+.snapshot-metrics b,
+.recovery-grid b{
+    display:block;
+    text-align:right;
+    font-size:18px;
+}
+
+.bridge-order-value{
+    font-size:30px;
+    font-weight:800;
+    color:var(--green);
+    margin:8px 0 14px;
+}
+
+.bridge-rationale{
+    color:var(--muted);
+    line-height:1.6;
+}
+
+.recovery-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+@media(max-width:900px){
+    .bridge-card{ grid-column:span 1; }
+    .bridge-grid{ grid-template-columns:1fr; }
+    .bridge-recovery{ grid-column:span 1; }
+    .snapshot-metrics,.recovery-grid{ grid-template-columns:1fr; }
 }

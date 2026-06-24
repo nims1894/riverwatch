@@ -13,7 +13,7 @@
         <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
         <div class="subtitle">A personal doctrine execution system for reaching the Open Sea.</div>
-        <div class="version">Version 0.3.2</div>
+        <div class="version">Version 0.4.0 CAB-005.2</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -51,6 +51,7 @@
                 <div class="last-sync">
                     Last Sync <span id="lastSync"></span> · <span id="dataSource">FALLBACK</span>
                 </div>
+                <div class="sync-detail" id="syncDetail">MKT -- · PORT -- · CFG --</div>
             </div>
         </header>
 
@@ -61,35 +62,35 @@
                 <div class="mission-text" id="mission">Stay the Course</div>
 
                 <div class="label">Status</div>
-                <div class="status-text" id="status">STAY THE COURSE</div>
+                <div class="status-text" id="status">--</div>
 
                 <div class="mini-grid">
                     <div>
                         <div class="label">Recommended Action</div>
-                        <div class="value" id="recommendedAction">NO ACTION</div>
+                        <div class="value" id="recommendedAction">--</div>
                     </div>
 
                     <div>
                         <div class="label">Days Since Action</div>
-                        <div class="value" id="daysSinceAction">36</div>
+                        <div class="value" id="daysSinceAction">--</div>
                     </div>
 
                     <div>
-                        <div class="label">Last Rebalance</div>
-                        <div class="value" id="lastRebalance">2026.05.17</div>
+                        <div class="label">Last Action</div>
+                        <div class="value" id="lastRebalance">--</div>
                     </div>
 
                     <div>
                         <div class="label">Doctrine Compliance</div>
-                        <div class="value" id="doctrineCompliance">100%</div>
+                        <div class="value" id="doctrineCompliance">--</div>
                     </div>
                 </div>
             </section>
 
             <section class="card health-card voyage-card">
                 <div class="label"><span class="health-icon">🧭</span> Voyage Health</div>
-                <div class="health-value"><span id="voyageHealth">96</span></div>
-                <div class="status-sub" id="voyageStatus">ON VOYAGE</div>
+                <div class="health-value"><span id="voyageHealth">--</span></div>
+                <div class="status-sub" id="voyageStatus">--</div>
 
                 <div class="voyage-flow">
                     <div class="voyage-step">
@@ -133,16 +134,16 @@
 
             <section class="card health-card">
                 <div class="label"><span class="health-icon">🌊</span> River Health</div>
-                <div class="health-value"><span id="riverHealth">88</span></div>
-                <div class="status-sub" id="riverStatus">STRONG CURRENT</div>
+                <div class="health-value"><span id="riverHealth">--</span></div>
+                <div class="status-sub" id="riverStatus">--</div>
 
                 <div class="metric-list" id="riverMetricList"></div>
             </section>
 
             <section class="card health-card">
                 <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
-                <div class="health-value"><span id="boatHealth">91</span></div>
-                <div class="status-sub" id="boatStatus">WELL CONFIGURED</div>
+                <div class="health-value"><span id="boatHealth">--</span></div>
+                <div class="status-sub" id="boatStatus">--</div>
 
                 <div class="metric-list">
                     <div><span>Allocation Alignment</span><b id="allocationAlignment">-</b></div>
@@ -158,7 +159,7 @@
             </section>
 
             <section class="card allocation-card">
-                <div class="label">Current Allocation vs Boat Configuration</div>
+                <div class="label">⛵ Boat Configuration</div>
 
                 <div class="alignment-header allocation-header">
                     <span>Asset</span>
@@ -171,20 +172,52 @@
                 <div id="allocationList" class="holdings-list"></div>
             </section>
 
-            <section class="card action-card">
-                <div class="label">Recommended Action</div>
-                <div class="action-value" id="actionValue">NO ACTION</div>
-                <div class="action-reason" id="actionReason">The river remains favorable. The boat is well configured. Continue the voyage.</div>
-            </section>
+            <section class="card bridge-card">
+                <div class="label">🧭 Captain's Bridge</div>
 
-            <section class="card captain-card">
-                <div class="label">Captain's Note</div>
-                <p id="captainNote">Architecture stabilized. Proceed to implementation.</p>
-            </section>
+                <div class="bridge-grid">
+                    <div class="bridge-section bridge-note">
+                        <div class="bridge-title">Captain's Note</div>
+                        <p id="bridgeCaptainNote">Loading captain note...</p>
+                    </div>
 
-            <section class="card logbook-card">
-                <div class="label">📖 Voyage Logbook</div>
-                <div id="logbookList" class="logbook-list"></div>
+                    <div class="bridge-section bridge-snapshot">
+                        <div class="bridge-title">Today's Log</div>
+                        <div class="snapshot-date" id="bridgeSnapshotDate">--</div>
+                        <div class="snapshot-metrics">
+                            <div><span>🌊 River</span><b id="bridgeRiverScore">--</b></div>
+                            <div><span>⛵ Boat</span><b id="bridgeBoatScore">--</b></div>
+                            <div><span>🧭 Voyage</span><b id="bridgeVoyageScore">--</b></div>
+                        </div>
+                    </div>
+
+                    <div class="bridge-section bridge-order">
+                        <div class="bridge-title">Captain's Order</div>
+                        <div class="bridge-order-value" id="bridgeOrder">--</div>
+                        <div class="bridge-rationale" id="bridgeOrderRationale">Loading order rationale...</div>
+                    </div>
+
+                    <div class="bridge-section bridge-recovery">
+                        <div class="bridge-title">Voyage Recovery Options</div>
+                        <div class="recovery-grid">
+                            <div>
+                                <span>Preferred Recovery</span>
+                                <small>Time Extension</small>
+                                <b id="bridgeExtraTime">--</b>
+                            </div>
+                            <div>
+                                <span>Alternative Recovery</span>
+                                <small>Contribution Needed</small>
+                                <b id="bridgeRequiredContribution">--</b>
+                            </div>
+                            <div>
+                                <span>Aggressive Recovery</span>
+                                <small>Required CAGR</small>
+                                <b id="bridgeRequiredCAGR">--</b>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section class="card philosophy-card">

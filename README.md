@@ -8,43 +8,49 @@ A personal doctrine execution system for reaching the Open Sea.
 * Adapt the Boat.
 * Continue the Voyage.
 
-## v0.3.2
+## v0.4.0 CAB-004.1
 
-This release completes the main River / Boat / Voyage dashboard flow and adds Captain Recommendation logic.
+This release establishes Google Sheet v2.0 as the operating database and introduces a phase-aware Voyage State Machine.
 
-### Core Health
+### Google Sheet v2.0
 
-* River Health: market environment and river bias
-* Boat Health: portfolio allocation, suitability, structure, and discipline
-* Voyage Health: arrival estimate against Open Sea target
+RiverWatch now reads:
 
-### Captain Recommendation
+* MarketData: USDKRW, VIX, ETF and stock prices
+* Portfolio: shares, AvgCostKRW, target weights
+* ManualConfig: captain judgment and voyage assumptions
+* CaptainGuide: human operating manual
 
-The Decision Engine now supports:
+### Core Engines
 
-* BUILD PHASE / CONTINUE BUILDING
-* RECOVER COURSE / INCREASE EFFORT
-* ADAPT THE BOAT / REBALANCE
-* KEEP WATCH / REVIEW
-* STAY THE COURSE / NO ACTION
+* River Engine: market and macro environment
+* Boat Engine: portfolio structure and alignment
+* Voyage Engine: adjusted arrival versus Open Sea target
+* Voyage State Machine: current voyage phase based on current position and time progress
 
-### MarketHub
+### Voyage Phases
 
-Google Sheet CSV Hub provides AUTO values for:
+* BUILD_PHASE
+* EARLY_VOYAGE
+* MID_VOYAGE
+* OPEN_SEA_APPROACH
+* OPEN_SEA_REACHED
+* TARGET_DATE_REACHED
 
-* USDKRW
-* VIX
-* BNO
-* QQQM / SPYM / SCHD / IAUM / BITQ
-* NVDA / MSFT / GOOGL / PLTR
+### Key Changes
 
-### Captain Input Zone
+* AvgCostKRW is used for true KRW cost basis.
+* BrentPrice is manually controlled in ManualConfig.
+* Brent scoring treats 65~85 USD/bbl as a normal growth zone.
+* Captain's Note is dynamically generated from phase, River, Boat, Voyage, and action.
+* Latest Snapshot replaces the static Voyage Logbook placeholder.
 
-The MANUAL section in `data.js` is controlled by the Captain.
-Do not modify without Captain approval.
+## Captain Input Rule
 
-### Dashboard polish
+Google Sheet is the Single Source of Truth.
+`data.js` is fallback only.
 
-* Equal-height health cards
-* Balanced lower dashboard layout
-* River Bias and Effective CAGR visible in the main health area
+
+### Sync detail
+
+Topbar now shows sheet-level sync status: `MKT OK · PORT OK · CFG OK`.
