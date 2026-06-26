@@ -1328,7 +1328,7 @@ function renderLogbookChart(rows) {
         Number(row.targetValueKRW || 0)
     )), 1);
 
-    const chartWidth = Math.max(720, Math.min(2600, 160 + enrichedRows.length * 160 + 80));
+    const chartWidth = Math.max(320, el.clientWidth || 720);
     const chartHeight = 250;
     const pad = { left: 72, right: 34, top: 28, bottom: 44 };
     const plotW = chartWidth - pad.left - pad.right;

@@ -1488,3 +1488,7 @@ body{
 .trim-target-label{
     display:none !important;
 }
+
+/* CAB-008.4 */
+.journey-scroll-x{overflow-x:hidden!important;}
+.journey-svg{width:100%;height:250px;display:block;}
