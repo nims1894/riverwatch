@@ -41,3 +41,12 @@ Status: Eye Comfort patch ready for review.
 ## CAB-008.1 Portfolio Journey Scale Patch
 - Fixed Portfolio Journey X-axis range to use actual OpenSeaLogbook record dates instead of the long-term target date.
 - Long-term Open Sea target remains represented in summary/progress cards.
+## CAB-008.3 Trim Deck Visual Enhancement Pass
+- Changed Trim Deck bar logic from ratio-based progress to doctrine-line deviation visualization.
+- Current bar remains filled from the left.
+- Minimum/Cap marker is fixed to a consistent local position.
+- Gap/Excess is shown as 5%-point block-style deviation around the doctrine marker.
+## CAB-008.3b Trim Deck Cleanup Pass
+- Removed gap-side auxiliary block rendering for cleaner Trim Deck bars.
+- Changed deviation block calculation to round away from zero by 5%-point units.
+- Kept only the upward target triangle marker shape.

@@ -1193,15 +1193,20 @@ function renderBoatyard() {
             const current = Number(item.current ?? 0);
             const limit = Number(rule.limit ?? 0);
             const delta = current - limit;
-            const localScaleMax = Math.max(
-                limit > 0 ? limit / 0.72 : 1,
-                current > 0 ? current / 0.92 : 1,
-                limit,
-                current,
-                1
-            );
-            const currentPct = Math.max(1.5, Math.min(96, (current / localScaleMax) * 100));
-            const limitPct = Math.max(4, Math.min(94, (limit / localScaleMax) * 100));
+
+            // CAB-008.3 Trim Deck Visual Pass
+            // The marker is kept in a consistent local position, while the current bar
+            // moves left/right from that doctrine line in 5%-point blocks.
+            const markerPct = 70;
+            const blockPct = 6;
+            const blockCountRaw = delta === 0 ? 0 : (delta > 0 ? Math.ceil(delta / 5) : Math.floor(delta / 5));
+            const blockCount = Math.max(-5, Math.min(5, blockCountRaw));
+            const currentPct = Math.max(8, Math.min(96, markerPct + blockCount * blockPct));
+
+            const gapStart = Math.min(currentPct, markerPct);
+            const gapWidth = Math.abs(markerPct - currentPct);
+            const isExcess = delta > 0;
+            const showDeviation = isExcess && Math.abs(delta) >= 0.5;
 
             const row = document.createElement("div");
             row.className = "trim-card";
@@ -1213,7 +1218,8 @@ function renderBoatyard() {
                 <div class="trim-bar-wrap">
                     <div class="trim-bar">
                         <div class="trim-fill" style="width:${currentPct}%"></div>
-                        <div class="trim-target" style="left:${limitPct}%"></div>
+                        ${showDeviation ? `<div class="${isExcess ? "trim-excess-blocks" : "trim-gap-blocks"}" style="left:${gapStart}%; width:${gapWidth}%"></div>` : ""}
+                        <div class="trim-target" style="left:${markerPct}%"></div>
                     </div>
                 </div>
                 <div class="trim-stats">
