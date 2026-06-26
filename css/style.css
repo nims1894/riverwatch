@@ -1259,3 +1259,180 @@ body{
         width:100%;
     }
 }
+
+/* ==========================================================================
+   CAB-007.2 Drydock Polish
+   - Captain's Bridge compact bullet notes
+   - Trim Deck doctrine compliance marker
+   - Portfolio Journey time-scaled line chart
+   - Voyage Timeline latest-first milestone cards
+   ========================================================================== */
+#bridgeCaptainNote,
+#bridgeOrderRationale{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    line-height:1.45;
+}
+.bridge-bullet{
+    position:relative;
+    padding-left:18px;
+    color:var(--text);
+}
+.bridge-bullet::before{
+    content:"•";
+    position:absolute;
+    left:0;
+    top:0;
+    color:var(--accent, var(--cyan));
+    font-weight:700;
+}
+
+.trim-target{
+    top:-7px !important;
+    width:2px !important;
+    height:24px !important;
+    background:var(--text-strong) !important;
+    border-radius:2px !important;
+    box-shadow:none !important;
+    transform:translateX(-1px);
+}
+.trim-target::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:25px;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:6px solid transparent;
+    border-right:6px solid transparent;
+    border-bottom:8px solid var(--text-strong);
+}
+.trim-target-label{ display:none !important; }
+.badge.building{ color:var(--warning, var(--yellow)); }
+.badge.diluting{ color:var(--cyan); }
+
+.logbook-chart{
+    height:330px !important;
+    max-height:330px !important;
+    overflow-y:hidden !important;
+    overflow-x:hidden;
+    padding-right:0 !important;
+}
+.journey-legend{
+    display:flex;
+    gap:18px;
+    align-items:center;
+    flex-wrap:wrap;
+    margin:8px 0 12px;
+    color:var(--text-soft);
+    font-size:12px;
+}
+.journey-legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+}
+.legend-line{
+    display:inline-block;
+    width:28px;
+    height:0;
+    border-top:2px solid var(--text-soft);
+}
+.legend-line.market{ border-top-width:4px; border-color:var(--cyan); }
+.legend-line.course{ border-top-style:dashed; border-color:var(--muted); }
+.journey-scroll-x{
+    max-width:100%;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding-bottom:8px;
+    scrollbar-width:thin;
+    scrollbar-color:#2E3848 transparent;
+}
+.journey-scroll-x::-webkit-scrollbar{
+    height:6px;
+}
+.journey-scroll-x::-webkit-scrollbar-thumb{
+    background:#2E3848;
+    border-radius:8px;
+}
+.journey-scroll-x::-webkit-scrollbar-track{
+    background:transparent;
+}
+.journey-svg{
+    display:block;
+    overflow:visible;
+}
+.journey-axis{
+    stroke:rgba(203,213,225,0.16);
+    stroke-width:1;
+}
+.journey-tick line{
+    stroke:rgba(203,213,225,0.075);
+    stroke-width:1;
+}
+.journey-tick text{
+    fill:var(--muted);
+    font-size:11px;
+}
+.journey-line{
+    fill:none;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.journey-line.principal{
+    stroke:var(--text-soft);
+    stroke-width:2;
+}
+.journey-line.market{
+    stroke:var(--cyan);
+    stroke-width:4;
+}
+.journey-line.course{
+    stroke:var(--muted);
+    stroke-width:2;
+    stroke-dasharray:8 7;
+}
+.journey-point{ stroke:var(--bg); stroke-width:2; }
+.journey-point.principal{ fill:var(--text-soft); }
+.journey-point.market{ fill:var(--cyan); }
+.journey-point.course{ fill:var(--muted); }
+
+.open-sea-timeline{
+    max-height:440px;
+    overflow-y:auto;
+    overflow-x:hidden;
+}
+.timeline-title{
+    margin-top:6px;
+    color:var(--text-strong);
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.02em;
+}
+.timeline-values{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin-top:10px;
+}
+.timeline-values span{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    background:rgba(0,0,0,0.12);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:8px 10px;
+    color:var(--text-soft);
+    font-size:11px;
+}
+.timeline-values b{
+    color:var(--text-strong);
+    font-size:14px;
+}
+@media(max-width:640px){
+    .timeline-values{ grid-template-columns:1fr; }
+    .journey-legend{ gap:10px; }
+}

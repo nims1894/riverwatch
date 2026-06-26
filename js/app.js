@@ -198,21 +198,19 @@ function calculateAllocationAlignment(holdings, target) {
     if (!holdings.length) return 0;
 
     const scores = holdings.map(item => {
-        const targetValue = Number(target[item.ticker] ?? 0);
+        const ticker = String(item.ticker || "").toUpperCase();
+        const limit = Number(target[ticker] ?? item.target ?? 0);
         const currentValue = Number(item.current ?? 0);
-        const diff = Math.abs(currentValue - targetValue);
-        return scoreAllocationDeviation(diff);
+        if (limit <= 0) return 100;
+
+        if (ticker === "INDIVIDUAL") {
+            return currentValue <= limit ? 100 : Math.round(Math.max(0, Math.min(100, (limit / currentValue) * 100)));
+        }
+
+        return currentValue >= limit ? 100 : Math.round(Math.max(0, Math.min(100, (currentValue / limit) * 100)));
     });
 
     return Math.round(scores.reduce((sum, value) => sum + value, 0) / scores.length);
-}
-
-function scoreAllocationDeviation(diff) {
-    if (diff <= 1) return 100;
-    if (diff <= 3) return 90;
-    if (diff <= 5) return 80;
-    if (diff <= 10) return 60;
-    return 40;
 }
 
 function calculateBoatExposure(holdings) {
@@ -1004,7 +1002,8 @@ function formatBridgeNote(text) {
         .map(line => line.trim())
         .filter(Boolean)
         .map(line => line.endsWith(".") ? line : line + ".")
-        .join("<br><br>");
+        .map(line => `<span class="bridge-bullet">${line}</span>`)
+        .join("");
 }
 
 function formatPhaseLabel(value) {
@@ -1135,11 +1134,11 @@ function getRiverBiasLabel(growth, defensive) {
 
 function getAlignmentLabel(score) {
     const value = Number(score ?? 0);
-    if (value >= 90) return "ON TARGET";
-    if (value >= 80) return "NEAR TARGET";
-    if (value >= 65) return "DRIFTING";
-    if (value >= 50) return "OFF TARGET";
-    return "MISALIGNED";
+    if (value >= 90) return "DOCTRINE FIT";
+    if (value >= 75) return "MOSTLY BUILT";
+    if (value >= 60) return "BUILDING";
+    if (value >= 45) return "EARLY BUILD";
+    return "NOT ALIGNED";
 }
 
 function getSuitabilityLabel(score) {
@@ -1190,38 +1189,37 @@ function renderBoatyard() {
     if (deck) {
         deck.innerHTML = "";
         (riverwatch.calc.allocationHoldings || []).forEach(item => {
-            const target = Number(riverwatch.manual.boatConfiguration[item.ticker] ?? 0);
+            const rule = getDoctrineRule(item);
             const current = Number(item.current ?? 0);
-            const delta = current - target;
-            const status = getAllocationStatus(delta);
+            const limit = Number(rule.limit ?? 0);
+            const delta = current - limit;
             const localScaleMax = Math.max(
-                target > 0 ? target / 0.72 : 1,
+                limit > 0 ? limit / 0.72 : 1,
                 current > 0 ? current / 0.92 : 1,
-                target,
+                limit,
                 current,
                 1
             );
             const currentPct = Math.max(1.5, Math.min(96, (current / localScaleMax) * 100));
-            const targetPct = Math.max(4, Math.min(94, (target / localScaleMax) * 100));
+            const limitPct = Math.max(4, Math.min(94, (limit / localScaleMax) * 100));
 
             const row = document.createElement("div");
             row.className = "trim-card";
             row.innerHTML = `
                 <div class="trim-head">
                     <b>${formatTicker(item.ticker)}</b>
-                    <span class="badge ${status.className}">${status.label}</span>
+                    <span class="badge ${rule.className}">${rule.label}</span>
                 </div>
                 <div class="trim-bar-wrap">
                     <div class="trim-bar">
                         <div class="trim-fill" style="width:${currentPct}%"></div>
-                        <div class="trim-target" style="left:${targetPct}%"></div>
+                        <div class="trim-target" style="left:${limitPct}%"></div>
                     </div>
-                    <div class="trim-target-label" style="left:${targetPct}%">Target</div>
                 </div>
                 <div class="trim-stats">
                     <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
-                    <div><span>Target</span><b>${target.toFixed(1)}%</b></div>
-                    <div><span>Delta</span><b>${formatSigned(delta)}%</b></div>
+                    <div><span>${rule.limitLabel}</span><b>${limit.toFixed(1)}%</b></div>
+                    <div><span>${rule.deltaLabel}</span><b>${formatSigned(delta)}%</b></div>
                 </div>
             `;
             deck.appendChild(row);
@@ -1235,16 +1233,13 @@ function renderTrimSummary() {
     const el = document.getElementById("trimSummary");
     if (!el) return;
 
-    const groups = { OVERWEIGHT: [], UNDERWEIGHT: [], "ON TARGET": [] };
+    const groups = { SATISFIED: [], BUILDING: [], DILUTING: [], "WITHIN CAP": [] };
 
     (riverwatch.calc.allocationHoldings || []).forEach(item => {
-        const target = Number(riverwatch.manual.boatConfiguration[item.ticker] ?? 0);
-        const delta = Number(item.current ?? 0) - target;
-        const status = getAllocationStatus(delta).label;
+        const rule = getDoctrineRule(item);
+        const delta = Number(item.current ?? 0) - Number(rule.limit ?? 0);
         const label = `${formatTicker(item.ticker)} (${formatSigned(delta)}%)`;
-        if (status === "OVER") groups.OVERWEIGHT.push({ label, delta: Math.abs(delta) });
-        else if (status === "UNDER") groups.UNDERWEIGHT.push({ label, delta: Math.abs(delta) });
-        else groups["ON TARGET"].push({ label: formatTicker(item.ticker), delta: 0 });
+        groups[rule.label]?.push({ label, delta: Math.abs(delta) });
     });
 
     Object.values(groups).forEach(items => items.sort((a, b) => b.delta - a.delta));
@@ -1255,6 +1250,25 @@ function renderTrimSummary() {
             <b>${items.length ? items.map(item => item.label).join(" · ") : "-"}</b>
         </div>
     `).join("");
+}
+
+function normalizeLogbookRows(rows) {
+    return (rows || []).map(row => {
+        const principal = Number(row.principalKRW || 0);
+        const market = Number(row.marketValueKRW || 0);
+        const target = Number(row.targetValueKRW || 0);
+        return {
+            ...row,
+            eventType: String(row.eventType || row.marker || "LOG").toUpperCase(),
+            title: row.title || row.note || "Log Entry",
+            memo: row.memo || row.note || "",
+            milestone: String(row.milestone ?? "TRUE").toUpperCase() === "TRUE",
+            principalKRW: principal,
+            marketValueKRW: market,
+            targetValueKRW: target,
+            returnPct: principal > 0 ? ((market / principal) - 1) * 100 : Number(row.returnPct || 0)
+        };
+    }).filter(row => row.date);
 }
 
 function renderOpenSeaLogbook() {
@@ -1290,37 +1304,83 @@ function renderLogbookChart(rows) {
         return;
     }
 
-    const enrichedRows = rows.map(row => ({
+    const enrichedRows = normalizeLogbookRows(rows).map(row => ({
         ...row,
-        targetValueKRW: calculateLogbookTargetValue(row.date, rows)
-    }));
+        targetValueKRW: Number(row.targetValueKRW || 0) || calculateLogbookTargetValue(row.date, rows)
+    })).sort((a, b) => (parseDateSafe(a.date) || 0) - (parseDateSafe(b.date) || 0));
 
+    const firstDate = parseDateSafe(enrichedRows[0]?.date);
+    const lastDate = parseDateSafe(enrichedRows[enrichedRows.length - 1]?.date);
+    const endDate = parseDateSafe((riverwatch.manualConfig || {}).targetDate) || lastDate;
+    const startDate = firstDate || lastDate || new Date();
+    const xEnd = endDate && endDate > startDate ? endDate : lastDate;
     const maxValue = Math.max(...enrichedRows.map(row => Math.max(
         Number(row.principalKRW || 0),
         Number(row.marketValueKRW || 0),
         Number(row.targetValueKRW || 0)
     )), 1);
 
-    el.innerHTML = enrichedRows.map(row => {
-        const principal = Number(row.principalKRW || 0);
-        const value = Number(row.marketValueKRW || 0);
-        const target = Number(row.targetValueKRW || 0);
-        return `
-            <div class="journey-row">
-                <div class="journey-date">${row.date || "-"}</div>
-                <div class="journey-bars">
-                    <div class="journey-bar-line target" style="width:${Math.max(2, (target / maxValue) * 100)}%"></div>
-                    <div class="journey-bar-line principal" style="width:${Math.max(2, (principal / maxValue) * 100)}%"></div>
-                    <div class="journey-bar-line market" style="width:${Math.max(2, (value / maxValue) * 100)}%"></div>
-                </div>
-                <div class="journey-values">
-                    <span>Planned Course ${formatKRWM(target)}</span>
-                    <span>Principal ${formatKRWM(principal)}</span>
-                    <b>Market Value ${formatKRWM(value)}</b>
-                </div>
-            </div>
-        `;
-    }).join("");
+    const chartWidth = Math.max(720, Math.min(2600, 160 + enrichedRows.length * 160 + 80));
+    const chartHeight = 250;
+    const pad = { left: 72, right: 34, top: 28, bottom: 44 };
+    const plotW = chartWidth - pad.left - pad.right;
+    const plotH = chartHeight - pad.top - pad.bottom;
+
+    const xForDate = dateText => {
+        const d = parseDateSafe(dateText);
+        if (!d || !xEnd || xEnd <= startDate) return pad.left;
+        const ratio = Math.max(0, Math.min(1, (d - startDate) / (xEnd - startDate)));
+        return pad.left + ratio * plotW;
+    };
+    const yForValue = value => pad.top + (1 - (Number(value || 0) / maxValue)) * plotH;
+
+    const linePath = (key) => enrichedRows.map((row, index) => {
+        const x = xForDate(row.date);
+        const y = yForValue(row[key]);
+        return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }).join(" ");
+
+    const points = (key, className) => enrichedRows.map(row => `
+        <circle class="journey-point ${className}" cx="${xForDate(row.date).toFixed(1)}" cy="${yForValue(row[key]).toFixed(1)}" r="3.5">
+            <title>${row.date} · ${formatKRWM(Number(row[key] || 0))}</title>
+        </circle>
+    `).join("");
+
+    const yearTicks = buildYearTicks(startDate, xEnd, xForDate);
+
+    el.innerHTML = `
+        <div class="journey-legend">
+            <span><i class="legend-line principal"></i>Principal</span>
+            <span><i class="legend-line market"></i>Market Value</span>
+            <span><i class="legend-line course"></i>Planned Course</span>
+        </div>
+        <div class="journey-scroll-x">
+            <svg class="journey-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Portfolio journey line chart">
+                <line class="journey-axis" x1="${pad.left}" y1="${pad.top + plotH}" x2="${chartWidth - pad.right}" y2="${pad.top + plotH}"></line>
+                <line class="journey-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + plotH}"></line>
+                ${yearTicks.map(t => `<g class="journey-tick"><line x1="${t.x}" y1="${pad.top}" x2="${t.x}" y2="${pad.top + plotH}"></line><text x="${t.x}" y="${chartHeight - 18}" text-anchor="middle">${t.label}</text></g>`).join("")}
+                <path class="journey-line principal" d="${linePath("principalKRW")}"></path>
+                <path class="journey-line market" d="${linePath("marketValueKRW")}"></path>
+                <path class="journey-line course" d="${linePath("targetValueKRW")}"></path>
+                ${points("principalKRW", "principal")}
+                ${points("marketValueKRW", "market")}
+                ${points("targetValueKRW", "course")}
+            </svg>
+        </div>
+    `;
+}
+
+function buildYearTicks(startDate, endDate, xForDate) {
+    if (!startDate || !endDate || endDate <= startDate) return [];
+    const startYear = startDate.getFullYear();
+    const endYear = endDate.getFullYear();
+    const ticks = [];
+    for (let year = startYear; year <= endYear; year += 1) {
+        if (year === startYear || year === endYear || year % 2 === 0) {
+            ticks.push({ label: String(year), x: xForDate(`${year}-01-01`).toFixed(1) });
+        }
+    }
+    return ticks;
 }
 
 function calculateLogbookTargetValue(dateText, rows) {
@@ -1350,22 +1410,39 @@ function renderLogbookTimeline(rows) {
     const el = document.getElementById("openSeaTimeline");
     if (!el) return;
 
-    if (!rows.length) {
+    const timelineRows = normalizeLogbookRows(rows)
+        .filter(row => row.milestone)
+        .map(row => ({
+            ...row,
+            targetValueKRW: Number(row.targetValueKRW || 0) || calculateLogbookTargetValue(row.date, rows)
+        }))
+        .sort((a, b) => (parseDateSafe(b.date) || 0) - (parseDateSafe(a.date) || 0));
+
+    if (!timelineRows.length) {
         el.innerHTML = `<div class="empty-state">No timeline entries yet.</div>`;
         return;
     }
 
-    el.innerHTML = rows.map(row => `
-        <div class="timeline-entry">
-            <div class="timeline-dot"></div>
-            <div>
-                <div class="timeline-meta">${row.marker || "LOG"} · ${row.phase || "-"}</div>
-                <div class="timeline-date">${row.date || "-"}</div>
-                <div class="timeline-note">${row.note || "-"}</div>
-                <div class="timeline-return">Return ${formatPercentValue(Number(row.returnPct || 0))}</div>
+    el.innerHTML = timelineRows.map(row => {
+        const ahead = Number(row.marketValueKRW || 0) - Number(row.targetValueKRW || 0);
+        return `
+            <div class="timeline-entry">
+                <div class="timeline-dot"></div>
+                <div>
+                    <div class="timeline-meta">${row.eventType || "LOG"}</div>
+                    <div class="timeline-date">${row.date || "-"}</div>
+                    <div class="timeline-title">${row.title || "Log Entry"}</div>
+                    <div class="timeline-values">
+                        <span>Principal <b>${formatKRWM(Number(row.principalKRW || 0))}</b></span>
+                        <span>Market Value <b>${formatKRWM(Number(row.marketValueKRW || 0))}</b></span>
+                        <span>Planned Course <b>${formatKRWM(Number(row.targetValueKRW || 0))}</b></span>
+                    </div>
+                    <div class="timeline-return">${ahead >= 0 ? "Ahead of Plan" : "Behind Plan"} ${formatSigned(Math.round(ahead / 1000000))}M</div>
+                    <div class="timeline-note">${row.memo || "-"}</div>
+                </div>
             </div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
 function setText(id, value) {
@@ -1399,6 +1476,32 @@ function getBoatStatus(score) {
     if (score >= 70) return "NEEDS ADJUSTMENT";
     if (score >= 60) return "POORLY BALANCED";
     return "TAKING WATER";
+}
+
+function getDoctrineRule(item) {
+    const ticker = String(item?.ticker || "").toUpperCase();
+    const current = Number(item?.current ?? 0);
+    const limit = Number(riverwatch.manual.boatConfiguration[ticker] ?? item?.target ?? 0);
+
+    if (ticker === "INDIVIDUAL") {
+        const satisfied = current <= limit;
+        return {
+            limit,
+            limitLabel: "Cap",
+            deltaLabel: "Excess",
+            label: satisfied ? "WITHIN CAP" : "DILUTING",
+            className: satisfied ? "on-target" : "diluting"
+        };
+    }
+
+    const satisfied = current >= limit;
+    return {
+        limit,
+        limitLabel: "Minimum",
+        deltaLabel: satisfied ? "Excess" : "Gap",
+        label: satisfied ? "SATISFIED" : "BUILDING",
+        className: satisfied ? "on-target" : "building"
+    };
 }
 
 function getAllocationStatus(delta) {

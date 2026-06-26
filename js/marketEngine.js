@@ -109,9 +109,16 @@ const RiverWatchMarketEngine = (() => {
         const idx = name => headers.indexOf(name.toUpperCase());
 
         const dateIdx = idx("Date");
+        const eventIdx = idx("EventType");
+        const titleIdx = idx("Title");
         const principalIdx = idx("PrincipalKRW");
         const marketIdx = idx("MarketValueKRW");
+        const targetIdx = idx("TargetValueKRW");
         const returnIdx = idx("ReturnPct");
+        const memoIdx = idx("Memo");
+        const milestoneIdx = idx("Milestone");
+
+        // Backward compatibility with CAB-006 OpenSeaLogbook schema.
         const noteIdx = idx("Note");
         const markerIdx = idx("Marker");
         const phaseIdx = idx("Phase");
@@ -120,13 +127,32 @@ const RiverWatchMarketEngine = (() => {
             const date = String(cols[dateIdx] || "").trim();
             if (!date) return null;
 
+            const principal = parseNumber(cols[principalIdx], 0);
+            const market = parseNumber(cols[marketIdx], 0);
+            const returnPct = principal > 0 ? ((market / principal) - 1) * 100 : parseNumber(cols[returnIdx], 0);
+            const eventType = eventIdx >= 0
+                ? String(cols[eventIdx] || "").trim().toUpperCase()
+                : (markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "LOG");
+            const memo = memoIdx >= 0
+                ? String(cols[memoIdx] || "").trim()
+                : (noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : "");
+            const title = titleIdx >= 0
+                ? String(cols[titleIdx] || "").trim()
+                : (memo || eventType || "Log Entry");
+
             return {
                 date,
-                principalKRW: parseNumber(cols[principalIdx], 0),
-                marketValueKRW: parseNumber(cols[marketIdx], 0),
-                returnPct: parseNumber(cols[returnIdx], 0),
-                note: noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : "",
-                marker: markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "LOG",
+                eventType,
+                title,
+                principalKRW: principal,
+                marketValueKRW: market,
+                targetValueKRW: targetIdx >= 0 ? parseNumber(cols[targetIdx], 0) : 0,
+                returnPct,
+                memo,
+                milestone: milestoneIdx >= 0 ? String(cols[milestoneIdx] || "").trim().toUpperCase() === "TRUE" : true,
+                // Backward-compatible aliases.
+                note: memo,
+                marker: eventType,
                 phase: phaseIdx >= 0 ? String(cols[phaseIdx] || "").trim().toUpperCase() : ""
             };
         }).filter(Boolean);

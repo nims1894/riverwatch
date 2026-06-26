@@ -1,6 +1,6 @@
 # RiverWatch
 
-**Version 1.0 Beta CAB-007.1**  
+**Version 1.0 Beta CAB-007.2**  
 Personal Navigation System for Reaching the Open Sea.
 
 ## Spaces
