@@ -1311,7 +1311,9 @@ function renderLogbookChart(rows) {
 
     const firstDate = parseDateSafe(enrichedRows[0]?.date);
     const lastDate = parseDateSafe(enrichedRows[enrichedRows.length - 1]?.date);
-    const endDate = parseDateSafe((riverwatch.manualConfig || {}).targetDate) || lastDate;
+    // Portfolio Journey should display the actual recorded voyage range,
+    // not the long-term Open Sea target date. Long-term target remains in summary cards.
+    const endDate = lastDate;
     const startDate = firstDate || lastDate || new Date();
     const xEnd = endDate && endDate > startDate ? endDate : lastDate;
     const maxValue = Math.max(...enrichedRows.map(row => Math.max(

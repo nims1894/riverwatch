@@ -37,3 +37,7 @@ Status: Eye Comfort patch ready for review.
 ## CAB-007.3 Scrollbar Comfort Pass
 - Portfolio Journey horizontal scrollbar restyled to match Voyage Timeline scrollbar.
 - Kept horizontal scroll for time-scaled journey chart; vertical scroll remains disabled.
+
+## CAB-008.1 Portfolio Journey Scale Patch
+- Fixed Portfolio Journey X-axis range to use actual OpenSeaLogbook record dates instead of the long-term target date.
+- Long-term Open Sea target remains represented in summary/progress cards.
