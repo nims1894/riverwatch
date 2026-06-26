@@ -1476,3 +1476,15 @@ body{
     .timeline-values{ grid-template-columns:1fr; }
     .journey-legend{ gap:10px; }
 }
+
+
+/* CAB-008.3c: Trim Summary removed and deviation overlays disabled */
+#trimSummary,
+.trim-summary,
+.trim-gap-blocks,
+.trim-excess-blocks{
+    display:none !important;
+}
+.trim-target-label{
+    display:none !important;
+}

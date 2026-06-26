@@ -1206,7 +1206,7 @@ function renderBoatyard() {
             const gapStart = Math.min(currentPct, markerPct);
             const gapWidth = Math.abs(markerPct - currentPct);
             const isExcess = delta > 0;
-            const showDeviation = isExcess && Math.abs(delta) >= 0.5;
+            const showDeviation = false;
 
             const row = document.createElement("div");
             row.className = "trim-card";
@@ -1232,7 +1232,7 @@ function renderBoatyard() {
         });
     }
 
-    renderTrimSummary();
+    // Trim Summary removed in CAB-008.3c.
 }
 
 function renderTrimSummary() {

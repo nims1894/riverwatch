@@ -50,3 +50,7 @@ Status: Eye Comfort patch ready for review.
 - Removed gap-side auxiliary block rendering for cleaner Trim Deck bars.
 - Changed deviation block calculation to round away from zero by 5%-point units.
 - Kept only the upward target triangle marker shape.
+## CAB-008.3c Trim Deck Cleanup Final
+- Removed remaining faint deviation block overlays from Trim Deck bars.
+- Removed Trim Summary section from the Boatyard page.
+- Kept the simplified target marker with a single upward triangle.
