@@ -1,5 +1,5 @@
 /****************************************************************************************
- * RiverWatch Script v0.4.0-cab005
+ * RiverWatch Script v1.0-beta-cab007
  * - Loads Google Sheet v2.0 MarketData / Portfolio / ManualConfig before dashboard rendering
  * - Falls back safely to data.js dummy values if AUTO load fails
  * - Adds River Health Engine v1.1, Boat Health Engine v1.1, Voyage Health Engine v1.1
@@ -12,11 +12,26 @@ async function showDashboard() {
     await initializeMarketData();
     runCalculationEngines();
     renderDashboard();
+    showAppPage("dashboardPage");
 }
 
 function showIntro() {
     document.getElementById("dashboard").classList.add("hidden");
     document.getElementById("intro").classList.remove("hidden");
+}
+
+
+function showAppPage(pageId) {
+    document.querySelectorAll(".app-page").forEach(page => {
+        page.classList.toggle("hidden", page.id !== pageId);
+    });
+
+    document.querySelectorAll(".nav-tab").forEach(tab => {
+        tab.classList.toggle("active", tab.dataset.page === pageId);
+    });
+
+    if (pageId === "boatyardPage") renderBoatyard();
+    if (pageId === "logbookPage") renderOpenSeaLogbook();
 }
 
 async function initializeMarketData() {
@@ -810,14 +825,33 @@ function formatBuildPhaseEnd() {
     return endText;
 }
 
+function getRecoveryDisplay() {
+    const phase = String(riverwatch.calc.voyagePhase || "").toUpperCase();
+
+    if (phase === "BUILD_PHASE") {
+        return {
+            mode: "BUILD LOCK",
+            eta: `After ${formatBuildPhaseEnd()}`
+        };
+    }
+    if (phase === "OPEN_SEA_REACHED") {
+        return { mode: "COMPLETE", eta: "0y 0m" };
+    }
+    if (phase === "TARGET_DATE_REACHED") {
+        return { mode: "COURSE RESET", eta: riverwatch.calc.extraTimeRequired || "-" };
+    }
+    return { mode: "TIME EXTENSION", eta: riverwatch.calc.extraTimeRequired || "-" };
+}
+
 function renderDashboard() {
     renderTopbar();
     renderMission();
     renderVoyageHealth();
     renderRiverHealth();
     renderBoatHealth();
-    renderAllocation();
     renderCaptainBridge();
+    renderBoatyard();
+    renderOpenSeaLogbook();
 }
 
 function renderTopbar() {
@@ -876,20 +910,19 @@ function getMissionStatusClass(status) {
 }
 
 function renderVoyageHealth() {
-    const totalAdjustment = (Number(riverwatch.calc.riverAdjustment ?? 0) + Number(riverwatch.calc.boatAdjustment ?? 0)) * 100;
     const voyageGap = Math.max(0, Number(riverwatch.calc.openSeaTarget ?? 0) - Number(riverwatch.calc.adjustedArrival ?? 0));
+    const recovery = getRecoveryDisplay();
 
     setText("voyageHealth", riverwatch.calc.voyageHealth);
     setText("voyageStatus", `${getVoyageStatus(riverwatch.calc.voyageHealth)} (${riverwatch.calc.voyageHealth})`);
-    setText("currentPosition", formatKRWB(riverwatch.calc.currentPosition));
+    setText("currentPosition", formatKRWM(riverwatch.calc.currentPosition));
     setText("remainingTime", riverwatch.calc.remainingTime);
-    setText("baseArrival", formatKRWB(riverwatch.calc.baseArrival));
-    setText("totalAdjustment", formatSigned(totalAdjustment) + "%");
     setText("effectiveCAGR", formatPercentValue(riverwatch.calc.effectiveCAGR * 100));
-    setText("adjustedArrival", formatKRWB(riverwatch.calc.adjustedArrival));
-    setText("openSeaTarget", formatKRWB(riverwatch.calc.openSeaTarget));
-    setText("voyageDrift", formatSigned(riverwatch.calc.voyageDrift) + "%");
-    setText("voyageGap", formatKRWB(voyageGap));
+    setText("adjustedArrival", formatKRWM(riverwatch.calc.adjustedArrival));
+    setText("openSeaTarget", formatKRWM(riverwatch.calc.openSeaTarget));
+    setText("voyageGap", formatKRWM(voyageGap));
+    setText("recoveryMode", recovery.mode);
+    setText("etaExtension", recovery.eta);
 }
 
 function renderRiverHealth() {
@@ -911,7 +944,6 @@ function renderRiverHealth() {
         ["NVDA DC Rev", `${config.nvdaDcRevenueGrowth}% (${scoreText(scores.nvdaDcRevenue)})`],
         ["M2", `${String(config.m2Trend || "-").toUpperCase()} (${scoreText(scores.m2)})`],
         ["Growth Environment", `${getEnvironmentLabel(riverwatch.calc.growthFavorability)} (${riverwatch.calc.growthFavorability})`],
-        ["Defensive Environment", `${getEnvironmentLabel(riverwatch.calc.defensiveFavorability)} (${riverwatch.calc.defensiveFavorability})`],
         ["River Bias", getRiverBiasLabel(riverwatch.calc.growthFavorability, riverwatch.calc.defensiveFavorability)]
     ];
 
@@ -930,9 +962,8 @@ function renderBoatHealth() {
     setText("structuralIntegrity", `${getIntegrityLabel(riverwatch.calc.structuralIntegrity)} (${riverwatch.calc.structuralIntegrity})`);
     setText("captainDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
     setText("boatArchetype", riverwatch.calc.boatArchetype);
-    setText("growthExposure", formatPercentValue(riverwatch.calc.growthExposure));
-    setText("defensiveExposure", formatPercentValue(riverwatch.calc.defensiveExposure));
-    setText("costBasis", formatKRWB(riverwatch.calc.costBasis));
+    setText("voyagePhaseInBoat", riverwatch.calc.voyagePhase || "-");
+    setText("costBasis", formatKRWM(riverwatch.calc.costBasis));
     setText("boatReturn", formatSigned(riverwatch.calc.boatReturn) + "%");
 }
 
@@ -962,18 +993,22 @@ function renderAllocation() {
 }
 
 function renderCaptainBridge() {
-    const snapshot = buildLatestSnapshot()[0] || {};
-
-    setText("bridgeCaptainNote", riverwatch.calc.captainNote || "-");
-    setText("bridgeSnapshotDate", `${snapshot.date || nowDateString()} · ${snapshot.phase || "-"}`);
-    setText("bridgeRiverScore", riverwatch.calc.riverHealth);
-    setText("bridgeBoatScore", riverwatch.calc.boatHealth);
-    setText("bridgeVoyageScore", riverwatch.calc.voyageHealth);
+    setHTML("bridgeCaptainNote", formatBridgeNote(riverwatch.calc.captainNote || "-"));
     setText("bridgeOrder", riverwatch.calc.recommendedAction || "-");
-    setText("bridgeOrderRationale", buildOrderRationale());
-    setText("bridgeExtraTime", riverwatch.calc.extraTimeRequired || "-");
-    setText("bridgeRequiredContribution", formatKRWMonthly(riverwatch.calc.requiredMonthlyContribution));
-    setText("bridgeRequiredCAGR", formatCAGRValue(riverwatch.calc.requiredCAGR));
+    setHTML("bridgeOrderRationale", formatBridgeNote(buildOrderRationale()));
+}
+
+function formatBridgeNote(text) {
+    return String(text || "-")
+        .split(/\.\s+/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => line.endsWith(".") ? line : line + ".")
+        .join("<br><br>");
+}
+
+function formatPhaseLabel(value) {
+    return String(value || "-").replace(/_/g, " ");
 }
 
 function buildOrderRationale() {
@@ -982,13 +1017,13 @@ function buildOrderRationale() {
     const voyage = Number(riverwatch.calc.voyageHealth ?? 0);
 
     if (phase === "BUILD_PHASE") {
-        return "Boat Health remains below threshold. Open Sea target remains beyond current projection.";
+        return "Boat Health remains below threshold. Prioritize alignment over optimization.";
     }
     if (phase === "EARLY_VOYAGE") {
         return "Current course remains viable. No immediate adjustment required.";
     }
     if (phase === "MID_VOYAGE") {
-        return "Progress toward Open Sea continues. Current allocation remains effective.";
+        return "Progress toward Open Sea continues. Maintain current heading.";
     }
     if (phase === "OPEN_SEA_APPROACH") {
         return "Open Sea is now within reach. Preserve current course.";
@@ -999,7 +1034,7 @@ function buildOrderRationale() {
     if (phase === "TARGET_DATE_REACHED") {
         return "Planned voyage ended before reaching Open Sea. Additional time is required.";
     }
-    if (boat < 70) return "Boat Health remains below threshold. Review allocation before pressing forward.";
+    if (boat < 70) return "Boat Health remains below threshold. Prioritize alignment over optimization.";
     if (voyage < 70) return "Open Sea target remains beyond current projection. Continue disciplined accumulation.";
     return "Current course remains viable. No immediate adjustment required.";
 }
@@ -1143,9 +1178,204 @@ function getVoyageDriftLabel(drift) {
     return "SIGNIFICANT GAP";
 }
 
+
+function renderBoatyard() {
+    setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
+    setText("boatyardDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
+    setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
+    setText("boatyardCostBasis", formatKRWM(riverwatch.calc.costBasis));
+    setText("boatyardReturn", formatSigned(riverwatch.calc.boatReturn) + "%");
+
+    const deck = document.getElementById("trimDeckList");
+    if (deck) {
+        deck.innerHTML = "";
+        (riverwatch.calc.allocationHoldings || []).forEach(item => {
+            const target = Number(riverwatch.manual.boatConfiguration[item.ticker] ?? 0);
+            const current = Number(item.current ?? 0);
+            const delta = current - target;
+            const status = getAllocationStatus(delta);
+            const localScaleMax = Math.max(
+                target > 0 ? target / 0.72 : 1,
+                current > 0 ? current / 0.92 : 1,
+                target,
+                current,
+                1
+            );
+            const currentPct = Math.max(1.5, Math.min(96, (current / localScaleMax) * 100));
+            const targetPct = Math.max(4, Math.min(94, (target / localScaleMax) * 100));
+
+            const row = document.createElement("div");
+            row.className = "trim-card";
+            row.innerHTML = `
+                <div class="trim-head">
+                    <b>${formatTicker(item.ticker)}</b>
+                    <span class="badge ${status.className}">${status.label}</span>
+                </div>
+                <div class="trim-bar-wrap">
+                    <div class="trim-bar">
+                        <div class="trim-fill" style="width:${currentPct}%"></div>
+                        <div class="trim-target" style="left:${targetPct}%"></div>
+                    </div>
+                    <div class="trim-target-label" style="left:${targetPct}%">Target</div>
+                </div>
+                <div class="trim-stats">
+                    <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
+                    <div><span>Target</span><b>${target.toFixed(1)}%</b></div>
+                    <div><span>Delta</span><b>${formatSigned(delta)}%</b></div>
+                </div>
+            `;
+            deck.appendChild(row);
+        });
+    }
+
+    renderTrimSummary();
+}
+
+function renderTrimSummary() {
+    const el = document.getElementById("trimSummary");
+    if (!el) return;
+
+    const groups = { OVERWEIGHT: [], UNDERWEIGHT: [], "ON TARGET": [] };
+
+    (riverwatch.calc.allocationHoldings || []).forEach(item => {
+        const target = Number(riverwatch.manual.boatConfiguration[item.ticker] ?? 0);
+        const delta = Number(item.current ?? 0) - target;
+        const status = getAllocationStatus(delta).label;
+        const label = `${formatTicker(item.ticker)} (${formatSigned(delta)}%)`;
+        if (status === "OVER") groups.OVERWEIGHT.push({ label, delta: Math.abs(delta) });
+        else if (status === "UNDER") groups.UNDERWEIGHT.push({ label, delta: Math.abs(delta) });
+        else groups["ON TARGET"].push({ label: formatTicker(item.ticker), delta: 0 });
+    });
+
+    Object.values(groups).forEach(items => items.sort((a, b) => b.delta - a.delta));
+
+    el.innerHTML = Object.entries(groups).map(([label, items]) => `
+        <div class="trim-summary-group">
+            <span>${label}</span>
+            <b>${items.length ? items.map(item => item.label).join(" · ") : "-"}</b>
+        </div>
+    `).join("");
+}
+
+function renderOpenSeaLogbook() {
+    const rows = (riverwatch.logbook || riverwatch.openSeaLogbook || []).slice();
+
+    renderLogbookKpis(rows);
+    renderLogbookChart(rows);
+    renderLogbookTimeline(rows);
+}
+
+function renderLogbookKpis(rows) {
+    const el = document.getElementById("logbookKpis");
+    if (!el) return;
+
+    const latest = rows[rows.length - 1] || {};
+    const target = Number((riverwatch.manualConfig || {}).openSeaTargetKRW || riverwatch.calc.openSeaTarget || 0);
+    const value = Number(latest.marketValueKRW || riverwatch.calc.currentPosition || 0);
+    const progress = target > 0 ? (value / target) * 100 : 0;
+
+    el.innerHTML = `
+        <div><span>Latest Value</span><b>${formatKRWM(value)}</b></div>
+        <div><span>Open Sea Target</span><b>${formatKRWM(target)}</b></div>
+        <div><span>Progress</span><b>${progress.toFixed(1)}%</b></div>
+    `;
+}
+
+function renderLogbookChart(rows) {
+    const el = document.getElementById("logbookChart");
+    if (!el) return;
+
+    if (!rows.length) {
+        el.innerHTML = `<div class="empty-state">No logbook entries yet.</div>`;
+        return;
+    }
+
+    const enrichedRows = rows.map(row => ({
+        ...row,
+        targetValueKRW: calculateLogbookTargetValue(row.date, rows)
+    }));
+
+    const maxValue = Math.max(...enrichedRows.map(row => Math.max(
+        Number(row.principalKRW || 0),
+        Number(row.marketValueKRW || 0),
+        Number(row.targetValueKRW || 0)
+    )), 1);
+
+    el.innerHTML = enrichedRows.map(row => {
+        const principal = Number(row.principalKRW || 0);
+        const value = Number(row.marketValueKRW || 0);
+        const target = Number(row.targetValueKRW || 0);
+        return `
+            <div class="journey-row">
+                <div class="journey-date">${row.date || "-"}</div>
+                <div class="journey-bars">
+                    <div class="journey-bar-line target" style="width:${Math.max(2, (target / maxValue) * 100)}%"></div>
+                    <div class="journey-bar-line principal" style="width:${Math.max(2, (principal / maxValue) * 100)}%"></div>
+                    <div class="journey-bar-line market" style="width:${Math.max(2, (value / maxValue) * 100)}%"></div>
+                </div>
+                <div class="journey-values">
+                    <span>Planned Course ${formatKRWM(target)}</span>
+                    <span>Principal ${formatKRWM(principal)}</span>
+                    <b>Market Value ${formatKRWM(value)}</b>
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function calculateLogbookTargetValue(dateText, rows) {
+    const target = Number((riverwatch.manualConfig || {}).openSeaTargetKRW || riverwatch.calc.openSeaTarget || 0);
+    if (!target) return 0;
+
+    const firstRow = (rows || []).find(row => row && row.date);
+    const startValue = Number(firstRow?.principalKRW || firstRow?.marketValueKRW || 0);
+    const startDate = parseDateSafe(firstRow?.date);
+    const currentDate = parseDateSafe(dateText);
+    const endDate = parseDateSafe((riverwatch.manualConfig || {}).targetDate);
+
+    if (!startDate || !currentDate || !endDate || endDate <= startDate) return target;
+
+    const progress = Math.max(0, Math.min(1, (currentDate - startDate) / (endDate - startDate)));
+    return startValue + (target - startValue) * progress;
+}
+
+function parseDateSafe(value) {
+    if (!value) return null;
+    const normalized = String(value).trim().replace(/\./g, "-");
+    const d = new Date(normalized);
+    return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function renderLogbookTimeline(rows) {
+    const el = document.getElementById("openSeaTimeline");
+    if (!el) return;
+
+    if (!rows.length) {
+        el.innerHTML = `<div class="empty-state">No timeline entries yet.</div>`;
+        return;
+    }
+
+    el.innerHTML = rows.map(row => `
+        <div class="timeline-entry">
+            <div class="timeline-dot"></div>
+            <div>
+                <div class="timeline-meta">${row.marker || "LOG"} · ${row.phase || "-"}</div>
+                <div class="timeline-date">${row.date || "-"}</div>
+                <div class="timeline-note">${row.note || "-"}</div>
+                <div class="timeline-return">Return ${formatPercentValue(Number(row.returnPct || 0))}</div>
+            </div>
+        </div>
+    `).join("");
+}
+
 function setText(id, value) {
     const el = document.getElementById(id);
     if (el) el.innerText = value;
+}
+
+function setHTML(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = value;
 }
 
 function getHealthStatus(score) {
@@ -1186,9 +1416,14 @@ function formatRemainingTime(years) {
     return `${y}y ${m}m`;
 }
 
-function formatKRWB(value) {
+function formatKRWM(value) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
-    return (value / 1000000000).toFixed(2) + "B";
+    return Math.round(value / 1000000) + "M";
+}
+
+function formatKRWB(value) {
+    // Backward-compatible alias. RiverWatch CAB-005.2.4 uses M units for visibility.
+    return formatKRWM(value);
 }
 
 function formatNumber(value) {
@@ -1233,6 +1468,10 @@ function formatCAGRValue(value) {
 
 function formatTicker(ticker) {
     return ticker === "INDIVIDUAL" ? "INDIVIDUAL STOCKS" : ticker;
+}
+
+function scrollToTop() {
+    window.scrollTo(0, 0);
 }
 
 window.addEventListener("DOMContentLoaded", () => {

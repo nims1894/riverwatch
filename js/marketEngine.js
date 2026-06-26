@@ -1,5 +1,5 @@
 /****************************************************************************
- * RiverWatch Market Engine v0.4.0-cab004
+ * RiverWatch Market Engine v0.4.0-cab006.0
  * Google Sheet v2.0 CSV Hub Reader
  * - MarketData: live market prices
  * - Portfolio: captain position data
@@ -98,6 +98,50 @@ const RiverWatchMarketEngine = (() => {
                 targetWeight: targetIdx >= 0 ? parseNumber(cols[targetIdx], 0) : 0
             };
         }).filter(Boolean);
+    }
+
+
+    function parseLogbookCsv(text) {
+        const rows = parseRows(text);
+        if (rows.length < 2) return [];
+
+        const headers = rows[0].map(h => String(h).trim().toUpperCase());
+        const idx = name => headers.indexOf(name.toUpperCase());
+
+        const dateIdx = idx("Date");
+        const principalIdx = idx("PrincipalKRW");
+        const marketIdx = idx("MarketValueKRW");
+        const returnIdx = idx("ReturnPct");
+        const noteIdx = idx("Note");
+        const markerIdx = idx("Marker");
+        const phaseIdx = idx("Phase");
+
+        return rows.slice(1).map(cols => {
+            const date = String(cols[dateIdx] || "").trim();
+            if (!date) return null;
+
+            return {
+                date,
+                principalKRW: parseNumber(cols[principalIdx], 0),
+                marketValueKRW: parseNumber(cols[marketIdx], 0),
+                returnPct: parseNumber(cols[returnIdx], 0),
+                note: noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : "",
+                marker: markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "LOG",
+                phase: phaseIdx >= 0 ? String(cols[phaseIdx] || "").trim().toUpperCase() : ""
+            };
+        }).filter(Boolean);
+    }
+
+    function applyLogbook(logbookRows) {
+        if (!Array.isArray(logbookRows) || logbookRows.length === 0) {
+            console.warn("OpenSeaLogbook CSV parsed but no usable rows found. Keeping fallback logbook.");
+            return false;
+        }
+
+        riverwatch.openSeaLogbook = logbookRows;
+        riverwatch.logbook = logbookRows;
+        console.log("RiverWatch OpenSeaLogbook AUTO", logbookRows);
+        return true;
     }
 
     function normalizeManualConfig(rawConfig) {
@@ -264,6 +308,19 @@ const RiverWatchMarketEngine = (() => {
         return true;
     }
 
+    async function loadOpenSeaLogbook() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.openSeaLogbookCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("OpenSeaLogbook CSV URL missing. Using fallback logbook.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        return applyLogbook(parseLogbookCsv(csvText));
+    }
+
     async function loadAllData() {
         const labels = ["MarketData", "Portfolio", "ManualConfig"];
 
@@ -300,6 +357,12 @@ const RiverWatchMarketEngine = (() => {
 
             console.table(syncStatus);
 
+            try {
+                await loadOpenSeaLogbook();
+            } catch (logError) {
+                console.warn("RiverWatch OpenSeaLogbook optional load failed", logError);
+            }
+
             return okCount === 3;
         } catch (error) {
             riverwatch.auto.dataSource = "FALLBACK";
@@ -319,8 +382,10 @@ const RiverWatchMarketEngine = (() => {
         loadMarketData,
         loadPortfolio,
         loadManualConfig,
+        loadOpenSeaLogbook,
         parseKeyValueCsv,
-        parsePortfolioCsv
+        parsePortfolioCsv,
+        parseLogbookCsv
     };
 
 })();

@@ -21,9 +21,9 @@ const riverwatch = {
      * [CONST] Doctrine
      * ======================================================================*/
     const: {
-        version: "0.4.0-cab005.2",
+        version: "0.4.0-cab006.0",
         mission: "Stay the Course",
-        subtitle: "A personal doctrine execution system for reaching the Open Sea.",
+        subtitle: "Personal Navigation System for Reaching the Open Sea.",
         operator: "NIMS",
         principles: [
             "Observe the River.",
@@ -47,6 +47,7 @@ const riverwatch = {
             marketCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0",
             portfolioCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1022059028",
             manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
+            openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1725380515",
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 5000
         },
@@ -229,6 +230,16 @@ const riverwatch = {
         { ticker: "MSFT", shares: 10, avgCostKRW: 616207, targetWeight: 0 },
         { ticker: "GOOGL", shares: 10, avgCostKRW: 473879, targetWeight: 0 },
         { ticker: "PLTR", shares: 30, avgCostKRW: 230025, targetWeight: 0 }
+    ],
+
+    /* ========================================================================
+     * [OPENSEA LOGBOOK] Fallback voyage timeline
+     * Google Sheet OpenSeaLogbook 탭이 SSOT입니다.
+     * ======================================================================*/
+    openSeaLogbook: [
+        { date: "2026.06.23", principalKRW: 58000000, marketValueKRW: 60800000, returnPct: 4.8, note: "Initial Deployment", marker: "DEPLOY", phase: "BUILD_PHASE" },
+        { date: "2026.07.30", principalKRW: 250000000, marketValueKRW: 262000000, returnPct: 4.8, note: "Build Complete", marker: "BUILD", phase: "BUILD_PHASE" },
+        { date: "2027.01.01", principalKRW: 268000000, marketValueKRW: 295000000, returnPct: 10.1, note: "First Milestone", marker: "MILESTONE", phase: "EARLY_VOYAGE" }
     ],
 
     /* ========================================================================
