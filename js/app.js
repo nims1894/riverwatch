@@ -1330,7 +1330,13 @@ function renderLogbookChart(rows) {
 
     const chartWidth = Math.max(320, el.clientWidth || 720);
     const chartHeight = 250;
-    const pad = { left: 72, right: 34, top: 28, bottom: 44 };
+    const isMobileChart = window.innerWidth < 768;
+    const pad = {
+        left: isMobileChart ? 28 : 72,
+        right: isMobileChart ? 14 : 34,
+        top: 28,
+        bottom: 44
+    };
     const plotW = chartWidth - pad.left - pad.right;
     const plotH = chartHeight - pad.top - pad.bottom;
 
