@@ -956,6 +956,8 @@ function renderDashboard() {
     renderBoatyard();
     renderOpenSeaLogbook();
     setupBridgeSections();
+    updateHealthMatrixSummary();
+    initHealthMatrixState();
 }
 
 function renderTopbar() {
@@ -1701,3 +1703,54 @@ function scrollToTop() {
 window.addEventListener("DOMContentLoaded", () => {
     // Intro first. Market data loads when user enters dashboard.
 });
+
+/* Sprint #008 Patch-1 : Health Matrix Toggle + Summary Binding */
+
+function setText(id, value) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+}
+
+function toggleHealthMatrix() {
+    const detail = document.getElementById("healthMatrixDetail");
+    const toggle = document.getElementById("healthMatrixToggle");
+    const title = toggle?.querySelector(".section-toggle-title");
+
+    if (!detail) return;
+
+    const willOpen = detail.hidden === true;
+    detail.hidden = !willOpen;
+
+    if (toggle) toggle.setAttribute("aria-expanded", String(willOpen));
+    if (title) title.textContent = willOpen ? "▴ Health Matrix" : "▾ Health Matrix";
+
+    localStorage.setItem("riverwatch.healthMatrixOpen", String(willOpen));
+}
+
+function initHealthMatrixState() {
+    const detail = document.getElementById("healthMatrixDetail");
+    const toggle = document.getElementById("healthMatrixToggle");
+    const title = toggle?.querySelector(".section-toggle-title");
+
+    if (!detail) return;
+
+    const saved = localStorage.getItem("riverwatch.healthMatrixOpen");
+    const open = saved === "true";
+
+    detail.hidden = !open;
+
+    if (toggle) toggle.setAttribute("aria-expanded", String(open));
+    if (title) title.textContent = open ? "▴ Health Matrix" : "▾ Health Matrix";
+}
+
+function updateHealthMatrixSummary() {
+    const c = riverwatch?.calc || {};
+
+    setText("summaryVoyageHealth", Math.round(Number(c.voyageHealth ?? 0)));
+    setText("summaryRiverHealth", Math.round(Number(c.riverHealth ?? 0)));
+    setText("summaryBoatHealth", Math.round(Number(c.boatHealth ?? 0)));
+
+    setText("summaryVoyageStatus", document.getElementById("voyageStatus")?.textContent || "--");
+    setText("summaryRiverStatus", document.getElementById("riverStatus")?.textContent || "--");
+    setText("summaryBoatStatus", document.getElementById("boatStatus")?.textContent || "--");
+}

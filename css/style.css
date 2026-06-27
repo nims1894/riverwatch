@@ -834,14 +834,29 @@ button:hover{ filter:brightness(1.08); }
     }
 
     .app-nav{
-        overflow-x:auto;
-        justify-content:flex-start;
+
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+
+        gap:10px;
+
+        overflow:visible;
+
         padding:8px;
+
     }
 
+
     .nav-tab{
-        white-space:nowrap;
-        padding:9px 13px;
+
+        width:auto;
+
+        min-width:0;
+
+        padding:10px 8px;
+
+        font-size:12px;
+
     }
 
     .boatyard-kpis,
@@ -959,7 +974,22 @@ button{ color:var(--text-strong); }
 }
 @media (max-width: 640px){
     .mission-text,.page-title{ font-size:34px; }
-    .nav-tab{ width:132px; min-width:132px; }
+
+    .app-nav{
+        display:grid;
+        grid-template-columns:repeat(3,1fr);
+        gap:10px;
+        overflow:visible;
+        padding:8px;
+    }
+
+    .nav-tab{
+        width:auto;
+        min-width:0;
+        padding:10px 6px;
+        font-size:12px;
+    }
+
     .bridge-snapshot .snapshot-metrics{ grid-template-columns:1fr; }
     .logbook-chart{ max-height:320px; }
     .open-sea-timeline{ max-height:360px; }
@@ -2237,4 +2267,78 @@ body{
     .trim-summary-target,
     .trim-summary-delta{ font-size:11.5px; }
     .trim-summary-row .badge{ font-size:9.8px; padding:5px 5px; }
+}
+
+/* Sprint #008 Patch-1 : Mobile Button Regression Fix */
+
+.refresh-button{
+    width:24px;
+    height:24px;
+    min-width:24px;
+    padding:0;
+    margin:0 0 0 6px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(255,255,255,.04);
+    color:var(--text-soft);
+    font-size:12px;
+    line-height:1;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    vertical-align:middle;
+}
+
+.refresh-button.refreshing{
+    opacity:.55;
+}
+
+.section-toggle{
+    width:100%;
+    margin:0 0 14px 0;
+    padding:12px 16px;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:14px;
+    background:rgba(255,255,255,.035);
+    color:var(--text);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+}
+
+.section-toggle-title{
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+}
+
+.section-toggle-hint{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:600;
+}
+
+@media (max-width:640px){
+    .refresh-button{
+        width:22px;
+        height:22px;
+        min-width:22px;
+        font-size:11px;
+    }
+
+    .section-toggle{
+        padding:10px 12px;
+        margin-bottom:12px;
+    }
+
+    .section-toggle-title{
+        font-size:15px;
+    }
+
+    .section-toggle-hint{
+        font-size:10px;
+    }
 }
