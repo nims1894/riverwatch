@@ -2745,3 +2745,217 @@ body{
         padding:5px 7px;
     }
 }
+
+
+/* ==========================================================================
+   CAB-014 : Trim Deck Detail-Only Layout
+   - Remove accordion toggle and summary rows.
+   - Keep detailed trim cards as the primary view.
+   - Restore stat labels in detail cards.
+   ========================================================================== */
+
+#boatyardPage .trim-deck-list{
+    display:block;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+#boatyardPage .trim-deck-detail-only,
+#boatyardPage .trim-deck-detail{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:16px;
+    margin-top:16px;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+#boatyardPage .trim-deck-detail[hidden]{
+    display:grid !important;
+}
+
+#boatyardPage .trim-detail-card-diet{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+}
+
+#boatyardPage .trim-stats-diet span{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    margin-bottom:5px;
+    line-height:1.1;
+}
+
+#boatyardPage .trim-stats-diet b{
+    display:block;
+    font-size:16px;
+    line-height:1.15;
+}
+
+#boatyardPage .trim-head-diet{
+    gap:12px;
+}
+
+#boatyardPage .trim-head-diet .trim-ticker{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+@media (max-width:760px){
+    #boatyardPage .trim-deck-detail-only,
+    #boatyardPage .trim-deck-detail{
+        grid-template-columns:1fr;
+        gap:14px;
+    }
+
+    #boatyardPage .trim-stats-diet{
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:8px;
+    }
+
+    #boatyardPage .trim-stats-diet div{
+        min-width:0;
+        padding:9px;
+    }
+
+    #boatyardPage .trim-stats-diet span{
+        font-size:10px;
+    }
+
+    #boatyardPage .trim-stats-diet b{
+        font-size:14px;
+    }
+}
+
+
+/* ==========================================================================
+   CAB-015 Trim Metric Semantic Labels / RC2d
+   - Restore semantic labels for detail-only Trim Deck
+   - Current / Target / Gap
+   - Status badge icons: SAT ✓ / BUILD ▲ / DILUTE ▼
+   ========================================================================== */
+
+.trim-detail-card-diet .trim-stats,
+.trim-detail-card-diet .trim-stats-diet{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+    margin-top:14px;
+}
+
+.trim-detail-card-diet .trim-stats div,
+.trim-detail-card-diet .trim-stats-diet div{
+    padding:10px;
+    border-radius:10px;
+    background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.055);
+    min-width:0;
+}
+
+.trim-detail-card-diet .trim-stats span,
+.trim-detail-card-diet .trim-stats-diet span{
+    display:block;
+    margin-bottom:5px;
+    font-size:11px;
+    line-height:1.15;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    white-space:nowrap;
+}
+
+.trim-detail-card-diet .trim-stats b,
+.trim-detail-card-diet .trim-stats-diet b{
+    display:block;
+    font-size:22px;
+    line-height:1.1;
+    font-weight:800;
+    color:var(--text-strong);
+    text-align:right;
+    white-space:nowrap;
+}
+
+.trim-detail-card-diet .badge{
+    white-space:nowrap;
+    min-width:max-content;
+}
+
+@media(max-width:760px){
+    .trim-detail-card-diet .trim-stats,
+    .trim-detail-card-diet .trim-stats-diet{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:8px;
+    }
+
+    .trim-detail-card-diet .trim-stats div,
+    .trim-detail-card-diet .trim-stats-diet div{
+        padding:9px 7px;
+    }
+
+    .trim-detail-card-diet .trim-stats span,
+    .trim-detail-card-diet .trim-stats-diet span{
+        font-size:10px;
+        letter-spacing:.06em;
+    }
+
+    .trim-detail-card-diet .trim-stats b,
+    .trim-detail-card-diet .trim-stats-diet b{
+        font-size:18px;
+    }
+}
+
+
+/* ==========================================================================
+   CAB-015b Trim Metric Label Visibility Fix / RC2e
+   - Overrides CAB-013 UI Diet label-hiding rule.
+   ========================================================================== */
+
+.trim-detail-card-diet .trim-stats-diet span,
+.trim-detail-card-diet .trim-stats span,
+#trimDeckDetail .trim-stats-diet span,
+#trimDeckDetail .trim-stats span{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    margin-bottom:5px;
+    font-size:11px !important;
+    line-height:1.15;
+    color:var(--muted) !important;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    white-space:nowrap;
+    text-align:left;
+}
+
+.trim-detail-card-diet .trim-stats-diet b,
+.trim-detail-card-diet .trim-stats b,
+#trimDeckDetail .trim-stats-diet b,
+#trimDeckDetail .trim-stats b{
+    display:block !important;
+    font-size:20px !important;
+    line-height:1.1;
+    text-align:right;
+}
+
+@media(max-width:760px){
+    .trim-detail-card-diet .trim-stats-diet span,
+    .trim-detail-card-diet .trim-stats span,
+    #trimDeckDetail .trim-stats-diet span,
+    #trimDeckDetail .trim-stats span{
+        font-size:10px !important;
+        letter-spacing:.05em;
+    }
+
+    .trim-detail-card-diet .trim-stats-diet b,
+    .trim-detail-card-diet .trim-stats b,
+    #trimDeckDetail .trim-stats-diet b,
+    #trimDeckDetail .trim-stats b{
+        font-size:17px !important;
+    }
+}

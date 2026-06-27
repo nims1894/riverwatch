@@ -1289,10 +1289,10 @@ function getVoyageDriftLabel(drift) {
 
 function getTrimBadgeLabel(label) {
     const text = String(label || "").trim().toUpperCase();
-    if (text === "SATISFIED") return "SAT";
-    if (text === "BUILDING") return "BUILD";
-    if (text === "DILUTING") return "DILUTE";
-    if (text === "WITHIN CAP") return "CAP OK";
+    if (text === "SATISFIED") return "SAT ✓";
+    if (text === "BUILDING") return "BUILD ▲";
+    if (text === "DILUTING") return "DILUTE ▼";
+    if (text === "WITHIN CAP") return "CAP OK ✓";
     return text || "-";
 }
 
@@ -1313,12 +1313,7 @@ function renderBoatyard() {
     if (deck) {
         const holdings = riverwatch.calc.allocationHoldings || [];
         deck.innerHTML = `
-            <button class="section-toggle trim-deck-toggle" type="button" id="trimDeckToggle" onclick="toggleTrimDeck()" aria-expanded="false">
-                <span class="section-toggle-title">▾ Trim Deck</span>
-                <span class="section-toggle-hint">Tap to inspect</span>
-            </button>
-            <div class="trim-summary-list" id="trimSummaryList"></div>
-            <div class="trim-deck-detail" id="trimDeckDetail" hidden></div>
+            <div class="trim-deck-detail trim-deck-detail-only" id="trimDeckDetail"></div>
         `;
 
         const summary = document.getElementById("trimSummaryList");
@@ -1350,7 +1345,7 @@ function renderBoatyard() {
                         <span class="trim-summary-ticker" title="${tickerLabel}">${tickerLabel}</span>
                         <span class="badge ${rule.className}">${badgeLabel}</span>
                     </div>
-                    <div class="trim-summary-values" aria-label="Current Target Delta">
+                    <div class="trim-summary-values" aria-label="Current Target Gap">
                         <span class="trim-summary-current">${current.toFixed(1)}%</span>
                         <span class="trim-summary-target">${limit.toFixed(1)}%</span>
                         <span class="trim-summary-delta">${formatSigned(delta)}%</span>
@@ -1375,10 +1370,10 @@ function renderBoatyard() {
                                 <div class="trim-target" style="left:${markerPct}%"></div>
                             </div>
                         </div>
-                        <div class="trim-stats trim-stats-diet" aria-label="Current Target Delta">
-                            <div><b>${current.toFixed(1)}%</b></div>
-                            <div><b>${limit.toFixed(1)}%</b></div>
-                            <div><b>${formatSigned(delta)}%</b></div>
+                        <div class="trim-stats trim-stats-diet" aria-label="Current Target Gap">
+                            <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
+                            <div><span>Target</span><b>${limit.toFixed(1)}%</b></div>
+                            <div><span>Gap</span><b>${formatSigned(delta)}%</b></div>
                         </div>
                     </div>
                 `;
@@ -1386,7 +1381,7 @@ function renderBoatyard() {
             }
         });
 
-        setTrimDeckOpen(getSectionOpen("cab011_trim_deck", false), false);
+        // CAB-014: Trim Deck accordion and summary removed. Details are always visible.
     }
 }
 // Trim Summary removed in CAB-009.4.

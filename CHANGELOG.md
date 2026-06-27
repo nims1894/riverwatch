@@ -1,3 +1,9 @@
+# RiverWatch v1.0 RC2c — CAB-014 Trim Deck Detail-Only
+
+- Removed Trim Deck accordion toggle and summary rows.
+- Restored detail stat labels.
+- Detail cards remain 2-column on desktop/tablet and 1-column on mobile.
+
 
 ## v1.0 RC2 — CAB-011 Bridge Layout Refactoring
 - Unified Health Matrix and Trim Deck toggles.
@@ -88,3 +94,16 @@ Status: Eye Comfort patch ready for review.
 - Detail-card duplicate labels removed.
 - Boatyard mobile overflow containment improved.
 - Intro philosophy restored on mobile.
+
+
+## v1.0 RC2d — CAB-015 Trim Metric Semantic Labels
+
+- Added Current / Target / Gap labels to Trim Deck detail metrics.
+- Added status badge icons: SAT ✓ / BUILD ▲ / DILUTE ▼.
+- Kept Trim Deck detail-only structure from CAB-014.
+
+
+## v1.0 RC2e — CAB-015b Trim Metric Label Visibility Fix
+
+- Restored visible Current / Target / Gap labels in Trim Deck detail cards.
+- Added stronger CSS override for previous UI Diet label-hiding rule.
