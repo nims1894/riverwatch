@@ -1,3 +1,10 @@
+
+## v1.0 RC2 — CAB-011 Bridge Layout Refactoring
+- Unified Health Matrix and Trim Deck toggles.
+- Default collapsed overview for mobile readability.
+- Removed Trim Deck label header.
+- Increased text readability and aligned dashboard bridge card widths.
+
 # CHANGELOG
 
 ## Version 1.0 Beta — CAB-007 Shipyard Reorganization
@@ -54,3 +61,22 @@ Status: Eye Comfort patch ready for review.
 - Removed remaining faint deviation block overlays from Trim Deck bars.
 - Removed Trim Summary section from the Boatyard page.
 - Kept the simplified target marker with a single upward triangle.
+
+## v1.0 RC1b — CAB-009 Sea Trial UX Polish Pack
+
+- Applied comma-based numeric formatting.
+- Added collapsible Health cards and Trim Deck cards.
+- Persisted collapse state with localStorage.
+- Removed Trim Summary card and unused render function.
+- Added Last Sync refresh button.
+- Updated intro label to Version 1.0 RC1b.
+- Added dashboard reload control to avoid unnecessary repeated reloads.
+
+
+## v1.0 RC1c — CAB-010a Dashboard Width & Readability Correction
+
+- Aligned top RiverWatch system bar and navigation width with the dashboard content grid.
+- Restored dashboard text readability after RC1b compact layout.
+- Kept Health cards collapsed by default while improving title / score / status spacing.
+- Converted Trim Deck collapsed header labels from Korean to English: Asset / Current / Target / Delta / Status.
+- Stabilized Trim Deck collapsed row column positions.

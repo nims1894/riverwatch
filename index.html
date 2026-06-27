@@ -13,7 +13,7 @@
         <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
         <div class="subtitle">Personal Navigation System<br>for Reaching the Open Sea</div>
-        <div class="version">Version 1.0 Beta</div>
+        <div class="version">Version 1.0 RC2</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -49,7 +49,7 @@
                     Operator : NIMS <span class="online">● ONLINE</span>
                 </div>
                 <div class="last-sync">
-                    Last Sync <span id="lastSync"></span> · <span id="dataSource">FALLBACK</span>
+                    Last Sync <span id="lastSync"></span> · <span id="dataSource">FALLBACK</span> <button id="refreshDashboardBtn" class="refresh-button" type="button" title="Refresh dashboard" onclick="refreshDashboard()">↻</button>
                 </div>
                 <div class="sync-detail" id="syncDetail">MKT -- · PORT -- · CFG --</div>
             </div>
@@ -109,69 +109,70 @@
                 </div>
             </section>
 
-            <section class="card health-card voyage-card">
-                <div class="label"><span class="health-icon">🧭</span> Voyage Health</div>
-                <div class="health-value"><span id="voyageHealth">--</span></div>
-                <div class="status-sub" id="voyageStatus">--</div>
+            <section class="card health-matrix-card" id="healthMatrixCard">
+                <button class="section-toggle health-matrix-toggle" type="button" id="healthMatrixToggle" onclick="toggleHealthMatrix()" aria-expanded="false">
+                    <span class="section-toggle-title">▾ Health Matrix</span>
+                    <span class="section-toggle-hint">Tap to inspect</span>
+                </button>
 
-                <div class="voyage-flow">
-                    <div class="voyage-step">
-                        <span>Current Position</span>
-                        <b id="currentPosition">-</b>
+                <div class="health-matrix-summary" id="healthMatrixSummary">
+                    <div class="health-summary-row">
+                        <span class="health-summary-name"><span class="health-icon">🧭</span> Voyage Health</span>
+                        <span class="health-summary-score" id="summaryVoyageHealth">--</span>
+                        <span class="health-summary-status" id="summaryVoyageStatus">--</span>
                     </div>
-                    <div class="voyage-step">
-                        <span>Remaining</span>
-                        <b id="remainingTime">-</b>
+                    <div class="health-summary-row">
+                        <span class="health-summary-name"><span class="health-icon">🌊</span> River Health</span>
+                        <span class="health-summary-score" id="summaryRiverHealth">--</span>
+                        <span class="health-summary-status" id="summaryRiverStatus">--</span>
                     </div>
-                    <div class="voyage-step">
-                        <span>Effective CAGR</span>
-                        <b id="effectiveCAGR">-</b>
-                    </div>
-                    <div class="voyage-step">
-                        <span>Adjusted Arrival</span>
-                        <b id="adjustedArrival">-</b>
-                    </div>
-                    <div class="voyage-step">
-                        <span>Open Sea Target</span>
-                        <b id="openSeaTarget">-</b>
-                    </div>
-                    <div class="voyage-step subtle-step">
-                        <span>Gap to Destination</span>
-                        <b id="voyageGap">-</b>
-                    </div>
-                    <div class="voyage-step">
-                        <span>Recovery Mode</span>
-                        <b id="recoveryMode">-</b>
-                    </div>
-                    <div class="voyage-step subtle-step">
-                        <span>ETA Extension</span>
-                        <b id="etaExtension">-</b>
+                    <div class="health-summary-row">
+                        <span class="health-summary-name"><span class="health-icon">⛵</span> Boat Health</span>
+                        <span class="health-summary-score" id="summaryBoatHealth">--</span>
+                        <span class="health-summary-status" id="summaryBoatStatus">--</span>
                     </div>
                 </div>
-            </section>
 
-            <section class="card health-card">
-                <div class="label"><span class="health-icon">🌊</span> River Health</div>
-                <div class="health-value"><span id="riverHealth">--</span></div>
-                <div class="status-sub" id="riverStatus">--</div>
+                <div class="health-matrix-detail" id="healthMatrixDetail" hidden>
+                    <section class="health-card voyage-card" data-health-detail="voyage">
+                        <div class="label"><span class="health-icon">🧭</span> Voyage Health</div>
+                        <div class="health-value"><span id="voyageHealth">--</span></div>
+                        <div class="status-sub" id="voyageStatus">--</div>
 
-                <div class="metric-list" id="riverMetricList"></div>
-            </section>
+                        <div class="voyage-flow">
+                            <div class="voyage-step"><span>Current Position</span><b id="currentPosition">-</b></div>
+                            <div class="voyage-step"><span>Remaining</span><b id="remainingTime">-</b></div>
+                            <div class="voyage-step"><span>Effective CAGR</span><b id="effectiveCAGR">-</b></div>
+                            <div class="voyage-step"><span>Adjusted Arrival</span><b id="adjustedArrival">-</b></div>
+                            <div class="voyage-step"><span>Open Sea Target</span><b id="openSeaTarget">-</b></div>
+                            <div class="voyage-step subtle-step"><span>Gap to Destination</span><b id="voyageGap">-</b></div>
+                            <div class="voyage-step"><span>Recovery Mode</span><b id="recoveryMode">-</b></div>
+                            <div class="voyage-step subtle-step"><span>ETA Extension</span><b id="etaExtension">-</b></div>
+                        </div>
+                    </section>
 
-            <section class="card health-card">
-                <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
-                <div class="health-value"><span id="boatHealth">--</span></div>
-                <div class="status-sub" id="boatStatus">--</div>
+                    <section class="health-card" data-health-detail="river">
+                        <div class="label"><span class="health-icon">🌊</span> River Health</div>
+                        <div class="health-value"><span id="riverHealth">--</span></div>
+                        <div class="status-sub" id="riverStatus">--</div>
+                        <div class="metric-list" id="riverMetricList"></div>
+                    </section>
 
-                <div class="metric-list">
-                    <div><span>Trim Alignment</span><b id="allocationAlignment">-</b></div>
-                    <div><span>River Suitability</span><b id="riverSuitability">-</b></div>
-                    <div><span>Diversification Integrity</span><b id="structuralIntegrity">-</b></div>
-                    <div><span>Captain Discipline</span><b id="captainDiscipline">-</b></div>
-                    <div><span>Boat Archetype</span><b id="boatArchetype">-</b></div>
-                    <div><span>Voyage Phase</span><b id="voyagePhaseInBoat">-</b></div>
-                    <div><span>Cost Basis</span><b id="costBasis">-</b></div>
-                    <div><span>Boat Return</span><b id="boatReturn">-</b></div>
+                    <section class="health-card" data-health-detail="boat">
+                        <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
+                        <div class="health-value"><span id="boatHealth">--</span></div>
+                        <div class="status-sub" id="boatStatus">--</div>
+                        <div class="metric-list">
+                            <div><span>Trim Alignment</span><b id="allocationAlignment">-</b></div>
+                            <div><span>River Suitability</span><b id="riverSuitability">-</b></div>
+                            <div><span>Diversification Integrity</span><b id="structuralIntegrity">-</b></div>
+                            <div><span>Captain Discipline</span><b id="captainDiscipline">-</b></div>
+                            <div><span>Boat Archetype</span><b id="boatArchetype">-</b></div>
+                            <div><span>Voyage Phase</span><b id="voyagePhaseInBoat">-</b></div>
+                            <div><span>Cost Basis</span><b id="costBasis">-</b></div>
+                            <div><span>Boat Return</span><b id="boatReturn">-</b></div>
+                        </div>
+                    </section>
                 </div>
             </section>
             <section class="card bridge-card">
@@ -212,10 +213,6 @@
                 <div id="trimDeckList" class="trim-deck-list"></div>
             </section>
 
-            <section class="card trim-summary-card">
-                <div class="label">Trim Summary</div>
-                <div id="trimSummary" class="trim-summary"></div>
-            </section>
         </main>
 
         <main id="logbookPage" class="app-page hidden">

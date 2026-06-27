@@ -5,14 +5,39 @@
  * - Adds River Health Engine v1.1, Boat Health Engine v1.1, Voyage Health Engine v1.1
  ****************************************************************************************/
 
-async function showDashboard() {
+let riverwatchDashboardInitialized = false;
+
+async function showDashboard(forceReload = false) {
     document.getElementById("intro").classList.add("hidden");
     document.getElementById("dashboard").classList.remove("hidden");
 
-    await initializeMarketData();
+    if (forceReload || !riverwatchDashboardInitialized) {
+        await initializeMarketData();
+        riverwatchDashboardInitialized = true;
+    }
+
     runCalculationEngines();
     renderDashboard();
     showAppPage("dashboardPage");
+}
+
+async function refreshDashboard() {
+    const button = document.getElementById("refreshDashboardBtn");
+    if (button) {
+        button.disabled = true;
+        button.classList.add("refreshing");
+    }
+
+    await initializeMarketData();
+    riverwatchDashboardInitialized = true;
+    runCalculationEngines();
+    renderDashboard();
+    showAppPage(document.querySelector(".nav-tab.active")?.dataset?.page || "dashboardPage");
+
+    if (button) {
+        button.disabled = false;
+        button.classList.remove("refreshing");
+    }
 }
 
 function showIntro() {
@@ -841,6 +866,86 @@ function getRecoveryDisplay() {
     return { mode: "TIME EXTENSION", eta: riverwatch.calc.extraTimeRequired || "-" };
 }
 
+
+function getSectionOpen(key, defaultOpen = false) {
+    const saved = localStorage.getItem(key);
+    return saved === null ? defaultOpen : saved === "open";
+}
+
+function setSectionOpen(key, isOpen) {
+    localStorage.setItem(key, isOpen ? "open" : "closed");
+}
+
+function setupBridgeSections() {
+    setHealthMatrixOpen(getSectionOpen("cab011_health_matrix", false), false);
+    setTrimDeckOpen(getSectionOpen("cab011_trim_deck", false), false);
+    syncHealthMatrixSummary();
+}
+
+function toggleHealthMatrix() {
+    const detail = document.getElementById("healthMatrixDetail");
+    const nextOpen = detail ? detail.hidden : true;
+    setHealthMatrixOpen(nextOpen, true);
+}
+
+function setHealthMatrixOpen(isOpen, persist = true) {
+    const card = document.getElementById("healthMatrixCard");
+    const detail = document.getElementById("healthMatrixDetail");
+    const toggle = document.getElementById("healthMatrixToggle");
+    if (card) card.classList.toggle("is-open", isOpen);
+    if (detail) detail.hidden = !isOpen;
+    if (toggle) {
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        const title = toggle.querySelector(".section-toggle-title");
+        const hint = toggle.querySelector(".section-toggle-hint");
+        if (title) title.textContent = `${isOpen ? "▴" : "▾"} Health Matrix`;
+        if (hint) hint.textContent = isOpen ? "Collapse" : "Tap to inspect";
+    }
+    if (persist) setSectionOpen("cab011_health_matrix", isOpen);
+}
+
+function syncHealthMatrixSummary() {
+    const voyage = document.getElementById("voyageHealth")?.textContent || "--";
+    const river = document.getElementById("riverHealth")?.textContent || "--";
+    const boat = document.getElementById("boatHealth")?.textContent || "--";
+    const voyageStatus = document.getElementById("voyageStatus")?.textContent || "--";
+    const riverStatus = document.getElementById("riverStatus")?.textContent || "--";
+    const boatStatus = document.getElementById("boatStatus")?.textContent || "--";
+
+    setText("summaryVoyageHealth", voyage);
+    setText("summaryRiverHealth", river);
+    setText("summaryBoatHealth", boat);
+    setText("summaryVoyageStatus", stripScoreSuffix(voyageStatus));
+    setText("summaryRiverStatus", stripScoreSuffix(riverStatus));
+    setText("summaryBoatStatus", stripScoreSuffix(boatStatus));
+}
+
+function stripScoreSuffix(value) {
+    return String(value || "--").replace(/\s*\([^)]*\)\s*$/, "");
+}
+
+function toggleTrimDeck() {
+    const detail = document.getElementById("trimDeckDetail");
+    const nextOpen = detail ? detail.hidden : true;
+    setTrimDeckOpen(nextOpen, true);
+}
+
+function setTrimDeckOpen(isOpen, persist = true) {
+    const deck = document.getElementById("trimDeckList");
+    const detail = document.getElementById("trimDeckDetail");
+    const toggle = document.getElementById("trimDeckToggle");
+    if (deck) deck.classList.toggle("is-open", isOpen);
+    if (detail) detail.hidden = !isOpen;
+    if (toggle) {
+        toggle.setAttribute("aria-expanded", String(isOpen));
+        const title = toggle.querySelector(".section-toggle-title");
+        const hint = toggle.querySelector(".section-toggle-hint");
+        if (title) title.textContent = `${isOpen ? "▴" : "▾"} Trim Deck`;
+        if (hint) hint.textContent = isOpen ? "Collapse" : "Tap to inspect";
+    }
+    if (persist) setSectionOpen("cab011_trim_deck", isOpen);
+}
+
 function renderDashboard() {
     renderTopbar();
     renderMission();
@@ -850,6 +955,7 @@ function renderDashboard() {
     renderCaptainBridge();
     renderBoatyard();
     renderOpenSeaLogbook();
+    setupBridgeSections();
 }
 
 function renderTopbar() {
@@ -1187,77 +1293,81 @@ function renderBoatyard() {
 
     const deck = document.getElementById("trimDeckList");
     if (deck) {
-        deck.innerHTML = "";
-        (riverwatch.calc.allocationHoldings || []).forEach(item => {
+        const holdings = riverwatch.calc.allocationHoldings || [];
+        deck.innerHTML = `
+            <button class="section-toggle trim-deck-toggle" type="button" id="trimDeckToggle" onclick="toggleTrimDeck()" aria-expanded="false">
+                <span class="section-toggle-title">▾ Trim Deck</span>
+                <span class="section-toggle-hint">Tap to inspect</span>
+            </button>
+            <div class="trim-summary-list" id="trimSummaryList"></div>
+            <div class="trim-deck-detail" id="trimDeckDetail" hidden></div>
+        `;
+
+        const summary = document.getElementById("trimSummaryList");
+        const detail = document.getElementById("trimDeckDetail");
+
+        holdings.forEach(item => {
             const rule = getDoctrineRule(item);
             const current = Number(item.current ?? 0);
             const limit = Number(rule.limit ?? 0);
             const delta = current - limit;
 
-            // CAB-008.3 Trim Deck Visual Pass
-            // The marker is kept in a consistent local position, while the current bar
-            // moves left/right from that doctrine line in 5%-point blocks.
             const markerPct = 70;
             const blockPct = 6;
             const blockCountRaw = delta === 0 ? 0 : (delta > 0 ? Math.ceil(delta / 5) : Math.floor(delta / 5));
             const blockCount = Math.max(-5, Math.min(5, blockCountRaw));
             const currentPct = Math.max(8, Math.min(96, markerPct + blockCount * blockPct));
-
+            const showDeviation = false;
             const gapStart = Math.min(currentPct, markerPct);
             const gapWidth = Math.abs(markerPct - currentPct);
             const isExcess = delta > 0;
-            const showDeviation = false;
 
-            const row = document.createElement("div");
-            row.className = "trim-card";
-            row.innerHTML = `
-                <div class="trim-head">
-                    <b>${formatTicker(item.ticker)}</b>
+            if (summary) {
+                const row = document.createElement("div");
+                row.className = "trim-summary-row";
+                row.innerHTML = `
+                    <span class="trim-summary-ticker">${formatTicker(item.ticker)}</span>
+                    <span class="trim-summary-current">${current.toFixed(1)}%</span>
+                    <span class="trim-summary-target">${limit.toFixed(1)}%</span>
+                    <span class="trim-summary-delta">${formatSigned(delta)}%</span>
                     <span class="badge ${rule.className}">${rule.label}</span>
-                </div>
-                <div class="trim-bar-wrap">
-                    <div class="trim-bar">
-                        <div class="trim-fill" style="width:${currentPct}%"></div>
-                        ${showDeviation ? `<div class="${isExcess ? "trim-excess-blocks" : "trim-gap-blocks"}" style="left:${gapStart}%; width:${gapWidth}%"></div>` : ""}
-                        <div class="trim-target" style="left:${markerPct}%"></div>
+                `;
+                summary.appendChild(row);
+            }
+
+            if (detail) {
+                const row = document.createElement("div");
+                row.className = "trim-card";
+                row.innerHTML = `
+                    <div class="trim-head trim-head-static">
+                        <b class="trim-ticker">${formatTicker(item.ticker)}</b>
+                        <span class="trim-current">${current.toFixed(1)}%</span>
+                        <span class="trim-target-value">${limit.toFixed(1)}%</span>
+                        <span class="trim-delta">${formatSigned(delta)}%</span>
+                        <span class="badge ${rule.className}">${rule.label}</span>
                     </div>
-                </div>
-                <div class="trim-stats">
-                    <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
-                    <div><span>${rule.limitLabel}</span><b>${limit.toFixed(1)}%</b></div>
-                    <div><span>${rule.deltaLabel}</span><b>${formatSigned(delta)}%</b></div>
-                </div>
-            `;
-            deck.appendChild(row);
+                    <div class="trim-card-body">
+                        <div class="trim-bar-wrap">
+                            <div class="trim-bar">
+                                <div class="trim-fill" style="width:${currentPct}%"></div>
+                                ${showDeviation ? `<div class="${isExcess ? "trim-excess-blocks" : "trim-gap-blocks"}" style="left:${gapStart}%; width:${gapWidth}%"></div>` : ""}
+                                <div class="trim-target" style="left:${markerPct}%"></div>
+                            </div>
+                        </div>
+                        <div class="trim-stats">
+                            <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
+                            <div><span>${rule.limitLabel}</span><b>${limit.toFixed(1)}%</b></div>
+                            <div><span>${rule.deltaLabel}</span><b>${formatSigned(delta)}%</b></div>
+                        </div>
+                    </div>
+                `;
+                detail.appendChild(row);
+            }
         });
     }
-
-    // Trim Summary removed in CAB-008.3c.
 }
 
-function renderTrimSummary() {
-    const el = document.getElementById("trimSummary");
-    if (!el) return;
-
-    const groups = { SATISFIED: [], BUILDING: [], DILUTING: [], "WITHIN CAP": [] };
-
-    (riverwatch.calc.allocationHoldings || []).forEach(item => {
-        const rule = getDoctrineRule(item);
-        const delta = Number(item.current ?? 0) - Number(rule.limit ?? 0);
-        const label = `${formatTicker(item.ticker)} (${formatSigned(delta)}%)`;
-        groups[rule.label]?.push({ label, delta: Math.abs(delta) });
-    });
-
-    Object.values(groups).forEach(items => items.sort((a, b) => b.delta - a.delta));
-
-    el.innerHTML = Object.entries(groups).map(([label, items]) => `
-        <div class="trim-summary-group">
-            <span>${label}</span>
-            <b>${items.length ? items.map(item => item.label).join(" · ") : "-"}</b>
-        </div>
-    `).join("");
-}
-
+// Trim Summary removed in CAB-009.4.
 function normalizeLogbookRows(rows) {
     return (rows || []).map(row => {
         const principal = Number(row.principalKRW || 0);
@@ -1330,13 +1440,7 @@ function renderLogbookChart(rows) {
 
     const chartWidth = Math.max(320, el.clientWidth || 720);
     const chartHeight = 250;
-    const isMobileChart = window.innerWidth < 768;
-    const pad = {
-        left: isMobileChart ? 28 : 72,
-        right: isMobileChart ? 14 : 34,
-        top: 28,
-        bottom: 44
-    };
+    const pad = { left: 72, right: 34, top: 28, bottom: 44 };
     const plotW = chartWidth - pad.left - pad.right;
     const plotH = chartHeight - pad.top - pad.bottom;
 
@@ -1535,7 +1639,7 @@ function formatRemainingTime(years) {
 
 function formatKRWM(value) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
-    return Math.round(value / 1000000) + "M";
+    return formatInteger(value / 1000000) + "M";
 }
 
 function formatKRWB(value) {
@@ -1543,9 +1647,12 @@ function formatKRWB(value) {
     return formatKRWM(value);
 }
 
-function formatNumber(value) {
+function formatNumber(value, maximumFractionDigits = 2) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
-    return value.toLocaleString("ko-KR", { maximumFractionDigits: 2 });
+    return value.toLocaleString("ko-KR", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits
+    });
 }
 
 function formatInteger(value) {
@@ -1555,12 +1662,12 @@ function formatInteger(value) {
 
 function formatPercentValue(value) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
-    return value.toFixed(1) + "%";
+    return formatNumber(value, 1) + "%";
 }
 
-function formatSigned(value) {
+function formatSigned(value, digits = 1) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
-    return (value > 0 ? "+" : "") + value.toFixed(1);
+    return (value > 0 ? "+" : "") + formatNumber(value, digits);
 }
 
 function scoreText(value) {
@@ -1572,8 +1679,8 @@ function formatKRWMonthly(value) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
     const n = Number(value);
     if (n <= 0) return "0 KRW";
-    if (n >= 1000000) return (n / 1000000).toFixed(1) + "M KRW";
-    return Math.round(n).toLocaleString("ko-KR") + " KRW";
+    if (n >= 1000000) return formatNumber(n / 1000000, 1) + "M KRW";
+    return formatInteger(n) + " KRW";
 }
 
 function formatCAGRValue(value) {
