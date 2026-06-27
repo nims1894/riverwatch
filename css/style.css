@@ -2342,3 +2342,82 @@ body{
         font-size:10px;
     }
 }
+
+/* Sprint #008 Patch-2 : Boatyard Overflow + Trim Detail Desktop Grid */
+
+.boatyardPage,
+#boatyardPage,
+.premium-allocation-card,
+.trim-deck-layout,
+.trim-card,
+.trim-card *{
+    min-width:0;
+}
+
+.trim-card,
+.trim-detail-card,
+.boatyard-kpis div,
+.page-hero{
+    overflow-wrap:anywhere;
+    word-break:keep-all;
+}
+
+.trim-head,
+.trim-summary-row,
+.trim-card-row{
+    min-width:0;
+}
+
+.trim-head b,
+.trim-summary-row b,
+.trim-summary-row span,
+.trim-card-row b,
+.trim-card-row span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.trim-detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:16px;
+    margin-top:18px;
+}
+
+@media (max-width: 760px){
+    .trim-detail-grid{
+        grid-template-columns:1fr;
+    }
+
+    #boatyardPage .trim-card{
+        width:100%;
+        max-width:100%;
+    }
+
+    #boatyardPage .trim-head{
+        gap:8px;
+    }
+
+    #boatyardPage .trim-head b{
+        font-size:20px;
+    }
+
+    #boatyardPage .trim-stats{
+        grid-template-columns:repeat(3, minmax(0,1fr));
+        gap:6px;
+    }
+
+    #boatyardPage .trim-stats div{
+        padding:8px;
+        min-width:0;
+    }
+
+    #boatyardPage .trim-stats span{
+        font-size:10px;
+    }
+
+    #boatyardPage .trim-stats b{
+        font-size:13px;
+    }
+}
