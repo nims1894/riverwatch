@@ -1286,6 +1286,22 @@ function getVoyageDriftLabel(drift) {
 }
 
 
+
+function getTrimBadgeLabel(label) {
+    const text = String(label || "").trim().toUpperCase();
+    if (text === "SATISFIED") return "SAT";
+    if (text === "BUILDING") return "BUILD";
+    if (text === "DILUTING") return "DILUTE";
+    if (text === "WITHIN CAP") return "CAP OK";
+    return text || "-";
+}
+
+function formatTrimTicker(ticker) {
+    const text = String(ticker || "").toUpperCase();
+    if (text === "INDIVIDUAL") return "INDIVIDUAL";
+    return formatTicker(text);
+}
+
 function renderBoatyard() {
     setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
     setText("boatyardDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
@@ -1313,6 +1329,8 @@ function renderBoatyard() {
             const current = Number(item.current ?? 0);
             const limit = Number(rule.limit ?? 0);
             const delta = current - limit;
+            const badgeLabel = getTrimBadgeLabel(rule.label);
+            const tickerLabel = formatTrimTicker(item.ticker);
 
             const markerPct = 70;
             const blockPct = 6;
@@ -1326,27 +1344,28 @@ function renderBoatyard() {
 
             if (summary) {
                 const row = document.createElement("div");
-                row.className = "trim-summary-row";
+                row.className = "trim-summary-row trim-summary-row-diet";
                 row.innerHTML = `
-                    <span class="trim-summary-ticker">${formatTicker(item.ticker)}</span>
-                    <span class="trim-summary-current">${current.toFixed(1)}%</span>
-                    <span class="trim-summary-target">${limit.toFixed(1)}%</span>
-                    <span class="trim-summary-delta">${formatSigned(delta)}%</span>
-                    <span class="badge ${rule.className}">${rule.label}</span>
+                    <div class="trim-summary-topline">
+                        <span class="trim-summary-ticker" title="${tickerLabel}">${tickerLabel}</span>
+                        <span class="badge ${rule.className}">${badgeLabel}</span>
+                    </div>
+                    <div class="trim-summary-values" aria-label="Current Target Delta">
+                        <span class="trim-summary-current">${current.toFixed(1)}%</span>
+                        <span class="trim-summary-target">${limit.toFixed(1)}%</span>
+                        <span class="trim-summary-delta">${formatSigned(delta)}%</span>
+                    </div>
                 `;
                 summary.appendChild(row);
             }
 
             if (detail) {
                 const row = document.createElement("div");
-                row.className = "trim-card";
+                row.className = "trim-card trim-detail-card-diet";
                 row.innerHTML = `
-                    <div class="trim-head trim-head-static">
-                        <b class="trim-ticker">${formatTicker(item.ticker)}</b>
-                        <span class="trim-current">${current.toFixed(1)}%</span>
-                        <span class="trim-target-value">${limit.toFixed(1)}%</span>
-                        <span class="trim-delta">${formatSigned(delta)}%</span>
-                        <span class="badge ${rule.className}">${rule.label}</span>
+                    <div class="trim-head trim-head-static trim-head-diet">
+                        <b class="trim-ticker" title="${tickerLabel}">${tickerLabel}</b>
+                        <span class="badge ${rule.className}">${badgeLabel}</span>
                     </div>
                     <div class="trim-card-body">
                         <div class="trim-bar-wrap">
@@ -1356,19 +1375,20 @@ function renderBoatyard() {
                                 <div class="trim-target" style="left:${markerPct}%"></div>
                             </div>
                         </div>
-                        <div class="trim-stats">
-                            <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
-                            <div><span>${rule.limitLabel}</span><b>${limit.toFixed(1)}%</b></div>
-                            <div><span>${rule.deltaLabel}</span><b>${formatSigned(delta)}%</b></div>
+                        <div class="trim-stats trim-stats-diet" aria-label="Current Target Delta">
+                            <div><b>${current.toFixed(1)}%</b></div>
+                            <div><b>${limit.toFixed(1)}%</b></div>
+                            <div><b>${formatSigned(delta)}%</b></div>
                         </div>
                     </div>
                 `;
                 detail.appendChild(row);
             }
         });
+
+        setTrimDeckOpen(getSectionOpen("cab011_trim_deck", false), false);
     }
 }
-
 // Trim Summary removed in CAB-009.4.
 function normalizeLogbookRows(rows) {
     return (rows || []).map(row => {

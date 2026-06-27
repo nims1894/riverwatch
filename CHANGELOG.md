@@ -80,3 +80,11 @@ Status: Eye Comfort patch ready for review.
 - Kept Health cards collapsed by default while improving title / score / status spacing.
 - Converted Trim Deck collapsed header labels from Korean to English: Asset / Current / Target / Delta / Status.
 - Stabilized Trim Deck collapsed row column positions.
+
+
+## RiverWatch v1.0 RC2b — CAB-013 Information Diet
+- Trim Deck information density reduced for mobile readability.
+- Status labels shortened.
+- Detail-card duplicate labels removed.
+- Boatyard mobile overflow containment improved.
+- Intro philosophy restored on mobile.
