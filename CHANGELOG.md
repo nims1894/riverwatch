@@ -107,3 +107,9 @@ Status: Eye Comfort patch ready for review.
 
 - Restored visible Current / Target / Gap labels in Trim Deck detail cards.
 - Added stronger CSS override for previous UI Diet label-hiding rule.
+
+
+## v1.0 RC2f — CAB-016 Portfolio Journey Mobile Margin Regression Fix
+
+- Restored mobile Portfolio Journey left-margin optimization.
+- Reduced mobile SVG chart padding and prevented horizontal chart overflow.

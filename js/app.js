@@ -1455,9 +1455,12 @@ function renderLogbookChart(rows) {
         Number(row.targetValueKRW || 0)
     )), 1);
 
-    const chartWidth = Math.max(320, el.clientWidth || 720);
+    const chartWidth = Math.max(300, el.clientWidth || 720);
     const chartHeight = 250;
-    const pad = { left: 72, right: 34, top: 28, bottom: 44 };
+    const isMobileJourney = chartWidth <= 520;
+    const pad = isMobileJourney
+        ? { left: 28, right: 16, top: 26, bottom: 42 }
+        : { left: 72, right: 34, top: 28, bottom: 44 };
     const plotW = chartWidth - pad.left - pad.right;
     const plotH = chartHeight - pad.top - pad.bottom;
 

@@ -2959,3 +2959,41 @@ body{
         font-size:17px !important;
     }
 }
+
+
+/* ==========================================================================
+   CAB-016 Portfolio Journey Mobile Margin Regression Fix / RC2f
+   - Restores CAB-008.4a mobile margin optimization.
+   - Reduces SVG left padding on mobile and prevents horizontal scroll.
+   ========================================================================== */
+
+@media(max-width:760px){
+    .logbook-chart-card{
+        padding-left:18px;
+        padding-right:18px;
+    }
+
+    .logbook-chart{
+        overflow-x:hidden;
+        padding-right:0;
+    }
+
+    .journey-scroll-x{
+        width:100%;
+        max-width:100%;
+        overflow-x:hidden;
+    }
+
+    .journey-svg{
+        width:100%;
+        max-width:100%;
+        display:block;
+    }
+}
+
+@media(max-width:430px){
+    .logbook-chart-card{
+        padding-left:14px;
+        padding-right:14px;
+    }
+}
