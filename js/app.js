@@ -752,12 +752,7 @@ function scoreVoyageDrift(drift) {
 }
 
 function getVoyageStatus(score) {
-    if (score >= 95) return "AHEAD OF COURSE";
-    if (score >= 85) return "ON COURSE";
-    if (score >= 75) return "MINOR CORRECTION";
-    if (score >= 60) return "OFF COURSE";
-    if (score >= 40) return "MAJOR CORRECTION";
-    return "LOST AT SEA";
+    return getStatusFromTable(score, "voyage");
 }
 
 function updateDecisionEngine() {
@@ -1020,7 +1015,7 @@ function renderVoyageHealth() {
     const recovery = getRecoveryDisplay();
 
     setText("voyageHealth", riverwatch.calc.voyageHealth);
-    setText("voyageStatus", `${getVoyageStatus(riverwatch.calc.voyageHealth)} (${riverwatch.calc.voyageHealth})`);
+    setText("voyageStatus", getVoyageStatus(riverwatch.calc.voyageHealth));
     setText("currentPosition", formatKRWM(riverwatch.calc.currentPosition));
     setText("remainingTime", riverwatch.calc.remainingTime);
     setText("effectiveCAGR", formatPercentValue(riverwatch.calc.effectiveCAGR * 100));
@@ -1593,27 +1588,54 @@ function setHTML(id, value) {
     if (el) el.innerHTML = value;
 }
 
+
+/* ==========================================================================
+   CAB-018 Health Status Threshold Tables / RC2g
+   - Centralized health status labels and score thresholds.
+   - Edit these tables to tune score bands or wording.
+   ========================================================================== */
+
+const HEALTH_STATUS_TABLES = {
+    voyage: [
+        { min: 90, label: "ON COURSE" },
+        { min: 75, label: "STABLE COURSE" },
+        { min: 60, label: "DRIFTING" },
+        { min: 40, label: "COURSE CORRECTION" },
+        { min: 0,  label: "LOST COURSE" }
+    ],
+    river: [
+        { min: 90, label: "STRONG CURRENT" },
+        { min: 75, label: "FAVORABLE CURRENT" },
+        { min: 60, label: "MIXED CURRENT" },
+        { min: 40, label: "HEAD CURRENT" },
+        { min: 0,  label: "STORM WARNING" }
+    ],
+    boat: [
+        { min: 90, label: "OPTIMALLY TRIMMED" },
+        { min: 75, label: "PROPERLY TRIMMED" },
+        { min: 60, label: "NEEDS ADJUSTMENT" },
+        { min: 40, label: "POORLY TRIMMED" },
+        { min: 0,  label: "REBALANCING REQUIRED" }
+    ]
+};
+
+function getStatusFromTable(score, tableKey) {
+    const value = Number(score ?? 0);
+    const table = HEALTH_STATUS_TABLES[tableKey] || [];
+    const matched = table.find(item => value >= item.min);
+    return matched ? matched.label : "-";
+}
+
 function getHealthStatus(score) {
-    if (score >= 90) return "ON VOYAGE";
-    if (score >= 80) return "KEEP WATCH";
-    if (score >= 70) return "ADAPT";
-    return "RECOVER COURSE";
+    return getStatusFromTable(score, "voyage");
 }
 
 function getRiverStatus(score) {
-    if (score >= 90) return "TAILWIND";
-    if (score >= 80) return "FAVORABLE CURRENT";
-    if (score >= 70) return "STABLE CURRENT";
-    if (score >= 60) return "CHOPPY WATER";
-    return "ROUGH SEA";
+    return getStatusFromTable(score, "river");
 }
 
 function getBoatStatus(score) {
-    if (score >= 90) return "WELL CONFIGURED";
-    if (score >= 80) return "PROPERLY TRIMMED";
-    if (score >= 70) return "NEEDS ADJUSTMENT";
-    if (score >= 60) return "POORLY BALANCED";
-    return "TAKING WATER";
+    return getStatusFromTable(score, "boat");
 }
 
 function getDoctrineRule(item) {
@@ -1768,7 +1790,7 @@ function updateHealthMatrixSummary() {
     setText("summaryRiverHealth", Math.round(Number(c.riverHealth ?? 0)));
     setText("summaryBoatHealth", Math.round(Number(c.boatHealth ?? 0)));
 
-    setText("summaryVoyageStatus", document.getElementById("voyageStatus")?.textContent || "--");
-    setText("summaryRiverStatus", document.getElementById("riverStatus")?.textContent || "--");
-    setText("summaryBoatStatus", document.getElementById("boatStatus")?.textContent || "--");
+    setText("summaryVoyageStatus", stripScoreSuffix(document.getElementById("voyageStatus")?.textContent || "--"));
+    setText("summaryRiverStatus", stripScoreSuffix(document.getElementById("riverStatus")?.textContent || "--"));
+    setText("summaryBoatStatus", stripScoreSuffix(document.getElementById("boatStatus")?.textContent || "--"));
 }

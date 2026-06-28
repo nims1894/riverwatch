@@ -2997,3 +2997,23 @@ body{
         padding-right:14px;
     }
 }
+
+
+/* CAB-019 Health Visual Polish */
+.metric-card.info,
+.metric-card.highlight,
+.metric-card.warning{
+  background:var(--card-bg) !important;
+  border:1px solid var(--card-border) !important;
+  box-shadow:none !important;
+}
+
+
+/* CAB-019a Health Visual Polish Completion / RC2i
+   - Force Voyage subtle-step cards to match ordinary voyage-step cards.
+*/
+.voyage-step.subtle-step{
+    background:rgba(255,255,255,0.03) !important;
+    border:1px solid rgba(255,255,255,0.05) !important;
+    box-shadow:none !important;
+}

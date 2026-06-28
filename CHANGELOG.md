@@ -113,3 +113,16 @@ Status: Eye Comfort patch ready for review.
 
 - Restored mobile Portfolio Journey left-margin optimization.
 - Reduced mobile SVG chart padding and prevented horizontal chart overflow.
+
+
+## v1.0 RC2g — CAB-018 Health Status Threshold Tables
+
+- Centralized Voyage / River / Boat health status thresholds in `app.js`.
+- Updated Voyage status labels to ON COURSE / STABLE COURSE / DRIFTING / COURSE CORRECTION / LOST COURSE.
+- Updated River and Boat status bands to shared 90 / 75 / 60 / 40 thresholds.
+
+
+## v1.0 RC2i — CAB-019a Health Visual Polish Completion
+
+- Completed Health status suffix removal and Voyage status table binding.
+- Unified `Gap to Destination` / `ETA Extension` styling with other Voyage metric cards.
