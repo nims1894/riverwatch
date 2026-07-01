@@ -29,3 +29,8 @@ Any change to `font-size`, `line-height`, `letter-spacing`, or typography tokens
 
 ## CAB-020e Addendum
 Intro screen typography is explicitly included in the ADR-002 Typography Baseline Lock scope.
+
+
+## Principle D06 — Responsive Consistency
+Narrow screens may stack metric boxes into one column, but they must not change the semantic alignment rule. Labels remain left-aligned and values remain right-aligned.
+

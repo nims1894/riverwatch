@@ -1,6 +1,6 @@
 # RiverWatch
 
-**Version 1.0 Beta CAB-007.2**  
+**Version 1.0 RC4 — Sprint #010 / CAB-020 Complete**  
 Personal Navigation System for Reaching the Open Sea.
 
 ## Spaces

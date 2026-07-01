@@ -3802,3 +3802,62 @@ body{
         grid-template-columns:1fr !important;
     }
 }
+
+
+/* ===========================================================================
+   RC4 / SPRINT #010 FINAL MOBILE VALUE ALIGNMENT LOCK
+   - Narrow screens must stack metric boxes in one column.
+   - Values must remain right-aligned on mobile, same as desktop.
+   - Typography must not be reduced to solve responsive density.
+   =========================================================================== */
+
+@media(max-width:900px){
+    .boatyard-kpis,
+    .logbook-kpis,
+    .boatyard-hero .boat-profile-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    .boatyard-kpis > div,
+    .logbook-kpis > div,
+    .boat-profile-grid > div{
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        justify-content:center !important;
+    }
+
+    .boatyard-kpis b,
+    .logbook-kpis b,
+    .boat-profile-grid b{
+        display:block !important;
+        width:100% !important;
+        text-align:right !important;
+        align-self:stretch !important;
+        justify-self:stretch !important;
+    }
+}
+
+@media(max-width:640px){
+    .boatyard-kpis,
+    .logbook-kpis,
+    .boatyard-hero .boat-profile-grid{
+        grid-template-columns:1fr !important;
+    }
+
+    .boatyard-kpis > div,
+    .logbook-kpis > div,
+    .boat-profile-grid > div{
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+    }
+
+    .boatyard-kpis b,
+    .logbook-kpis b,
+    .boat-profile-grid b{
+        display:block !important;
+        width:100% !important;
+        text-align:right !important;
+    }
+}

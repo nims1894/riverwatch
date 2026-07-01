@@ -1,3 +1,18 @@
+# CHANGELOG
+
+## v1.0 RC4 — Sprint #010 / CAB-020 Complete
+
+- Completed CAB-020 Boat Health Information Architecture Refactoring.
+- Standardized Boat Health, Boat Profile, and Logbook KPI metric-box behavior.
+- Locked RC2i Typography Baseline under ADR-002.
+- Added Design Constitution.
+- Restored Intro typography into the locked baseline.
+- Forced Boat Profile and Logbook KPI to one-column layout on narrow screens.
+- Preserved value right alignment on mobile.
+- Consolidated CAB-020 revision logs into a single CAB-020 changelog.
+
+Status: Sprint #010 baseline release.
+
 # CAB-020d — Typography Baseline Hard Lock
 
 - RC2i readability style elevated to locked typography baseline.

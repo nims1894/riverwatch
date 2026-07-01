@@ -4,9 +4,9 @@
 Title: Boat Health Information Architecture Refactoring
 Status: DONE
 Priority: HIGH
-Target: v1.0 RC3
+Target: v1.0 RC4
 
-Completed in RC3.
+Completed in Sprint #010 / RC4.
 
 ## CAB-021
 Title: Recovery Engine Enhancement
