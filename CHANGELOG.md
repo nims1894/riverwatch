@@ -198,3 +198,10 @@ Status: Eye Comfort patch ready for review.
 ## CAB-020g - Logbook KPI Narrow-Width Stack Lock
 - Locked Logbook KPI boxes to 1-column stacking on narrow screens.
 - Preserved ADR-002 Typography Baseline Lock and KPI value right alignment.
+
+## v1.0 RC4a - Metric Box Height Responsive Lock
+
+- Added shared Metric Box height tokens.
+- Unified Dashboard Health, Boat Profile, and Logbook KPI item heights.
+- Reduced mobile metric box vertical height target from 68px to 54px.
+- Preserved Typography Baseline Lock and value right alignment.

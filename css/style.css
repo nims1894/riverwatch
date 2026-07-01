@@ -3861,3 +3861,83 @@ body{
         text-align:right !important;
     }
 }
+
+/* ===========================================================================
+   RC4a / METRIC BOX HEIGHT RESPONSIVE LOCK
+   - Unify metric-box item height across Dashboard Health, Boat Profile, and Logbook.
+   - Desktop keeps current comfortable density.
+   - Mobile reduces box vertical density by about 20% versus RC4 mobile 68px lock.
+   - ADR-002: typography size is preserved; density is controlled by height/padding only.
+   =========================================================================== */
+
+:root{
+    --rw-metric-box-min-height-desktop:68px;
+    --rw-metric-box-padding-y-desktop:14px;
+    --rw-metric-box-padding-x-desktop:16px;
+    --rw-metric-box-min-height-mobile:54px;
+    --rw-metric-box-padding-y-mobile:9px;
+    --rw-metric-box-padding-x-mobile:14px;
+    --rw-metric-box-gap:8px;
+}
+
+.health-matrix-detail .metric-list,
+.health-matrix-detail .voyage-flow{
+    gap:var(--rw-metric-box-gap) !important;
+}
+
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step,
+.boatyard-kpis > div,
+.logbook-kpis > div,
+.boatyard-hero .boat-profile-grid > div,
+.boat-profile-grid > div{
+    min-height:var(--rw-metric-box-min-height-desktop) !important;
+    padding:var(--rw-metric-box-padding-y-desktop) var(--rw-metric-box-padding-x-desktop) !important;
+    box-sizing:border-box !important;
+}
+
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step,
+.boatyard-kpis > div,
+.logbook-kpis > div,
+.boatyard-hero .boat-profile-grid > div,
+.boat-profile-grid > div{
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:space-between !important;
+}
+
+.health-matrix-detail .metric-list b,
+.health-matrix-detail .voyage-step b,
+.boatyard-kpis b,
+.logbook-kpis b,
+.boatyard-hero .boat-profile-grid b,
+.boat-profile-grid b{
+    display:block !important;
+    width:100% !important;
+    text-align:right !important;
+}
+
+@media(max-width:900px){
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step,
+    .boatyard-kpis > div,
+    .logbook-kpis > div,
+    .boatyard-hero .boat-profile-grid > div,
+    .boat-profile-grid > div{
+        min-height:var(--rw-metric-box-min-height-mobile) !important;
+        padding:var(--rw-metric-box-padding-y-mobile) var(--rw-metric-box-padding-x-mobile) !important;
+    }
+}
+
+@media(max-width:640px){
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step,
+    .boatyard-kpis > div,
+    .logbook-kpis > div,
+    .boatyard-hero .boat-profile-grid > div,
+    .boat-profile-grid > div{
+        min-height:var(--rw-metric-box-min-height-mobile) !important;
+        padding:var(--rw-metric-box-padding-y-mobile) var(--rw-metric-box-padding-x-mobile) !important;
+    }
+}
