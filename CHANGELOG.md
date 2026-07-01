@@ -1,3 +1,9 @@
+# CAB-020d — Typography Baseline Hard Lock
+
+- RC2i readability style elevated to locked typography baseline.
+- Header / Health / Metric / Boat Profile / Logbook / Trim Deck text scale reinforced.
+- Added Design Constitution and ADR-002 clarification.
+
 # RiverWatch v1.0 RC2c — CAB-014 Trim Deck Detail-Only
 
 - Removed Trim Deck accordion toggle and summary rows.
@@ -126,3 +132,54 @@ Status: Eye Comfort patch ready for review.
 
 - Completed Health status suffix removal and Voyage status table binding.
 - Unified `Gap to Destination` / `ETA Extension` styling with other Voyage metric cards.
+
+
+## v1.0 RC3 — CAB-020 Boat Health Information Architecture
+
+- Refactored Boat Health to health-only metrics.
+- Added Boat Profile section to Boatyard.
+- Renamed Diversification Integrity to Role Coverage.
+- Added Development Constitution and ADR-001.
+
+
+## v1.0 RC3a — CAB-020a Health Row Alignment + Typography Restoration
+
+- Aligned Boat Health metric row heights with Voyage/River Health.
+- Restored metric typography for readability.
+- Right-aligned Boat Profile values.
+- Matched Trim Deck caption style with Boatyard subtitle style.
+
+
+## v1.0 RC3b — CAB-020b Health Width + Typography Baseline Lock
+
+- Finalized CAB-020 visual correction pass.
+- Boat Health now follows the same full-width metric row rhythm as River/Voyage Health.
+- Typography was restored and locked to the RC2i readability baseline.
+- Boat Profile right-aligned values remain unchanged.
+- Trim Deck caption now follows the same subtitle rhythm as Boat Profile.
+
+
+## v1.0 RC3c — CAB-020c Typography Constitution + Metric Box Standardization
+
+- Added ADR-002 Typography Baseline Lock.
+- Locked RC2i as the minimum readability baseline.
+- Restored stronger header typography.
+- Standardized Boat Profile KPI boxes to two-line Health metric style.
+- Right-aligned Logbook KPI values.
+- Updated Development Constitution with typography protection principle.
+
+
+## v1.0 RC3e — CAB-020e Intro Typography Baseline Lock
+- Intro screen added to ADR-002 Typography Hard Lock scope.
+- Intro brand/subtitle/operator/philosophy/button typography restored and tokenized.
+- No functional change.
+
+
+## CAB-020f
+- Boat Profile narrow-width layout locked to single-column stack.
+- Typography baseline preserved; no font-size reduction.
+
+
+## CAB-020g - Logbook KPI Narrow-Width Stack Lock
+- Locked Logbook KPI boxes to 1-column stacking on narrow screens.
+- Preserved ADR-002 Typography Baseline Lock and KPI value right alignment.

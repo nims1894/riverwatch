@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiverWatch v1.0 RC2i</title>
+    <title>RiverWatch v1.0 RC3f</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
         <div class="boat-icon">⛵</div>
         <div class="brand">RiverWatch</div>
         <div class="subtitle">Personal Navigation System<br>for Reaching the Open Sea</div>
-        <div class="version">Version 1.0 RC2i</div>
+        <div class="version">Version 1.0 RC3f</div>
 
         <div class="operator">
             Operator : NIMS <span class="online">● ONLINE</span>
@@ -162,15 +162,11 @@
                         <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
                         <div class="health-value"><span id="boatHealth">--</span></div>
                         <div class="status-sub" id="boatStatus">--</div>
-                        <div class="metric-list">
+                        <div class="metric-list boat-health-list">
                             <div><span>Trim Alignment</span><b id="allocationAlignment">-</b></div>
                             <div><span>River Suitability</span><b id="riverSuitability">-</b></div>
-                            <div><span>Diversification Integrity</span><b id="structuralIntegrity">-</b></div>
+                            <div><span>Role Coverage</span><b id="structuralIntegrity">-</b></div>
                             <div><span>Captain Discipline</span><b id="captainDiscipline">-</b></div>
-                            <div><span>Boat Archetype</span><b id="boatArchetype">-</b></div>
-                            <div><span>Voyage Phase</span><b id="voyagePhaseInBoat">-</b></div>
-                            <div><span>Cost Basis</span><b id="costBasis">-</b></div>
-                            <div><span>Boat Return</span><b id="boatReturn">-</b></div>
                         </div>
                     </section>
                 </div>
@@ -195,21 +191,21 @@
 
 
         <main id="boatyardPage" class="app-page hidden">
-            <section class="card page-hero">
+            <section class="card page-hero boatyard-hero">
                 <div class="label">Boatyard</div>
-                <div class="page-title">Trim Deck</div>
-                <p class="page-subtitle">Inspect the boat, compare current trim with target trim, and keep the vessel aligned.</p>
-                <div class="boatyard-kpis">
+                <div class="page-title">Boat Profile</div>
+                <p class="page-subtitle">Understand the vessel profile, inspect the trim, and maintain proper balance throughout the voyage.</p>
+                <div class="boatyard-kpis boat-profile-grid">
                     <div><span>Boat Archetype</span><b id="boatyardArchetype">-</b></div>
-                    <div><span>Captain Discipline</span><b id="boatyardDiscipline">-</b></div>
                     <div><span>Voyage Phase</span><b id="boatyardPhase">-</b></div>
                     <div><span>Cost Basis</span><b id="boatyardCostBasis">-</b></div>
                     <div><span>Boat Return</span><b id="boatyardReturn">-</b></div>
                 </div>
             </section>
 
-            <section class="card allocation-card premium-allocation-card">
+            <section class="card allocation-card premium-allocation-card trim-deck-card">
                 <div class="label">Trim Deck</div>
+                <div class="section-caption">Compare current trim with target allocation and keep the boat properly balanced.</div>
                 <div id="trimDeckList" class="trim-deck-list"></div>
             </section>
 

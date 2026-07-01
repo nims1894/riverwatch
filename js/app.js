@@ -1062,10 +1062,6 @@ function renderBoatHealth() {
     setText("riverSuitability", `${getSuitabilityLabel(riverwatch.calc.riverSuitability)} (${riverwatch.calc.riverSuitability})`);
     setText("structuralIntegrity", `${getIntegrityLabel(riverwatch.calc.structuralIntegrity)} (${riverwatch.calc.structuralIntegrity})`);
     setText("captainDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
-    setText("boatArchetype", riverwatch.calc.boatArchetype);
-    setText("voyagePhaseInBoat", riverwatch.calc.voyagePhase || "-");
-    setText("costBasis", formatKRWM(riverwatch.calc.costBasis));
-    setText("boatReturn", formatSigned(riverwatch.calc.boatReturn) + "%");
 }
 
 function renderAllocation() {
@@ -1299,7 +1295,6 @@ function formatTrimTicker(ticker) {
 
 function renderBoatyard() {
     setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
-    setText("boatyardDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
     setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
     setText("boatyardCostBasis", formatKRWM(riverwatch.calc.costBasis));
     setText("boatyardReturn", formatSigned(riverwatch.calc.boatReturn) + "%");

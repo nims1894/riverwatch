@@ -3017,3 +3017,788 @@ body{
     border:1px solid rgba(255,255,255,0.05) !important;
     box-shadow:none !important;
 }
+
+
+/* ==========================================================================
+   CAB-020 Boat Health Information Architecture / RC3
+   - Dashboard Boat Health owns health-only metrics.
+   - Boatyard owns Boat Profile and Trim Deck.
+   ========================================================================== */
+
+.boat-health-list{
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+}
+
+.boatyard-hero .page-title{
+    margin-bottom:10px;
+}
+
+.boat-profile-grid{
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+}
+
+.section-caption{
+    margin:4px 0 18px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+}
+
+.trim-deck-card .label{
+    margin-bottom:4px;
+}
+
+@media(max-width:900px){
+    .boat-profile-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media(max-width:640px){
+    .boat-health-list,
+    .boat-profile-grid{
+        grid-template-columns:1fr;
+    }
+
+    .section-caption{
+        font-size:12px;
+        margin-bottom:14px;
+    }
+}
+
+
+/* ==========================================================================
+   CAB-020a Health Row Alignment + Typography Restoration / RC3a
+   - Boat Health metric rows use the same row rhythm as Voyage/River Health.
+   - Boat Health rows are top-aligned; empty lower area is intentionally left blank.
+   - Metric typography restored for readability.
+   ========================================================================== */
+
+/* Boat Health must not render as 2x2 tiles. It uses the same 8-row rhythm as
+   River/Voyage and occupies the first 4 rows only. */
+.health-card .boat-health-list{
+    grid-template-columns:1fr !important;
+    grid-template-rows:repeat(8, minmax(58px, 1fr)) !important;
+    align-content:stretch !important;
+}
+
+.health-card .boat-health-list > div{
+    min-height:0;
+}
+
+/* Shared metric row typography restoration */
+.metric-grid span,
+.metric-list span,
+.voyage-step span{
+    font-size:13px !important;
+    line-height:1.25;
+}
+
+.metric-grid b,
+.metric-list b,
+.voyage-step b{
+    font-size:18px !important;
+    line-height:1.2;
+}
+
+.status-sub{
+    font-size:14px !important;
+}
+
+.health-value{
+    font-size:58px !important;
+}
+
+/* Boatyard Boat Profile rows: values right-aligned like other metric rows */
+.boat-profile-grid > div{
+    display:flex !important;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    min-height:58px;
+}
+
+.boat-profile-grid > div span{
+    margin-bottom:0 !important;
+}
+
+.boat-profile-grid > div b{
+    text-align:right;
+}
+
+/* Make Trim Deck caption visually match the Boatyard page subtitle rhythm */
+.section-caption{
+    color:var(--text-soft, var(--muted)) !important;
+    font-size:16px !important;
+    line-height:1.55 !important;
+    margin:8px 0 18px !important;
+}
+
+@media(max-width:640px){
+    .metric-grid span,
+    .metric-list span,
+    .voyage-step span{
+        font-size:12.5px !important;
+    }
+
+    .metric-grid b,
+    .metric-list b,
+    .voyage-step b{
+        font-size:17px !important;
+    }
+
+    .section-caption{
+        font-size:14px !important;
+        line-height:1.5 !important;
+    }
+
+    .boat-profile-grid > div{
+        min-height:58px;
+    }
+}
+
+
+/* ==========================================================================
+   CAB-020b Health Width + Typography Baseline Lock / RC3b
+   - Boat Health uses the exact same one-column metric row component as River.
+   - Boat Health row width, height, padding and gap match Voyage/River rows.
+   - RC2i visual scale is locked as the minimum readability baseline.
+   - Do not solve layout density by shrinking typography.
+   ========================================================================== */
+
+/* RC2i typography baseline lock */
+.brand{ font-size:42px !important; line-height:1.05; }
+.subtitle{ font-size:16px !important; line-height:1.25; }
+.version{ font-size:13px !important; }
+.operator{ font-size:16px !important; }
+.philosophy{ display:block !important; font-size:16px !important; line-height:1.8 !important; }
+
+.brand-small{ font-size:28px !important; line-height:1.05 !important; }
+.subtitle-small{ font-size:14px !important; line-height:1.25 !important; }
+.operator-small{ font-size:14px !important; }
+.last-sync{ font-size:12px !important; }
+.sync-detail{ font-size:11px !important; }
+.nav-tab{ font-size:14px !important; }
+
+.label,
+.card-header,
+.bridge-title{
+    font-size:14px !important;
+    line-height:1.25 !important;
+}
+
+.mission-text{ font-size:58px !important; line-height:1.05 !important; }
+.status-text{ font-size:46px !important; line-height:1.05 !important; }
+.value{ font-size:22px !important; line-height:1.15 !important; }
+
+.health-summary-name{ font-size:20px !important; }
+.health-summary-score{ font-size:40px !important; }
+.health-summary-status{ font-size:14px !important; }
+.section-toggle-title{ font-size:20px !important; }
+.section-toggle-hint{ font-size:13px !important; }
+
+.page-title{ font-size:42px !important; line-height:1.08 !important; }
+.page-subtitle,
+.section-caption{
+    font-size:16px !important;
+    line-height:1.55 !important;
+    color:var(--text-soft) !important;
+}
+
+.bridge-card p,
+.bridge-rationale{ font-size:16px !important; line-height:1.85 !important; }
+.bridge-order-value{ font-size:28px !important; line-height:1.16 !important; }
+
+/* Health card detail: shared component contract */
+.health-matrix-detail{
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    align-items:stretch !important;
+}
+
+.health-matrix-detail .health-card{
+    padding:24px !important;
+    min-height:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+}
+
+.health-matrix-detail .health-value{
+    font-size:58px !important;
+    line-height:1 !important;
+    margin-bottom:8px !important;
+}
+
+.health-matrix-detail .status-sub{
+    font-size:15px !important;
+    line-height:1.3 !important;
+    margin-bottom:20px !important;
+}
+
+.health-matrix-detail .metric-list,
+.health-matrix-detail .voyage-flow{
+    width:100% !important;
+    max-width:100% !important;
+    flex:1 1 auto !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:repeat(8, minmax(58px, 1fr)) !important;
+    gap:8px !important;
+    align-content:stretch !important;
+}
+
+.health-matrix-detail .boat-health-list{
+    grid-template-columns:1fr !important;
+    grid-template-rows:repeat(8, minmax(58px, 1fr)) !important;
+}
+
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step{
+    width:100% !important;
+    min-width:0 !important;
+    min-height:58px !important;
+    padding:11px 12px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    justify-content:space-between !important;
+}
+
+.health-matrix-detail .metric-list span,
+.health-matrix-detail .voyage-step span{
+    font-size:13px !important;
+    line-height:1.25 !important;
+    color:var(--text-soft) !important;
+}
+
+.health-matrix-detail .metric-list b,
+.health-matrix-detail .voyage-step b{
+    font-size:18px !important;
+    line-height:1.2 !important;
+    text-align:right !important;
+    color:var(--text-strong) !important;
+}
+
+/* Boat Profile remains profile-only and value-aligned right. */
+.boat-profile-grid > div{
+    min-height:64px !important;
+    padding:14px 16px !important;
+}
+.boat-profile-grid span,
+.logbook-kpis span{ font-size:13px !important; line-height:1.25 !important; }
+.boat-profile-grid b,
+.logbook-kpis b{ font-size:18px !important; line-height:1.15 !important; text-align:right !important; }
+
+/* Trim Deck readability */
+.trim-head b,
+.trim-head-diet .trim-ticker{ font-size:22px !important; }
+.trim-stats span,
+.trim-stats-diet span{ font-size:12px !important; }
+.trim-stats b,
+.trim-stats-diet b{ font-size:20px !important; }
+
+@media(max-width:900px){
+    .health-matrix-detail{ grid-template-columns:1fr !important; }
+    .brand-small{ font-size:26px !important; }
+    .mission-text{ font-size:48px !important; }
+    .status-text{ font-size:40px !important; }
+    .health-matrix-detail .health-value{ font-size:54px !important; }
+}
+
+@media(max-width:640px){
+    .brand{ font-size:42px !important; }
+    .subtitle{ font-size:16px !important; }
+    .operator{ font-size:16px !important; }
+    .philosophy{ display:block !important; font-size:16px !important; }
+
+    .brand-small{ font-size:24px !important; }
+    .subtitle-small{ font-size:13px !important; }
+    .nav-tab{ font-size:12px !important; }
+
+    .mission-text{ font-size:42px !important; }
+    .status-text{ font-size:34px !important; }
+    .value{ font-size:18px !important; }
+    .page-title{ font-size:40px !important; }
+    .page-subtitle,
+    .section-caption{ font-size:15px !important; }
+
+    .health-summary-name{ font-size:17px !important; }
+    .health-summary-score{ font-size:36px !important; }
+    .health-summary-status{ font-size:13px !important; }
+
+    .health-matrix-detail .health-value{ font-size:50px !important; }
+    .health-matrix-detail .status-sub{ font-size:14px !important; }
+    .health-matrix-detail .metric-list span,
+    .health-matrix-detail .voyage-step span{ font-size:12.5px !important; }
+    .health-matrix-detail .metric-list b,
+    .health-matrix-detail .voyage-step b{ font-size:17px !important; }
+}
+
+
+/* ===========================================================================
+   CAB-020c Typography Constitution + Metric Box Standardization / RC3c
+   - RC2i visual scale is treated as the locked readability baseline.
+   - Do not reduce typography to solve layout density.
+   - Boat Profile and Logbook KPI boxes follow the Health metric box rhythm:
+     label on first line, value on second line, value right-aligned.
+   =========================================================================== */
+
+:root{
+    --rw-type-brand-small:30px;
+    --rw-type-subtitle-small:14px;
+    --rw-type-operator-small:14px;
+    --rw-type-sync:12px;
+    --rw-type-section-label:14px;
+    --rw-type-page-title:42px;
+    --rw-type-page-subtitle:16px;
+    --rw-type-metric-label:13px;
+    --rw-type-metric-value:18px;
+    --rw-type-health-score:58px;
+    --rw-type-health-status:15px;
+    --rw-type-summary-name:20px;
+    --rw-type-summary-score:40px;
+    --rw-type-summary-status:14px;
+}
+
+/* Header baseline: keep RC2i readability as minimum. */
+.brand-small{
+    font-size:var(--rw-type-brand-small) !important;
+    line-height:1.05 !important;
+    font-weight:800 !important;
+    letter-spacing:-0.02em !important;
+}
+.subtitle-small{
+    font-size:var(--rw-type-subtitle-small) !important;
+    line-height:1.28 !important;
+}
+.operator-small{
+    font-size:var(--rw-type-operator-small) !important;
+    line-height:1.3 !important;
+}
+.last-sync{ font-size:var(--rw-type-sync) !important; }
+.sync-detail{ font-size:11px !important; }
+.boat-icon-small{ font-size:42px !important; line-height:1 !important; }
+.brand-wrap{ gap:16px !important; }
+
+/* Page / section titles remain visually strong. */
+.label,
+.card-header,
+.bridge-title{
+    font-size:var(--rw-type-section-label) !important;
+    line-height:1.25 !important;
+    letter-spacing:0.18em !important;
+}
+.page-title{
+    font-size:var(--rw-type-page-title) !important;
+    line-height:1.08 !important;
+    font-weight:900 !important;
+    letter-spacing:-0.035em !important;
+}
+.page-subtitle,
+.section-caption{
+    font-size:var(--rw-type-page-subtitle) !important;
+    line-height:1.55 !important;
+}
+
+/* Metric box contract: label first line, value second line, value right-aligned. */
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step,
+.boatyard-kpis > div,
+.logbook-kpis > div{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    min-height:64px !important;
+    padding:14px 16px !important;
+}
+
+.health-matrix-detail .metric-list span,
+.health-matrix-detail .voyage-step span,
+.boatyard-kpis span,
+.logbook-kpis span{
+    display:block !important;
+    margin:0 !important;
+    font-size:var(--rw-type-metric-label) !important;
+    line-height:1.25 !important;
+    color:var(--text-soft) !important;
+    text-align:left !important;
+}
+
+.health-matrix-detail .metric-list b,
+.health-matrix-detail .voyage-step b,
+.boatyard-kpis b,
+.logbook-kpis b{
+    display:block !important;
+    margin:0 !important;
+    font-size:var(--rw-type-metric-value) !important;
+    line-height:1.15 !important;
+    color:var(--text-strong) !important;
+    text-align:right !important;
+    align-self:stretch !important;
+}
+
+/* Boat Profile must not collapse into same-line label/value layout. */
+.boat-profile-grid > div{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:space-between !important;
+    min-height:64px !important;
+}
+.boat-profile-grid > div span{ margin-bottom:0 !important; }
+.boat-profile-grid > div b{ text-align:right !important; }
+
+/* Logbook KPI values follow the same right-aligned value rule. */
+.logbook-kpis b{ text-align:right !important; }
+
+/* Health readability baseline. */
+.health-matrix-detail .health-value{
+    font-size:var(--rw-type-health-score) !important;
+    line-height:1 !important;
+}
+.health-matrix-detail .status-sub{
+    font-size:var(--rw-type-health-status) !important;
+    line-height:1.3 !important;
+}
+.health-summary-name{ font-size:var(--rw-type-summary-name) !important; }
+.health-summary-score{ font-size:var(--rw-type-summary-score) !important; }
+.health-summary-status{ font-size:var(--rw-type-summary-status) !important; }
+
+/* Preserve typography on small screens; reduce layout before reducing type. */
+@media(max-width:900px){
+    .brand-small{ font-size:28px !important; }
+    .boat-icon-small{ font-size:40px !important; }
+    .page-title{ font-size:42px !important; }
+}
+
+@media(max-width:640px){
+    .brand-small{ font-size:26px !important; }
+    .subtitle-small{ font-size:13.5px !important; }
+    .operator-small{ font-size:14px !important; }
+    .page-title{ font-size:40px !important; }
+    .page-subtitle,
+    .section-caption{ font-size:15px !important; }
+    .health-matrix-detail .metric-list span,
+    .health-matrix-detail .voyage-step span,
+    .boatyard-kpis span,
+    .logbook-kpis span{ font-size:12.5px !important; }
+    .health-matrix-detail .metric-list b,
+    .health-matrix-detail .voyage-step b,
+    .boatyard-kpis b,
+    .logbook-kpis b{ font-size:17px !important; }
+}
+
+
+/* ===========================================================================
+   CAB-020d / ADR-002 TYPOGRAPHY BASELINE HARD LOCK
+   Baseline source: RC2i preferred readability style.
+   Rule: Typography is a managed design asset. Do not reduce these values
+   to solve layout density without explicit CAB approval.
+   =========================================================================== */
+
+:root{
+    --rw-lock-brand-small:32px;
+    --rw-lock-subtitle-small:15px;
+    --rw-lock-operator-small:15px;
+    --rw-lock-sync:12px;
+    --rw-lock-nav:14px;
+    --rw-lock-section-label:15px;
+    --rw-lock-page-title:44px;
+    --rw-lock-page-subtitle:16px;
+    --rw-lock-body:15px;
+    --rw-lock-metric-label:14px;
+    --rw-lock-metric-value:19px;
+    --rw-lock-health-score:60px;
+    --rw-lock-health-status:16px;
+    --rw-lock-summary-name:20px;
+    --rw-lock-summary-score:42px;
+    --rw-lock-summary-status:14px;
+    --rw-lock-bridge-order:30px;
+}
+
+/* Header */
+.brand-small{
+    font-size:var(--rw-lock-brand-small) !important;
+    line-height:1.04 !important;
+    font-weight:900 !important;
+    letter-spacing:-0.025em !important;
+}
+.subtitle-small{
+    font-size:var(--rw-lock-subtitle-small) !important;
+    line-height:1.34 !important;
+}
+.operator-small{
+    font-size:var(--rw-lock-operator-small) !important;
+    line-height:1.3 !important;
+}
+.last-sync{ font-size:var(--rw-lock-sync) !important; }
+.sync-detail{ font-size:12px !important; }
+.nav-tab{
+    font-size:var(--rw-lock-nav) !important;
+    line-height:1.2 !important;
+}
+.boat-icon-small{ font-size:44px !important; }
+
+/* Page hierarchy */
+.page-title{
+    font-size:var(--rw-lock-page-title) !important;
+    line-height:1.06 !important;
+    font-weight:900 !important;
+    letter-spacing:-0.04em !important;
+}
+.page-subtitle,
+.section-caption,
+.philosophy{
+    font-size:var(--rw-lock-page-subtitle) !important;
+    line-height:1.55 !important;
+}
+.label,
+.card-header,
+.bridge-title{
+    font-size:var(--rw-lock-section-label) !important;
+    line-height:1.25 !important;
+    letter-spacing:0.16em !important;
+}
+.value{ font-size:22px !important; }
+
+/* Dashboard health summary */
+.health-summary-name{
+    font-size:var(--rw-lock-summary-name) !important;
+    line-height:1.18 !important;
+}
+.health-summary-score{
+    font-size:var(--rw-lock-summary-score) !important;
+    line-height:1 !important;
+}
+.health-summary-status{
+    font-size:var(--rw-lock-summary-status) !important;
+    line-height:1.25 !important;
+}
+
+/* Health detail cards */
+.health-matrix-detail .health-value{
+    font-size:var(--rw-lock-health-score) !important;
+    line-height:0.98 !important;
+}
+.health-matrix-detail .status-sub{
+    font-size:var(--rw-lock-health-status) !important;
+    line-height:1.25 !important;
+}
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step,
+.boatyard-kpis > div,
+.logbook-kpis > div,
+.boat-profile-grid > div{
+    min-height:68px !important;
+    padding:15px 16px !important;
+    gap:9px !important;
+}
+.health-matrix-detail .metric-list span,
+.health-matrix-detail .voyage-step span,
+.boatyard-kpis span,
+.logbook-kpis span,
+.boat-profile-grid span{
+    font-size:var(--rw-lock-metric-label) !important;
+    line-height:1.28 !important;
+    text-align:left !important;
+}
+.health-matrix-detail .metric-list b,
+.health-matrix-detail .voyage-step b,
+.boatyard-kpis b,
+.logbook-kpis b,
+.boat-profile-grid b{
+    font-size:var(--rw-lock-metric-value) !important;
+    line-height:1.15 !important;
+    text-align:right !important;
+    align-self:stretch !important;
+}
+
+/* Captain / Logbook readability */
+.bridge-card p,
+.bridge-rationale,
+.log-entry-body,
+.timeline-meta,
+.timeline-return{
+    font-size:var(--rw-lock-body) !important;
+    line-height:1.55 !important;
+}
+.bridge-order-value{
+    font-size:var(--rw-lock-bridge-order) !important;
+    line-height:1.1 !important;
+}
+.logbook-kpis b{ text-align:right !important; }
+
+/* Trim Deck / Boat Profile visual consistency */
+.trim-head b,
+.trim-head-diet .trim-ticker,
+.trim-head-static .trim-ticker{
+    font-size:22px !important;
+    line-height:1.1 !important;
+}
+.trim-stats span,
+.trim-stats-diet span,
+.trim-summary-group span{
+    font-size:13px !important;
+    line-height:1.25 !important;
+}
+.trim-stats b,
+.trim-stats-diet b{
+    font-size:20px !important;
+    line-height:1.1 !important;
+}
+.trim-summary-ticker{ font-size:20px !important; }
+.trim-summary-current,
+.trim-summary-target,
+.trim-summary-delta{ font-size:15px !important; }
+.trim-summary-row .badge{ font-size:12px !important; }
+
+/* Responsive rule: preserve readability first. Layout may stack before type shrinks. */
+@media(max-width:900px){
+    .brand-small{ font-size:30px !important; }
+    .boat-icon-small{ font-size:42px !important; }
+    .page-title{ font-size:44px !important; }
+    .health-matrix-detail .health-value{ font-size:58px !important; }
+}
+
+@media(max-width:640px){
+    .brand-small{ font-size:29px !important; }
+    .subtitle-small{ font-size:14px !important; }
+    .operator-small{ font-size:14px !important; }
+    .nav-tab{ font-size:13px !important; }
+    .page-title{ font-size:42px !important; }
+    .page-subtitle,
+    .section-caption{ font-size:16px !important; }
+    .label,
+    .card-header,
+    .bridge-title{ font-size:14px !important; }
+    .health-summary-name{ font-size:19px !important; }
+    .health-summary-score{ font-size:40px !important; }
+    .health-summary-status{ font-size:14px !important; }
+    .health-matrix-detail .health-value{ font-size:56px !important; }
+    .health-matrix-detail .status-sub{ font-size:15px !important; }
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step,
+    .boatyard-kpis > div,
+    .logbook-kpis > div,
+    .boat-profile-grid > div{
+        min-height:68px !important;
+        padding:15px 16px !important;
+    }
+    .health-matrix-detail .metric-list span,
+    .health-matrix-detail .voyage-step span,
+    .boatyard-kpis span,
+    .logbook-kpis span,
+    .boat-profile-grid span{ font-size:14px !important; }
+    .health-matrix-detail .metric-list b,
+    .health-matrix-detail .voyage-step b,
+    .boatyard-kpis b,
+    .logbook-kpis b,
+    .boat-profile-grid b{ font-size:19px !important; }
+}
+
+
+/* ===========================================================================
+   CAB-020e / ADR-002 INTRO TYPOGRAPHY BASELINE LOCK
+   Scope: Intro screen was previously outside the hard-lock coverage.
+   Rule: Intro typography is part of the same RC2i visual identity baseline.
+   =========================================================================== */
+
+:root{
+    --rw-lock-intro-boat-icon:64px;
+    --rw-lock-intro-brand:52px;
+    --rw-lock-intro-subtitle:18px;
+    --rw-lock-intro-version:14px;
+    --rw-lock-intro-operator:16px;
+    --rw-lock-intro-philosophy:18px;
+    --rw-lock-intro-button:14px;
+}
+
+.intro-screen .boat-icon{
+    font-size:var(--rw-lock-intro-boat-icon) !important;
+    line-height:1 !important;
+    margin-bottom:14px !important;
+}
+.intro-screen .brand{
+    font-size:var(--rw-lock-intro-brand) !important;
+    line-height:1.02 !important;
+    font-weight:900 !important;
+    letter-spacing:-0.035em !important;
+}
+.intro-screen .subtitle{
+    margin-top:14px !important;
+    font-size:var(--rw-lock-intro-subtitle) !important;
+    line-height:1.45 !important;
+    color:var(--text-soft) !important;
+}
+.intro-screen .version{
+    margin-top:8px !important;
+    font-size:var(--rw-lock-intro-version) !important;
+    line-height:1.35 !important;
+}
+.intro-screen .operator{
+    margin-top:28px !important;
+    font-size:var(--rw-lock-intro-operator) !important;
+    line-height:1.35 !important;
+}
+.intro-screen .philosophy{
+    font-size:var(--rw-lock-intro-philosophy) !important;
+    line-height:1.85 !important;
+}
+.intro-screen .line{
+    width:min(460px, 78vw) !important;
+    margin:32px 0 !important;
+}
+.intro-screen button{
+    margin-top:32px !important;
+    padding:14px 34px !important;
+    font-size:var(--rw-lock-intro-button) !important;
+    line-height:1.2 !important;
+    letter-spacing:0.08em !important;
+}
+
+@media(max-width:640px){
+    .intro-screen .boat-icon{ font-size:60px !important; }
+    .intro-screen .brand{ font-size:50px !important; }
+    .intro-screen .subtitle{ font-size:17px !important; }
+    .intro-screen .operator{ font-size:16px !important; }
+    .intro-screen .philosophy{ font-size:18px !important; }
+}
+
+
+/* ===========================================================================
+   CAB-020f / BOAT PROFILE NARROW-WIDTH STACK LOCK
+   - Boat Profile must not fall back to the old 2-column compact layout.
+   - When the available viewport is narrow, stack profile metric boxes in 1 column.
+   - Preserve ADR-002 typography; solve density through layout, not smaller text.
+   =========================================================================== */
+
+@media(max-width:900px){
+    .boatyard-hero .boat-profile-grid{
+        grid-template-columns:1fr !important;
+    }
+}
+
+@media(max-width:640px){
+    .boatyard-hero .boat-profile-grid{
+        grid-template-columns:1fr !important;
+    }
+}
+
+/* ===========================================================================
+   CAB-020g / LOGBOOK KPI NARROW-WIDTH STACK LOCK
+   - Logbook KPI boxes must not render as 2 columns on narrow screens.
+   - Align with Boat Profile responsive behavior: stack KPI boxes in 1 column.
+   - Preserve ADR-002 typography; solve density through layout, not smaller text.
+   =========================================================================== */
+
+@media(max-width:900px){
+    .logbook-kpis{
+        grid-template-columns:1fr !important;
+    }
+}
+
+@media(max-width:640px){
+    .logbook-kpis{
+        grid-template-columns:1fr !important;
+    }
+}

@@ -26,3 +26,7 @@ RiverWatch/
 ## Operating principle
 
 Observe the River. Adjust the Boat. Remember the Voyage. Stay the Course.
+
+
+## CAB-020g
+- Logbook KPI narrow-screen layout now stacks in one column for consistency with Boat Profile.
