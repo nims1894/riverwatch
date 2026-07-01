@@ -1,4 +1,26 @@
+## CAB-021c - PortfolioConfig CRYPTO Alignment
+
+- Aligned fallback data model with finalized Google Sheet schema.
+- Changed crypto sleeve `configId` from `BTC` to `CRYPTO`.
+- Changed BITQ fallback holding group to `CRYPTO`.
+- No UI/design changes.
+
+## CAB-021b - PortfolioConfig AssetClass Structural Integrity Integration
+
+- Structural Integrity now uses PortfolioConfig `assetClass` instead of hard-coded IAUM/BITQ references.
+- Reserve scoring uses GOLD/RESERVE exposure.
+- Speculation scoring uses CRYPTO/SPECULATIVE exposure.
+- UI design unchanged.
+
 # CHANGELOG
+## CAB-021 - Portfolio Configuration Refactor
+
+- Added Google Sheet `PortfolioConfig` integration.
+- Refactored portfolio target logic from ticker-based to configId/holdingGroup-based.
+- Added support for `controlType` (`MIN`, `MAX`) and `assetRole` (`GROWTH`, `DEFENSIVE`).
+- Removed hardcoded growth/defensive ticker classification from Boat Health calculation.
+- Updated Portfolio schema to `holdingTicker`, `holdingGroup`, `quantity`, `avgPriceKRW`.
+
 
 ## v1.0 RC4 — Sprint #010 / CAB-020 Complete
 

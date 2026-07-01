@@ -2,6 +2,7 @@
  * RiverWatch Market Engine v0.4.0-cab006.0
  * Google Sheet v2.0 CSV Hub Reader
  * - MarketData: live market prices
+ * - PortfolioConfig: target allocation / role data
  * - Portfolio: captain position data
  * - ManualConfig: captain judgment / voyage inputs
  ****************************************************************************/
@@ -75,26 +76,81 @@ const RiverWatchMarketEngine = (() => {
         return result;
     }
 
+    function headerIndex(headers, ...names) {
+        const upper = headers.map(h => String(h).trim().toUpperCase());
+        for (const name of names) {
+            const index = upper.indexOf(String(name).trim().toUpperCase());
+            if (index >= 0) return index;
+        }
+        return -1;
+    }
+
+    function parseBoolean(value, fallback = true) {
+        const v = String(value ?? "").trim().toUpperCase();
+        if (["TRUE", "Y", "YES", "1"].includes(v)) return true;
+        if (["FALSE", "N", "NO", "0"].includes(v)) return false;
+        return fallback;
+    }
+
+    function parsePortfolioConfigCsv(text) {
+        const rows = parseRows(text);
+        if (rows.length < 2) return [];
+
+        const headers = rows[0].map(h => String(h).trim());
+        const orderIdx = headerIndex(headers, "configOrder", "Display Order", "Order");
+        const idIdx = headerIndex(headers, "configId", "GroupId", "Id");
+        const labelIdx = headerIndex(headers, "displayLabel", "Label");
+        const targetIdx = headerIndex(headers, "targetWeight", "Target Weight");
+        const controlIdx = headerIndex(headers, "controlType", "Control Type");
+        const roleIdx = headerIndex(headers, "assetRole", "Asset Role", "Role");
+        const classIdx = headerIndex(headers, "assetClass", "Asset Class", "Class");
+        const enabledIdx = headerIndex(headers, "isEnabled", "Enabled");
+
+        return rows.slice(1).map(cols => {
+            const configId = String(cols[idIdx] || "").trim().toUpperCase();
+            if (!configId) return null;
+
+            return {
+                configOrder: parseNumber(cols[orderIdx], 999),
+                configId,
+                displayLabel: String(cols[labelIdx] || configId).trim(),
+                targetWeight: parseNumber(cols[targetIdx], 0),
+                controlType: String(cols[controlIdx] || "MIN").trim().toUpperCase(),
+                assetRole: String(cols[roleIdx] || "GROWTH").trim().toUpperCase(),
+                assetClass: String(cols[classIdx] || configId).trim().toUpperCase(),
+                isEnabled: parseBoolean(cols[enabledIdx], true)
+            };
+        }).filter(Boolean).sort((a, b) => a.configOrder - b.configOrder);
+    }
+
     function parsePortfolioCsv(text) {
         const rows = parseRows(text);
         if (rows.length < 2) return [];
 
-        const headers = rows[0].map(h => String(h).trim().toUpperCase());
-        const idx = name => headers.indexOf(name.toUpperCase());
-
-        const tickerIdx = idx("Ticker");
-        const sharesIdx = idx("Shares");
-        const avgCostIdx = idx("AvgCostKRW");
-        const targetIdx = idx("TargetWeight");
+        const headers = rows[0].map(h => String(h).trim());
+        const tickerIdx = headerIndex(headers, "holdingTicker", "Ticker");
+        const groupIdx = headerIndex(headers, "holdingGroup", "Group", "GroupId");
+        const quantityIdx = headerIndex(headers, "quantity", "Shares");
+        const avgPriceIdx = headerIndex(headers, "avgPriceKRW", "AvgCostKRW", "Avg Price (KRW)");
+        const targetIdx = headerIndex(headers, "TargetWeight");
 
         return rows.slice(1).map(cols => {
-            const ticker = String(cols[tickerIdx] || "").trim().toUpperCase();
-            if (!ticker) return null;
+            const holdingTicker = String(cols[tickerIdx] || "").trim().toUpperCase();
+            if (!holdingTicker) return null;
+
+            const holdingGroup = groupIdx >= 0
+                ? String(cols[groupIdx] || holdingTicker).trim().toUpperCase()
+                : holdingTicker;
 
             return {
-                ticker,
-                shares: parseNumber(cols[sharesIdx], 0),
-                avgCostKRW: parseNumber(cols[avgCostIdx], 0),
+                holdingTicker,
+                holdingGroup,
+                quantity: parseNumber(cols[quantityIdx], 0),
+                avgPriceKRW: parseNumber(cols[avgPriceIdx], 0),
+                // Backward-compatible aliases.
+                ticker: holdingTicker,
+                shares: parseNumber(cols[quantityIdx], 0),
+                avgCostKRW: parseNumber(cols[avgPriceIdx], 0),
                 targetWeight: targetIdx >= 0 ? parseNumber(cols[targetIdx], 0) : 0
             };
         }).filter(Boolean);
@@ -220,22 +276,29 @@ const RiverWatchMarketEngine = (() => {
         console.log("RiverWatch MarketData AUTO", csvData);
     }
 
+    function applyPortfolioConfig(configRows) {
+        if (!Array.isArray(configRows) || configRows.length === 0) {
+            throw new Error("PortfolioConfig CSV parsed but no usable config found.");
+        }
+
+        const enabledRows = configRows.filter(item => item.isEnabled !== false);
+        riverwatch.portfolioConfiguration = enabledRows;
+
+        // Backward-compatible target map for older render/calculation helpers.
+        riverwatch.manual.boatConfiguration = enabledRows.reduce((acc, item) => {
+            acc[item.configId] = Number(item.targetWeight || 0);
+            return acc;
+        }, {});
+
+        console.log("RiverWatch PortfolioConfig AUTO", enabledRows);
+    }
+
     function applyPortfolio(portfolioRows) {
         if (!Array.isArray(portfolioRows) || portfolioRows.length === 0) {
             throw new Error("Portfolio CSV parsed but no usable holdings found.");
         }
 
         riverwatch.portfolio = portfolioRows;
-
-        const target = {};
-        portfolioRows.forEach(item => {
-            if (Number(item.targetWeight || 0) > 0) {
-                target[item.ticker] = Number(item.targetWeight);
-            }
-        });
-        target.INDIVIDUAL = Number((riverwatch.manual.boatConfiguration || {}).INDIVIDUAL ?? 10);
-        riverwatch.manual.boatConfiguration = target;
-
         console.log("RiverWatch Portfolio AUTO", portfolioRows);
     }
 
@@ -306,6 +369,20 @@ const RiverWatchMarketEngine = (() => {
         return true;
     }
 
+    async function loadPortfolioConfig() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.portfolioConfigCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("PortfolioConfig CSV URL missing. Using fallback portfolio config.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        applyPortfolioConfig(parsePortfolioConfigCsv(csvText));
+        return true;
+    }
+
     async function loadPortfolio() {
         const hub = riverwatch.policy.marketDataHub;
         const url = hub?.portfolioCsvUrl;
@@ -348,11 +425,12 @@ const RiverWatchMarketEngine = (() => {
     }
 
     async function loadAllData() {
-        const labels = ["MarketData", "Portfolio", "ManualConfig"];
+        const labels = ["MarketData", "PortfolioConfig", "Portfolio", "ManualConfig"];
 
         try {
             const results = await Promise.allSettled([
                 loadMarketData(),
+                loadPortfolioConfig(),
                 loadPortfolio(),
                 loadManualConfig()
             ]);
@@ -379,7 +457,7 @@ const RiverWatchMarketEngine = (() => {
             riverwatch.auto.lastSync = nowString();
             riverwatch.auto.syncStatus = syncStatus;
             riverwatch.auto.syncErrors = syncErrors;
-            riverwatch.auto.dataSource = okCount === 3 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
+            riverwatch.auto.dataSource = okCount === 4 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
 
             console.table(syncStatus);
 
@@ -389,11 +467,12 @@ const RiverWatchMarketEngine = (() => {
                 console.warn("RiverWatch OpenSeaLogbook optional load failed", logError);
             }
 
-            return okCount === 3;
+            return okCount === 4;
         } catch (error) {
             riverwatch.auto.dataSource = "FALLBACK";
             riverwatch.auto.syncStatus = {
                 MarketData: false,
+                PortfolioConfig: false,
                 Portfolio: false,
                 ManualConfig: false
             };
@@ -406,10 +485,12 @@ const RiverWatchMarketEngine = (() => {
     return {
         loadAllData,
         loadMarketData,
+        loadPortfolioConfig,
         loadPortfolio,
         loadManualConfig,
         loadOpenSeaLogbook,
         parseKeyValueCsv,
+        parsePortfolioConfigCsv,
         parsePortfolioCsv,
         parseLogbookCsv
     };

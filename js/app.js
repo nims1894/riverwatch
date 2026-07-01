@@ -127,53 +127,107 @@ function calculateRiverHealth() {
 
 
 
+function getEnabledPortfolioConfig() {
+    const configRows = Array.isArray(riverwatch.portfolioConfiguration)
+        ? riverwatch.portfolioConfiguration
+        : [];
+
+    return configRows
+        .filter(item => item && item.isEnabled !== false)
+        .map(item => ({
+            configOrder: Number(item.configOrder ?? 999),
+            configId: String(item.configId || "").trim().toUpperCase(),
+            displayLabel: String(item.displayLabel || item.configId || "").trim(),
+            targetWeight: Number(item.targetWeight ?? 0),
+            controlType: String(item.controlType || "MIN").trim().toUpperCase(),
+            assetRole: String(item.assetRole || "GROWTH").trim().toUpperCase(),
+            assetClass: String(item.assetClass || item.configId || "").trim().toUpperCase()
+        }))
+        .filter(item => item.configId)
+        .sort((a, b) => a.configOrder - b.configOrder);
+}
+
 function calculatePortfolioPosition() {
     const portfolio = Array.isArray(riverwatch.portfolio) ? riverwatch.portfolio : [];
+    const portfolioConfig = getEnabledPortfolioConfig();
+    const configById = portfolioConfig.reduce((acc, item) => {
+        acc[item.configId] = item;
+        return acc;
+    }, {});
+
     const config = riverwatch.manualConfig || {};
     const usdkrw = Number(riverwatch.auto.usdkrw ?? 0);
-    const target = riverwatch.manual.boatConfiguration || {};
 
     const assetGroups = {};
     let currentPosition = Number(config.cashKRW ?? 0);
     let costBasis = Number(config.cashKRW ?? 0);
 
     portfolio.forEach(item => {
-        const ticker = String(item.ticker || "").toUpperCase();
-        const shares = Number(item.shares ?? 0);
-        const avgCostKRW = Number(item.avgCostKRW ?? 0);
-        const currentPriceUSD = getMarketPriceUSD(ticker, 0);
+        const holdingTicker = String(item.holdingTicker || item.ticker || "").trim().toUpperCase();
+        const holdingGroup = String(item.holdingGroup || item.groupId || item.ticker || "").trim().toUpperCase();
+        const quantity = Number(item.quantity ?? item.shares ?? 0);
+        const avgPriceKRW = Number(item.avgPriceKRW ?? item.avgCostKRW ?? 0);
+        const currentPriceUSD = getMarketPriceUSD(holdingTicker, 0);
 
-        const currentValueKRW = shares * currentPriceUSD * usdkrw;
-        const costBasisKRW = shares * avgCostKRW;
+        if (!holdingTicker || !holdingGroup) return;
+
+        const currentValueKRW = quantity * currentPriceUSD * usdkrw;
+        const costBasisKRW = quantity * avgPriceKRW;
 
         currentPosition += currentValueKRW;
         costBasis += costBasisKRW;
 
-        const targetWeight = Number(target[ticker] ?? item.targetWeight ?? 0);
-        const groupTicker = targetWeight > 0 ? ticker : "INDIVIDUAL";
+        const cfg = configById[holdingGroup] || {
+            configId: holdingGroup,
+            displayLabel: holdingGroup,
+            targetWeight: 0,
+            controlType: "MIN",
+            assetRole: "GROWTH",
+            assetClass: holdingGroup
+        };
 
-        if (!assetGroups[groupTicker]) {
-            assetGroups[groupTicker] = {
-                ticker: groupTicker,
+        if (!assetGroups[holdingGroup]) {
+            assetGroups[holdingGroup] = {
+                ticker: holdingGroup,              // backward-compatible group key
+                configId: holdingGroup,
+                label: cfg.displayLabel || holdingGroup,
+                displayLabel: cfg.displayLabel || holdingGroup,
                 valueKRW: 0,
                 costBasisKRW: 0,
-                target: Number(target[groupTicker] ?? targetWeight ?? 0)
+                target: Number(cfg.targetWeight ?? 0),
+                controlType: String(cfg.controlType || "MIN").toUpperCase(),
+                assetRole: String(cfg.assetRole || "GROWTH").toUpperCase(),
+                assetClass: String(cfg.assetClass || cfg.configId || holdingGroup).toUpperCase()
             };
         }
 
-        assetGroups[groupTicker].valueKRW += currentValueKRW;
-        assetGroups[groupTicker].costBasisKRW += costBasisKRW;
+        assetGroups[holdingGroup].valueKRW += currentValueKRW;
+        assetGroups[holdingGroup].costBasisKRW += costBasisKRW;
     });
 
-    const allocationHoldings = Object.keys(target).map(ticker => {
-        const group = assetGroups[ticker] || { ticker, valueKRW: 0, costBasisKRW: 0, target: Number(target[ticker] ?? 0) };
+    const allocationHoldings = portfolioConfig.map(cfg => {
+        const group = assetGroups[cfg.configId] || {
+            ticker: cfg.configId,
+            configId: cfg.configId,
+            label: cfg.displayLabel,
+            displayLabel: cfg.displayLabel,
+            valueKRW: 0,
+            costBasisKRW: 0,
+            target: Number(cfg.targetWeight ?? 0),
+            controlType: String(cfg.controlType || "MIN").toUpperCase(),
+            assetRole: String(cfg.assetRole || "GROWTH").toUpperCase(),
+            assetClass: String(cfg.assetClass || cfg.configId || "").toUpperCase()
+        };
+
         const current = currentPosition > 0 ? (group.valueKRW / currentPosition) * 100 : 0;
         return {
-            ticker,
+            ...group,
             current,
-            target: Number(target[ticker] ?? 0),
-            valueKRW: group.valueKRW,
-            costBasisKRW: group.costBasisKRW
+            target: Number(cfg.targetWeight ?? group.target ?? 0),
+            controlType: String(cfg.controlType || group.controlType || "MIN").toUpperCase(),
+            assetRole: String(cfg.assetRole || group.assetRole || "GROWTH").toUpperCase(),
+            assetClass: String(cfg.assetClass || group.assetClass || cfg.configId || "").toUpperCase(),
+            displayLabel: cfg.displayLabel || group.displayLabel || cfg.configId
         };
     });
 
@@ -195,9 +249,8 @@ function getMarketPriceUSD(ticker, fallback = 0) {
 
 function calculateBoatHealth() {
     const holdings = riverwatch.calc.allocationHoldings || [];
-    const target = riverwatch.manual.boatConfiguration || {};
 
-    const alignment = calculateAllocationAlignment(holdings, target);
+    const alignment = calculateAllocationAlignment(holdings);
     const exposure = calculateBoatExposure(holdings);
     const suitability = calculateRiverSuitability(exposure.growth);
     const integrity = calculateStructuralIntegrity(holdings);
@@ -219,19 +272,25 @@ function calculateBoatHealth() {
     }, riverwatch.policy.boatHealthWeights || {}));
 }
 
-function calculateAllocationAlignment(holdings, target) {
+function calculateAllocationAlignment(holdings) {
     if (!holdings.length) return 0;
 
     const scores = holdings.map(item => {
-        const ticker = String(item.ticker || "").toUpperCase();
-        const limit = Number(target[ticker] ?? item.target ?? 0);
+        const limit = Number(item.target ?? 0);
         const currentValue = Number(item.current ?? 0);
+        const controlType = String(item.controlType || "MIN").toUpperCase();
         if (limit <= 0) return 100;
 
-        if (ticker === "INDIVIDUAL") {
+        if (controlType === "MAX") {
             return currentValue <= limit ? 100 : Math.round(Math.max(0, Math.min(100, (limit / currentValue) * 100)));
         }
 
+        if (controlType === "TARGET" || controlType === "BAND") {
+            const gap = Math.abs(currentValue - limit);
+            return Math.round(Math.max(0, Math.min(100, 100 - gap * 10)));
+        }
+
+        // Default MIN: core groups should be maintained at or above target weight.
         return currentValue >= limit ? 100 : Math.round(Math.max(0, Math.min(100, (currentValue / limit) * 100)));
     });
 
@@ -239,16 +298,14 @@ function calculateAllocationAlignment(holdings, target) {
 }
 
 function calculateBoatExposure(holdings) {
-    const growthTickers = new Set(["QQQM", "BITQ", "INDIVIDUAL"]);
-    const defensiveTickers = new Set(["SPYM", "SCHD", "IAUM"]);
-
     let growth = 0;
     let defensive = 0;
 
     holdings.forEach(item => {
         const value = Number(item.current ?? 0);
-        if (growthTickers.has(item.ticker)) growth += value;
-        if (defensiveTickers.has(item.ticker)) defensive += value;
+        const role = String(item.assetRole || "").toUpperCase();
+        if (role === "GROWTH") growth += value;
+        if (role === "DEFENSIVE") defensive += value;
     });
 
     return {
@@ -274,24 +331,37 @@ function calculateRiverSuitability(growthExposure) {
 }
 
 function calculateStructuralIntegrity(holdings) {
-    const currentMap = Object.fromEntries(holdings.map(item => [item.ticker, Number(item.current ?? 0)]));
     const maxHolding = Math.max(...holdings.map(item => Number(item.current ?? 0)), 0);
-    const iaum = currentMap.IAUM ?? 0;
-    const bitq = currentMap.BITQ ?? 0;
+
+    // CAB-021b: structural scoring now follows PortfolioConfig.assetClass,
+    // not ticker-specific assumptions such as IAUM/BITQ.
+    const reserveExposure = sumCurrentByAssetClass(holdings, ["GOLD", "RESERVE"]);
+    const speculationExposure = sumCurrentByAssetClass(holdings, ["CRYPTO", "SPECULATIVE"]);
 
     const diversification = scoreDiversification(maxHolding);
-    const reserve = scoreReserve(iaum);
-    const speculation = scoreSpeculation(bitq);
+    const reserve = scoreReserve(reserveExposure);
+    const speculation = scoreSpeculation(speculationExposure);
 
     riverwatch.calc.diversificationScore = diversification;
     riverwatch.calc.reserveScore = reserve;
     riverwatch.calc.speculationScore = speculation;
+    riverwatch.calc.reserveExposure = Math.round(reserveExposure * 10) / 10;
+    riverwatch.calc.speculationExposure = Math.round(speculationExposure * 10) / 10;
 
     return Math.round(weightedAverage({
         diversification,
         reserve,
         speculation
     }, riverwatch.policy.structuralIntegrityWeights || {}));
+}
+
+function sumCurrentByAssetClass(holdings, classNames) {
+    const allowed = new Set(classNames.map(name => String(name).toUpperCase()));
+
+    return holdings.reduce((sum, item) => {
+        const assetClass = String(item.assetClass || item.configId || item.ticker || "").toUpperCase();
+        return allowed.has(assetClass) ? sum + Number(item.current ?? 0) : sum;
+    }, 0);
 }
 
 function scoreDiversification(maxHolding) {
@@ -1071,15 +1141,16 @@ function renderAllocation() {
     list.innerHTML = "";
 
     (riverwatch.calc.allocationHoldings || []).forEach(item => {
-        const target = riverwatch.manual.boatConfiguration[item.ticker] ?? 0;
+        const target = Number(item.target ?? 0);
         const current = Number(item.current ?? 0);
         const delta = current - target;
-        const status = getAllocationStatus(delta);
+        const status = getAllocationStatusForItem(item);
+        const label = item.displayLabel || item.label || item.ticker;
 
         const row = document.createElement("div");
         row.className = "holding-row";
         row.innerHTML = `
-            <span>${formatTicker(item.ticker)}</span>
+            <span>${formatTicker(label)}</span>
             <span>${current.toFixed(1)}%</span>
             <span>${target.toFixed(1)}%</span>
             <span>${formatSigned(delta)}%</span>
@@ -1315,7 +1386,7 @@ function renderBoatyard() {
             const limit = Number(rule.limit ?? 0);
             const delta = current - limit;
             const badgeLabel = getTrimBadgeLabel(rule.label);
-            const tickerLabel = formatTrimTicker(item.ticker);
+            const tickerLabel = formatTrimTicker(item.displayLabel || item.label || item.ticker);
 
             const markerPct = 70;
             const blockPct = 6;
@@ -1634,11 +1705,11 @@ function getBoatStatus(score) {
 }
 
 function getDoctrineRule(item) {
-    const ticker = String(item?.ticker || "").toUpperCase();
     const current = Number(item?.current ?? 0);
-    const limit = Number(riverwatch.manual.boatConfiguration[ticker] ?? item?.target ?? 0);
+    const limit = Number(item?.target ?? 0);
+    const controlType = String(item?.controlType || "MIN").toUpperCase();
 
-    if (ticker === "INDIVIDUAL") {
+    if (controlType === "MAX") {
         const satisfied = current <= limit;
         return {
             limit,
@@ -1646,6 +1717,17 @@ function getDoctrineRule(item) {
             deltaLabel: "Excess",
             label: satisfied ? "WITHIN CAP" : "DILUTING",
             className: satisfied ? "on-target" : "diluting"
+        };
+    }
+
+    if (controlType === "TARGET" || controlType === "BAND") {
+        const satisfied = Math.abs(current - limit) <= 3;
+        return {
+            limit,
+            limitLabel: "Target",
+            deltaLabel: satisfied ? "Aligned" : "Gap",
+            label: satisfied ? "SATISFIED" : (current < limit ? "BUILDING" : "DILUTING"),
+            className: satisfied ? "on-target" : (current < limit ? "building" : "diluting")
         };
     }
 
@@ -1657,6 +1739,25 @@ function getDoctrineRule(item) {
         label: satisfied ? "SATISFIED" : "BUILDING",
         className: satisfied ? "on-target" : "building"
     };
+}
+
+function getAllocationStatusForItem(item) {
+    const current = Number(item?.current ?? 0);
+    const target = Number(item?.target ?? 0);
+    const controlType = String(item?.controlType || "MIN").toUpperCase();
+    const delta = current - target;
+
+    if (controlType === "MAX") {
+        if (current <= target) return { label: "WITHIN CAP", className: "on-target" };
+        return { label: "OVER CAP", className: "over" };
+    }
+
+    if (controlType === "MIN") {
+        if (current >= target) return { label: "SATISFIED", className: "on-target" };
+        return { label: "BUILDING", className: "under" };
+    }
+
+    return getAllocationStatus(delta);
 }
 
 function getAllocationStatus(delta) {

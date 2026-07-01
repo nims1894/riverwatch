@@ -8,7 +8,9 @@ Target: v1.0 RC4
 
 Completed in Sprint #010 / RC4.
 
-## CAB-021
+## CAB-021b AssetClass Structural Integrity Integration - DONE
+
+CAB-021
 Title: Recovery Engine Enhancement
 Status: BACKLOG
 Priority: MEDIUM
@@ -43,3 +45,6 @@ Title: Macro Data Automation (BRENT / M2)
 Status: BACKLOG
 Priority: HIGH
 Target: v2.0
+## Completed
+
+- CAB-021c PortfolioConfig CRYPTO Alignment — DONE

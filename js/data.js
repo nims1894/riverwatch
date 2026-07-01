@@ -21,7 +21,7 @@ const riverwatch = {
      * [CONST] Doctrine
      * ======================================================================*/
     const: {
-        version: "0.4.0-cab006.0",
+        version: "0.4.0-cab021c",
         mission: "Stay the Course",
         subtitle: "Personal Navigation System for Reaching the Open Sea.",
         operator: "NIMS",
@@ -47,6 +47,7 @@ const riverwatch = {
             marketCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0",
             portfolioCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1022059028",
             manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
+            portfolioConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=283502072",
             openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1725380515",
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 5000
@@ -184,15 +185,31 @@ const riverwatch = {
      * Google Sheet v2.0이 우선이며, 이 영역은 비상 fallback으로만 사용합니다.
      * ======================================================================*/
     manual: {
+        // Backward-compatible target map generated from portfolioConfiguration.
         boatConfiguration: {
-            QQQM: 40,
-            SPYM: 25,
-            SCHD: 15,
-            IAUM: 8,
-            BITQ: 2,
+            GROWTH_ETF: 40,
+            CORE_ETF: 25,
+            DIVIDEND: 15,
+            GOLD: 8,
+            CRYPTO: 2,
             INDIVIDUAL: 10
         }
     },
+
+    /* ========================================================================
+     * [PORTFOLIO CONFIG] Fallback portfolio configuration
+     * Google Sheet PortfolioConfig 탭이 SSOT입니다.
+     * configId = stable portfolio group / displayLabel = screen label.
+     * controlType: MIN means maintain at or above target, MAX means cap at or below target.
+     * ======================================================================*/
+    portfolioConfiguration: [
+        { configOrder: 10, configId: "GROWTH_ETF", displayLabel: "QQQM", targetWeight: 40, controlType: "MIN", assetRole: "GROWTH", assetClass: "ETF", isEnabled: true },
+        { configOrder: 20, configId: "CORE_ETF", displayLabel: "SPYM", targetWeight: 25, controlType: "MIN", assetRole: "DEFENSIVE", assetClass: "ETF", isEnabled: true },
+        { configOrder: 30, configId: "DIVIDEND", displayLabel: "SCHD", targetWeight: 15, controlType: "MIN", assetRole: "DEFENSIVE", assetClass: "ETF", isEnabled: true },
+        { configOrder: 40, configId: "GOLD", displayLabel: "IAUM", targetWeight: 8, controlType: "MIN", assetRole: "DEFENSIVE", assetClass: "GOLD", isEnabled: true },
+        { configOrder: 50, configId: "CRYPTO", displayLabel: "BITQ", targetWeight: 2, controlType: "MIN", assetRole: "GROWTH", assetClass: "CRYPTO", isEnabled: true },
+        { configOrder: 60, configId: "INDIVIDUAL", displayLabel: "INDIVIDUAL", targetWeight: 10, controlType: "MAX", assetRole: "GROWTH", assetClass: "STOCK", isEnabled: true }
+    ],
 
     /* ========================================================================
      * [MANUAL CONFIG] Fallback captain inputs
@@ -221,15 +238,15 @@ const riverwatch = {
      * avgCostKRW = 매수 당시 환율까지 반영한 원화 평단가입니다.
      * ======================================================================*/
     portfolio: [
-        { ticker: "QQQM", shares: 65, avgCostKRW: 386089, targetWeight: 40 },
-        { ticker: "SPYM", shares: 20, avgCostKRW: 132678, targetWeight: 25 },
-        { ticker: "SCHD", shares: 4, avgCostKRW: 49498, targetWeight: 15 },
-        { ticker: "IAUM", shares: 40, avgCostKRW: 69096, targetWeight: 8 },
-        { ticker: "BITQ", shares: 1, avgCostKRW: 43006, targetWeight: 2 },
-        { ticker: "NVDA", shares: 20, avgCostKRW: 289240, targetWeight: 0 },
-        { ticker: "MSFT", shares: 10, avgCostKRW: 616207, targetWeight: 0 },
-        { ticker: "GOOGL", shares: 10, avgCostKRW: 473879, targetWeight: 0 },
-        { ticker: "PLTR", shares: 30, avgCostKRW: 230025, targetWeight: 0 }
+        { holdingTicker: "QQQM", holdingGroup: "GROWTH_ETF", quantity: 109, avgPriceKRW: 404687 },
+        { holdingTicker: "SPYM", holdingGroup: "CORE_ETF", quantity: 119, avgPriceKRW: 133078 },
+        { holdingTicker: "SCHD", holdingGroup: "DIVIDEND", quantity: 174, avgPriceKRW: 48857 },
+        { holdingTicker: "IAUM", holdingGroup: "GOLD", quantity: 113, avgPriceKRW: 63863 },
+        { holdingTicker: "BITQ", holdingGroup: "CRYPTO", quantity: 29, avgPriceKRW: 39915 },
+        { holdingTicker: "NVDA", holdingGroup: "INDIVIDUAL", quantity: 20, avgPriceKRW: 273395 },
+        { holdingTicker: "MSFT", holdingGroup: "INDIVIDUAL", quantity: 10, avgPriceKRW: 590350 },
+        { holdingTicker: "GOOGL", holdingGroup: "INDIVIDUAL", quantity: 10, avgPriceKRW: 453983 },
+        { holdingTicker: "PLTR", holdingGroup: "INDIVIDUAL", quantity: 30, avgPriceKRW: 220642 }
     ],
 
     /* ========================================================================
