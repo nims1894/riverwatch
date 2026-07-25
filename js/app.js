@@ -194,6 +194,7 @@ function calculatePortfolioPosition() {
                 displayLabel: cfg.displayLabel || holdingGroup,
                 valueKRW: 0,
                 costBasisKRW: 0,
+                quantity: 0,
                 target: Number(cfg.targetWeight ?? 0),
                 controlType: String(cfg.controlType || "MIN").toUpperCase(),
                 assetRole: String(cfg.assetRole || "GROWTH").toUpperCase(),
@@ -203,6 +204,7 @@ function calculatePortfolioPosition() {
 
         assetGroups[holdingGroup].valueKRW += currentValueKRW;
         assetGroups[holdingGroup].costBasisKRW += costBasisKRW;
+        assetGroups[holdingGroup].quantity += quantity;
     });
 
     const allocationHoldings = portfolioConfig.map(cfg => {
@@ -213,6 +215,7 @@ function calculatePortfolioPosition() {
             displayLabel: cfg.displayLabel,
             valueKRW: 0,
             costBasisKRW: 0,
+            quantity: 0,
             target: Number(cfg.targetWeight ?? 0),
             controlType: String(cfg.controlType || "MIN").toUpperCase(),
             assetRole: String(cfg.assetRole || "GROWTH").toUpperCase(),
@@ -1364,6 +1367,16 @@ function formatTrimTicker(ticker) {
     return formatTicker(text);
 }
 
+function formatHoldingQuantity(value) {
+    const quantity = Number(value ?? 0);
+    if (!Number.isFinite(quantity)) return "0.0";
+
+    return quantity.toLocaleString("en-US", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+    });
+}
+
 function renderBoatyard() {
     setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
     setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
@@ -1387,6 +1400,7 @@ function renderBoatyard() {
             const delta = current - limit;
             const badgeLabel = getTrimBadgeLabel(rule.label);
             const tickerLabel = formatTrimTicker(item.displayLabel || item.label || item.ticker);
+            const holdingQuantity = formatHoldingQuantity(item.quantity);
 
             const markerPct = 70;
             const blockPct = 6;
@@ -1420,7 +1434,13 @@ function renderBoatyard() {
                 row.className = "trim-card trim-detail-card-diet";
                 row.innerHTML = `
                     <div class="trim-head trim-head-static trim-head-diet">
-                        <b class="trim-ticker" title="${tickerLabel}">${tickerLabel}</b>
+                        <div class="trim-identity">
+                            <b class="trim-ticker" title="${tickerLabel}">${tickerLabel}</b>
+                            <span class="trim-holdings" aria-label="Holdings ${holdingQuantity}">
+                                <span class="trim-holdings-label">Holdings</span>
+                                <b class="trim-holdings-value">${holdingQuantity}</b>
+                            </span>
+                        </div>
                         <span class="badge ${rule.className}">${badgeLabel}</span>
                     </div>
                     <div class="trim-card-body">

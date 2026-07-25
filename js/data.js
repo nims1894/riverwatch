@@ -21,7 +21,7 @@ const riverwatch = {
      * [CONST] Doctrine
      * ======================================================================*/
     const: {
-        version: "0.4.0-cab021c",
+        version: "0.4.0-cab022",
         mission: "Stay the Course",
         subtitle: "Personal Navigation System for Reaching the Open Sea.",
         operator: "NIMS",
