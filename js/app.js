@@ -579,11 +579,11 @@ function calculateVoyageHealth() {
     const baseCAGR = baseCAGRInput > 1 ? baseCAGRInput / 100 : baseCAGRInput;
     const remainingYears = calculateRemainingYears(config.targetDate);
 
-    const riverAdjustment = getCagrAdjustment(riverwatch.policy.voyageCagrAdjustment?.river, riverwatch.calc.riverHealth);
-    const boatScoreAdjustment = getCagrAdjustment(riverwatch.policy.voyageCagrAdjustment?.boat, riverwatch.calc.boatHealth);
-    const captainBoatAdjustment = Number(config.boatAdjustment ?? 0) / 100;
-    const boatAdjustment = boatScoreAdjustment + captainBoatAdjustment;
-    const effectiveCAGR = Math.max(0, baseCAGR + riverAdjustment + boatAdjustment);
+    // Google Sheet ManualConfig.expectedCAGR is the single source of truth.
+    // River Health, Boat Health, and boatAdjustment no longer modify Voyage CAGR.
+    const riverAdjustment = 0;
+    const boatAdjustment = 0;
+    const effectiveCAGR = baseCAGR;
 
     const baseArrival = projectFutureValue(currentAssets, monthlyContribution, baseCAGR, remainingYears);
     const adjustedArrival = projectFutureValue(currentAssets, monthlyContribution, effectiveCAGR, remainingYears);
@@ -1091,7 +1091,7 @@ function renderVoyageHealth() {
     setText("voyageStatus", getVoyageStatus(riverwatch.calc.voyageHealth));
     setText("currentPosition", formatKRWM(riverwatch.calc.currentPosition));
     setText("remainingTime", riverwatch.calc.remainingTime);
-    setText("effectiveCAGR", formatPercentValue(riverwatch.calc.effectiveCAGR * 100));
+    setText("effectiveCAGR", formatEffectiveCAGR(riverwatch.calc.effectiveCAGR));
     setText("adjustedArrival", formatKRWM(riverwatch.calc.adjustedArrival));
     setText("openSeaTarget", formatKRWM(riverwatch.calc.openSeaTarget));
     setText("voyageGap", formatKRWM(voyageGap));
@@ -1821,6 +1821,11 @@ function formatInteger(value) {
 function formatPercentValue(value) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
     return formatNumber(value, 1) + "%";
+}
+
+function formatEffectiveCAGR(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    return (value * 100).toFixed(2) + "%";
 }
 
 function formatSigned(value, digits = 1) {
