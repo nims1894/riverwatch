@@ -754,6 +754,27 @@ function calculateRequiredCAGR() {
     return high;
 }
 
+function formatBrentPrice(price, asOf) {
+    const priceText = `${formatNumber(price)} USD`;
+    const dateText = formatMonthDay(asOf);
+    return dateText ? `${priceText} @ ${dateText}` : priceText;
+}
+
+function formatMonthDay(value) {
+    if (value === null || value === undefined || value === "") return "";
+
+    // Google Sheet CSV may return dates as 2026.7.27, 2026-07-27,
+    // 2026/07/27, or locale-spaced variants such as 2026. 7. 27.
+    const parts = String(value).trim().match(/^(?:\d{4})\s*[.\/-]\s*(\d{1,2})\s*[.\/-]\s*(\d{1,2})\.?$/);
+    if (!parts) return "";
+
+    const month = Number(parts[1]);
+    const day = Number(parts[2]);
+    if (month < 1 || month > 12 || day < 1 || day > 31) return "";
+
+    return `${month}/${day}`;
+}
+
 function parseDate(text) {
     if (!text || typeof text !== "string") return null;
     const parts = text.split(".").map(Number);
@@ -1113,7 +1134,7 @@ function renderRiverHealth() {
     const metrics = [
         ["USDKRW", `${formatInteger(riverwatch.auto.usdkrw)} (${scoreText(scores.usdkrw)})`],
         ["VIX", `${formatInteger(riverwatch.auto.vix)} (${scoreText(scores.vix)})`],
-        ["Brent", `${formatNumber(riverwatch.calc.brentPrice)} (${scoreText(scores.oil)})`],
+        ["Brent", `${formatBrentPrice(riverwatch.calc.brentPrice, config.BrentPriceAsOf ?? config.brentPriceAsOf)} (${scoreText(scores.oil)})`],
         ["AI CAPEX", `${String(config.aiCapexTrend || "-").toUpperCase()} (${scoreText(scores.aiCapex)})`],
         ["NVDA DC Rev", `${config.nvdaDcRevenueGrowth}% (${scoreText(scores.nvdaDcRevenue)})`],
         ["M2", `${String(config.m2Trend || "-").toUpperCase()} (${scoreText(scores.m2)})`],

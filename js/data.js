@@ -228,6 +228,7 @@ const riverwatch = {
      * ======================================================================*/
     manualConfig: {
         BrentPrice: 77.1,
+        BrentPriceAsOf: "2026.07.27",
         aiCapexTrend: "increasing",
         nvdaDcRevenueGrowth: 40,
         fedRateState: "pause",
