@@ -3,6 +3,7 @@
  * Google Sheet v2.0 CSV Hub Reader
  * - MarketData: live market prices
  * - PortfolioConfig: target allocation / role data
+ * - ControlRules: MIN/MAX evaluation thresholds and status labels
  * - Portfolio: captain position data
  * - ManualConfig: captain judgment / voyage inputs
  ****************************************************************************/
@@ -121,6 +122,39 @@ const RiverWatchMarketEngine = (() => {
                 isEnabled: parseBoolean(cols[enabledIdx], true)
             };
         }).filter(Boolean).sort((a, b) => a.configOrder - b.configOrder);
+    }
+
+    function parseControlRulesCsv(text) {
+        const rows = parseRows(text);
+        if (rows.length < 2) return {};
+
+        const headers = rows[0].map(h => String(h).trim());
+        const controlIdx = headerIndex(headers, "controlType", "Control Type");
+        const modeIdx = headerIndex(headers, "evaluationMode", "Evaluation Mode");
+        const satThresholdIdx = headerIndex(headers, "satThreshold", "SAT Threshold");
+        const buildThresholdIdx = headerIndex(headers, "buildThreshold", "BUILD Threshold");
+        const satStatusIdx = headerIndex(headers, "satStatus", "SAT Status");
+        const buildStatusIdx = headerIndex(headers, "buildStatus", "BUILD Status");
+        const rebalanceStatusIdx = headerIndex(headers, "rebalanceStatus", "REBALANCE Status");
+
+        return rows.slice(1).reduce((acc, cols) => {
+            const controlType = String(cols[controlIdx] || "").trim().toUpperCase();
+            if (!controlType) return acc;
+
+            const satThreshold = parseNumber(cols[satThresholdIdx], 1);
+            const buildThreshold = parseNumber(cols[buildThresholdIdx], 5);
+
+            acc[controlType] = {
+                controlType,
+                evaluationMode: String(cols[modeIdx] || (controlType === "MAX" ? "UPPER_ONLY" : "ABS")).trim().toUpperCase(),
+                satThreshold: Math.max(0, satThreshold),
+                buildThreshold: Math.max(satThreshold, buildThreshold),
+                satStatus: String(cols[satStatusIdx] || "SAT").trim().toUpperCase(),
+                buildStatus: String(cols[buildStatusIdx] || "BUILD").trim().toUpperCase(),
+                rebalanceStatus: String(cols[rebalanceStatusIdx] || "REBALANCE").trim().toUpperCase()
+            };
+            return acc;
+        }, {});
     }
 
     function parsePortfolioCsv(text) {
@@ -293,6 +327,18 @@ const RiverWatchMarketEngine = (() => {
         console.log("RiverWatch PortfolioConfig AUTO", enabledRows);
     }
 
+    function applyControlRules(controlRules) {
+        if (!controlRules || Object.keys(controlRules).length === 0) {
+            throw new Error("ControlRules CSV parsed but no usable rules found.");
+        }
+
+        riverwatch.controlRules = {
+            ...(riverwatch.controlRules || {}),
+            ...controlRules
+        };
+        console.log("RiverWatch ControlRules AUTO", riverwatch.controlRules);
+    }
+
     function applyPortfolio(portfolioRows) {
         if (!Array.isArray(portfolioRows) || portfolioRows.length === 0) {
             throw new Error("Portfolio CSV parsed but no usable holdings found.");
@@ -383,6 +429,20 @@ const RiverWatchMarketEngine = (() => {
         return true;
     }
 
+    async function loadControlRules() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.controlRulesCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("ControlRules CSV URL missing. Using fallback control rules.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        applyControlRules(parseControlRulesCsv(csvText));
+        return true;
+    }
+
     async function loadPortfolio() {
         const hub = riverwatch.policy.marketDataHub;
         const url = hub?.portfolioCsvUrl;
@@ -425,12 +485,13 @@ const RiverWatchMarketEngine = (() => {
     }
 
     async function loadAllData() {
-        const labels = ["MarketData", "PortfolioConfig", "Portfolio", "ManualConfig"];
+        const labels = ["MarketData", "PortfolioConfig", "ControlRules", "Portfolio", "ManualConfig"];
 
         try {
             const results = await Promise.allSettled([
                 loadMarketData(),
                 loadPortfolioConfig(),
+                loadControlRules(),
                 loadPortfolio(),
                 loadManualConfig()
             ]);
@@ -457,7 +518,7 @@ const RiverWatchMarketEngine = (() => {
             riverwatch.auto.lastSync = nowString();
             riverwatch.auto.syncStatus = syncStatus;
             riverwatch.auto.syncErrors = syncErrors;
-            riverwatch.auto.dataSource = okCount === 4 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
+            riverwatch.auto.dataSource = okCount === 5 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
 
             console.table(syncStatus);
 
@@ -467,12 +528,13 @@ const RiverWatchMarketEngine = (() => {
                 console.warn("RiverWatch OpenSeaLogbook optional load failed", logError);
             }
 
-            return okCount === 4;
+            return okCount === 5;
         } catch (error) {
             riverwatch.auto.dataSource = "FALLBACK";
             riverwatch.auto.syncStatus = {
                 MarketData: false,
                 PortfolioConfig: false,
+                ControlRules: false,
                 Portfolio: false,
                 ManualConfig: false
             };
@@ -486,11 +548,13 @@ const RiverWatchMarketEngine = (() => {
         loadAllData,
         loadMarketData,
         loadPortfolioConfig,
+        loadControlRules,
         loadPortfolio,
         loadManualConfig,
         loadOpenSeaLogbook,
         parseKeyValueCsv,
         parsePortfolioConfigCsv,
+        parseControlRulesCsv,
         parsePortfolioCsv,
         parseLogbookCsv
     };

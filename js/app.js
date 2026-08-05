@@ -1354,10 +1354,9 @@ function getVoyageDriftLabel(drift) {
 
 function getTrimBadgeLabel(label) {
     const text = String(label || "").trim().toUpperCase();
-    if (text === "SATISFIED") return "SAT ✓";
-    if (text === "BUILDING") return "BUILD ▲";
-    if (text === "DILUTING") return "DILUTE ▼";
-    if (text === "WITHIN CAP") return "CAP OK ✓";
+    if (text === "SAT" || text === "SATISFIED" || text === "WITHIN CAP") return "SAT ✓";
+    if (text === "BUILD" || text === "BUILDING") return "BUILD ▲";
+    if (text === "REBALANCE" || text === "DILUTING" || text === "OVER CAP") return "REBALANCE !";
     return text || "-";
 }
 
@@ -1381,7 +1380,12 @@ function renderBoatyard() {
     setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
     setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
     setText("boatyardCostBasis", formatKRWM(riverwatch.calc.costBasis));
-    setText("boatyardReturn", formatSigned(riverwatch.calc.boatReturn) + "%");
+    // Reuse Voyage Health Current Position as the single source of truth.
+    setText("boatyardCurrentValue", formatKRWM(riverwatch.calc.currentPosition));
+    setText(
+        "boatyardReturn",
+        `${formatSignedKRWM(riverwatch.calc.boatPnL)} (${formatSigned(riverwatch.calc.boatReturn, 1)}%)`
+    );
 
     const deck = document.getElementById("trimDeckList");
     if (deck) {
@@ -1724,67 +1728,71 @@ function getBoatStatus(score) {
     return getStatusFromTable(score, "boat");
 }
 
+function getControlRule(controlType) {
+    const type = String(controlType || "MIN").trim().toUpperCase();
+    const fallback = type === "MAX"
+        ? { controlType: "MAX", evaluationMode: "UPPER_ONLY", satThreshold: 1, buildThreshold: 5, satStatus: "SAT", buildStatus: "BUILD", rebalanceStatus: "REBALANCE" }
+        : { controlType: "MIN", evaluationMode: "ABS", satThreshold: 1, buildThreshold: 5, satStatus: "SAT", buildStatus: "BUILD", rebalanceStatus: "REBALANCE" };
+
+    return {
+        ...fallback,
+        ...((riverwatch.controlRules || {})[type] || {})
+    };
+}
+
+function evaluateAllocationRule(item) {
+    const current = Number(item?.current ?? 0);
+    const target = Number(item?.target ?? 0);
+    const controlType = String(item?.controlType || "MIN").trim().toUpperCase();
+    const rule = getControlRule(controlType);
+    const rawDelta = current - target;
+    const evaluationMode = String(rule.evaluationMode || "ABS").trim().toUpperCase();
+
+    let deviation;
+    if (evaluationMode === "UPPER_ONLY") {
+        deviation = Math.max(rawDelta, 0);
+    } else if (evaluationMode === "LOWER_ONLY") {
+        deviation = Math.max(-rawDelta, 0);
+    } else {
+        deviation = Math.abs(rawDelta);
+    }
+
+    const satThreshold = Math.max(0, Number(rule.satThreshold ?? 1));
+    const buildThreshold = Math.max(satThreshold, Number(rule.buildThreshold ?? 5));
+
+    if (deviation < satThreshold) {
+        return { status: String(rule.satStatus || "SAT"), className: "on-target", deviation, rawDelta, rule };
+    }
+    if (deviation <= buildThreshold) {
+        return { status: String(rule.buildStatus || "BUILD"), className: "building", deviation, rawDelta, rule };
+    }
+    return { status: String(rule.rebalanceStatus || "REBALANCE"), className: "over", deviation, rawDelta, rule };
+}
+
 function getDoctrineRule(item) {
     const current = Number(item?.current ?? 0);
     const limit = Number(item?.target ?? 0);
     const controlType = String(item?.controlType || "MIN").toUpperCase();
+    const result = evaluateAllocationRule(item);
 
-    if (controlType === "MAX") {
-        const satisfied = current <= limit;
-        return {
-            limit,
-            limitLabel: "Cap",
-            deltaLabel: "Excess",
-            label: satisfied ? "WITHIN CAP" : "DILUTING",
-            className: satisfied ? "on-target" : "diluting"
-        };
-    }
-
-    if (controlType === "TARGET" || controlType === "BAND") {
-        const satisfied = Math.abs(current - limit) <= 3;
-        return {
-            limit,
-            limitLabel: "Target",
-            deltaLabel: satisfied ? "Aligned" : "Gap",
-            label: satisfied ? "SATISFIED" : (current < limit ? "BUILDING" : "DILUTING"),
-            className: satisfied ? "on-target" : (current < limit ? "building" : "diluting")
-        };
-    }
-
-    const satisfied = current >= limit;
     return {
         limit,
-        limitLabel: "Minimum",
-        deltaLabel: satisfied ? "Excess" : "Gap",
-        label: satisfied ? "SATISFIED" : "BUILDING",
-        className: satisfied ? "on-target" : "building"
+        limitLabel: controlType === "MAX" ? "Cap" : "Target",
+        deltaLabel: result.rawDelta >= 0 ? "Excess" : "Gap",
+        label: result.status,
+        className: result.className,
+        deviation: result.deviation
     };
 }
 
 function getAllocationStatusForItem(item) {
-    const current = Number(item?.current ?? 0);
-    const target = Number(item?.target ?? 0);
-    const controlType = String(item?.controlType || "MIN").toUpperCase();
-    const delta = current - target;
-
-    if (controlType === "MAX") {
-        if (current <= target) return { label: "WITHIN CAP", className: "on-target" };
-        return { label: "OVER CAP", className: "over" };
-    }
-
-    if (controlType === "MIN") {
-        if (current >= target) return { label: "SATISFIED", className: "on-target" };
-        return { label: "BUILDING", className: "under" };
-    }
-
-    return getAllocationStatus(delta);
+    const result = evaluateAllocationRule(item);
+    return { label: result.status, className: result.className };
 }
 
 function getAllocationStatus(delta) {
-    const abs = Math.abs(delta);
-    if (abs <= 3) return { label: "ON TARGET", className: "on-target" };
-    if (delta > 3) return { label: "OVER", className: "over" };
-    return { label: "UNDER", className: "under" };
+    const result = evaluateAllocationRule({ current: Number(delta || 0), target: 0, controlType: "MIN" });
+    return { label: result.status, className: result.className };
 }
 
 function formatRemainingTime(years) {
@@ -1803,6 +1811,14 @@ function formatKRWM(value) {
 function formatKRWB(value) {
     // Backward-compatible alias. RiverWatch CAB-005.2.4 uses M units for visibility.
     return formatKRWM(value);
+}
+
+function formatSignedKRWM(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    const amountM = value / 1000000;
+    const roundedM = Math.round(amountM);
+    const sign = roundedM > 0 ? "+" : "";
+    return `${sign}${roundedM.toLocaleString("ko-KR")}M`;
 }
 
 function formatNumber(value, maximumFractionDigits = 2) {

@@ -48,6 +48,7 @@ const riverwatch = {
             portfolioCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1022059028",
             manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
             portfolioConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=283502072",
+            controlRulesCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1223105705",
             openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1725380515",
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 5000
@@ -210,6 +211,16 @@ const riverwatch = {
         { configOrder: 50, configId: "CRYPTO", displayLabel: "BITQ", targetWeight: 2, controlType: "MIN", assetRole: "GROWTH", assetClass: "CRYPTO", isEnabled: true },
         { configOrder: 60, configId: "INDIVIDUAL", displayLabel: "INDIVIDUAL", targetWeight: 10, controlType: "MAX", assetRole: "GROWTH", assetClass: "STOCK", isEnabled: true }
     ],
+
+    /* ========================================================================
+     * [CONTROL RULES] Fallback allocation status rules
+     * Google Sheet ControlRules tab is SSOT.
+     * Threshold unit is percentage points (1 = 1%p).
+     * ======================================================================*/
+    controlRules: {
+        MIN: { controlType: "MIN", evaluationMode: "ABS", satThreshold: 1, buildThreshold: 5, satStatus: "SAT", buildStatus: "BUILD", rebalanceStatus: "REBALANCE" },
+        MAX: { controlType: "MAX", evaluationMode: "UPPER_ONLY", satThreshold: 1, buildThreshold: 5, satStatus: "SAT", buildStatus: "BUILD", rebalanceStatus: "REBALANCE" }
+    },
 
     /* ========================================================================
      * [MANUAL CONFIG] Fallback captain inputs

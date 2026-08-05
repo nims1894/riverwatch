@@ -1,3 +1,14 @@
+## CAB-025 — Boat Profile Value SSOT & Return Detail
+- Added Current Value to Boat Profile using the Voyage Health Current Position value.
+- Changed Boat Return to combined amount/rate format: `+7M (+3.0%)`.
+- Reused `boatPnL` as the derived gain/loss amount.
+
+## CAB-023 — ControlRules Google Sheet SSOT
+- Added ControlRules CSV loading (gid 1223105705).
+- Added sheet-driven MIN/MAX evaluation modes, thresholds, and status labels.
+- Allocation and trim-deck statuses now use SAT / BUILD / REBALANCE.
+- Added offline fallback rules matching the current sheet configuration.
+
 ## CAB-021c - PortfolioConfig CRYPTO Alignment
 
 - Aligned fallback data model with finalized Google Sheet schema.
