@@ -4249,3 +4249,95 @@ body{
         letter-spacing:-.045em !important;
     }
 }
+
+/* ===========================================================================
+   CAB-031 / Current Deck Mobile Balance & Status Badge
+   - Make WATCH / KEEP immediately scannable with compact filled pill badges.
+   - Reallocate mobile card width to approx. 62:38 (allocation:performance).
+   - Keep full KRW values right-aligned while reducing unused label/value space.
+   =========================================================================== */
+#boatyardPage .trim-head-diet > .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:20px;
+    padding:2px 10px !important;
+    border:0;
+    border-radius:999px !important;
+    color:#fff !important;
+    font-size:10px !important;
+    line-height:16px !important;
+    font-weight:800;
+    box-shadow:0 2px 7px rgba(0,0,0,.18);
+}
+
+#boatyardPage .trim-head-diet > .badge.normal,
+#boatyardPage .trim-head-diet > .badge.on-target{
+    background:var(--green);
+}
+
+#boatyardPage .trim-head-diet > .badge.under,
+#boatyardPage .trim-head-diet > .badge.watch{
+    background:var(--yellow);
+}
+
+#boatyardPage .trim-head-diet > .badge.over,
+#boatyardPage .trim-head-diet > .badge.adapt{
+    background:var(--orange);
+}
+
+#boatyardPage .trim-head-diet > .badge.recover{
+    background:var(--red);
+}
+
+@media (max-width:520px){
+    #boatyardPage .trim-card-body-performance{
+        grid-template-columns:minmax(0, 1.62fr) minmax(128px, 1fr);
+        gap:8px;
+    }
+
+    #boatyardPage .trim-performance{
+        min-width:128px;
+        padding-left:8px;
+    }
+
+    #boatyardPage .trim-performance-row{
+        grid-template-columns:auto minmax(76px, 1fr);
+        gap:3px;
+    }
+
+    #boatyardPage .trim-head-diet > .badge{
+        min-height:19px;
+        padding:1px 9px !important;
+        font-size:9px !important;
+        line-height:17px !important;
+    }
+}
+
+@media (max-width:380px){
+    #boatyardPage .trim-card-body-performance{
+        grid-template-columns:minmax(0, 1.62fr) minmax(120px, 1fr);
+        gap:6px;
+    }
+
+    #boatyardPage .trim-performance{
+        min-width:120px;
+        padding-left:6px;
+    }
+
+    #boatyardPage .trim-performance-row{
+        grid-template-columns:auto minmax(72px, 1fr);
+        gap:2px;
+    }
+}
+
+/* ===========================================================================
+   CAB-032 / Trim Deck WATCH badge class correction
+   - Allocation engine emits className "building" for WATCH status.
+   - Apply the same filled yellow pill treatment to .building.
+   =========================================================================== */
+#boatyardPage .trim-head-diet > .badge.building{
+    background:var(--yellow) !important;
+    color:#fff !important;
+    border:0 !important;
+}

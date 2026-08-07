@@ -1,3 +1,7 @@
+## CAB-032 — Current Deck WATCH Badge Fix
+- Fixed WATCH status badge background by styling the actual `building` class emitted by the allocation engine.
+- No calculation or data logic changes.
+
 ## CAB-029 — Current Deck Return Precision
 
 - Current Deck Return values now always display one decimal place.
@@ -258,3 +262,9 @@ Status: Eye Comfort patch ready for review.
 - Compacted Current / Target / Gap boxes at <=520px, with an additional <=380px refinement.
 - Preserved Current Deck performance typography and two-pane layout.
 - Added dynamic viewport height (`100dvh`) support for mobile browsers with visible browser chrome.
+
+## CAB-031 — Current Deck mobile balance & status visibility
+- Added compact filled pill badges for WATCH / KEEP with white text.
+- Expanded the mobile allocation pane and narrowed the performance pane to approximately 62:38.
+- Tightened performance label/value spacing while preserving large KRW value readability.
+- No calculation or data logic changes.
