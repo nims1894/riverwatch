@@ -1,3 +1,12 @@
+## CAB-029 — Current Deck Return Precision
+
+- Current Deck Return values now always display one decimal place.
+- Display-only change; no calculation logic changed.
+
+# CAB-027 Health Engine Calibration & Rule Consolidation
+- River Health: Brent semantics corrected, continuous score interpolation, Fed detail display, N/A-safe inputs, scoring/environment SSoT, status narrative alignment.
+- Voyage Health: CAGR 0~30% validation, day-aware target date, continuous 0~100 drift score, signed Target Margin.
+
 ## CAB-025 — Boat Profile Value SSOT & Return Detail
 - Added Current Value to Boat Profile using the Voyage Health Current Position value.
 - Changed Boat Return to combined amount/rate format: `+7M (+3.0%)`.
@@ -238,3 +247,9 @@ Status: Eye Comfort patch ready for review.
 - Unified Dashboard Health, Boat Profile, and Logbook KPI item heights.
 - Reduced mobile metric box vertical height target from 68px to 54px.
 - Preserved Typography Baseline Lock and value right alignment.
+
+## CAB-028 — Current Deck Investment Performance UI
+- Added Cost / Current / P/L / Return to each Trim Deck asset card.
+- Preserved Holdings and Current / Target / Gap.
+- Added profit-red / loss-blue performance colors and full KRW thousands formatting.
+- Added responsive width protection for 10B+ values and Galaxy S26 portrait-class mobile widths.

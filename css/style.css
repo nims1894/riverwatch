@@ -4003,3 +4003,183 @@ body{
         font-size:11px !important;
     }
 }
+
+/* ==========================================================================
+   CAB-028 Current Deck Performance Panel
+   - Preserve Current / Target / Gap + Holdings.
+   - Add Cost / Current / P/L / Return in the right-side card space.
+   - Profit uses red, loss uses blue, matching Korean market convention.
+   - Galaxy S26 portrait target: stable single-card layout around 360-430 CSS px.
+   ========================================================================== */
+#boatyardPage .trim-card-body-performance{
+    display:grid;
+    grid-template-columns:minmax(0, 1.45fr) minmax(168px, .72fr);
+    gap:16px;
+    align-items:stretch;
+}
+
+#boatyardPage .trim-allocation-pane{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+#boatyardPage .trim-performance{
+    min-width:168px;
+    padding:2px 0 2px 16px;
+    border-left:1px solid rgba(125,211,252,.28);
+    display:grid;
+    grid-template-rows:repeat(4, minmax(26px, auto));
+    align-content:center;
+}
+
+#boatyardPage .trim-performance-row{
+    min-width:0;
+    display:grid;
+    grid-template-columns:auto minmax(104px, 1fr);
+    align-items:center;
+    gap:10px;
+    padding:5px 0;
+    border-bottom:1px solid rgba(255,255,255,.045);
+}
+
+#boatyardPage .trim-performance-row:last-child{
+    border-bottom:0;
+}
+
+#boatyardPage .trim-performance-row span{
+    color:var(--text-soft);
+    font-size:12px !important;
+    line-height:1.1;
+    white-space:nowrap;
+}
+
+#boatyardPage .trim-performance-row b{
+    min-width:0;
+    text-align:right;
+    white-space:nowrap;
+    font-size:15px !important;
+    line-height:1.15;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-.02em;
+}
+
+#boatyardPage .trim-performance-row b.is-profit{
+    color:#ff5252 !important;
+}
+
+#boatyardPage .trim-performance-row b.is-loss{
+    color:#3b9cff !important;
+}
+
+#boatyardPage .trim-performance-row b.is-neutral{
+    color:var(--text-strong) !important;
+}
+
+/* Keep two cards per row only where each card has enough room for 10B+ values. */
+@media (max-width:1180px){
+    #boatyardPage .trim-deck-detail-only,
+    #boatyardPage .trim-deck-detail{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Galaxy S26 portrait / compact mobile: preserve two-pane card, compress spacing first. */
+@media (max-width:520px){
+    #boatyardPage .trim-detail-card-diet{
+        padding:13px 12px !important;
+    }
+
+    #boatyardPage .trim-head-diet{
+        margin-bottom:12px;
+    }
+
+    #boatyardPage .trim-card-body-performance{
+        grid-template-columns:minmax(0, 1fr) minmax(142px, .88fr);
+        gap:9px;
+    }
+
+    #boatyardPage .trim-performance{
+        min-width:142px;
+        padding-left:9px;
+    }
+
+    #boatyardPage .trim-performance-row{
+        grid-template-columns:auto minmax(86px, 1fr);
+        gap:5px;
+        padding:4px 0;
+    }
+
+    #boatyardPage .trim-performance-row span{
+        font-size:10px !important;
+    }
+
+    #boatyardPage .trim-performance-row b{
+        font-size:clamp(10px, 2.8vw, 13px) !important;
+        letter-spacing:-.045em;
+    }
+
+    #boatyardPage .trim-bar-wrap{
+        padding-bottom:18px;
+    }
+
+    #boatyardPage .trim-bar{
+        height:13px;
+    }
+
+    #boatyardPage .trim-stats-diet{
+        gap:5px !important;
+        margin-top:8px !important;
+    }
+
+    #boatyardPage .trim-stats-diet div{
+        padding:8px 5px !important;
+    }
+
+    #boatyardPage .trim-stats-diet span,
+    #trimDeckDetail .trim-stats-diet span{
+        font-size:9px !important;
+        letter-spacing:.02em !important;
+    }
+
+    #boatyardPage .trim-stats-diet b,
+    #trimDeckDetail .trim-stats-diet b{
+        font-size:15px !important;
+    }
+}
+
+@media (max-width:380px){
+    #boatyardPage .trim-detail-card-diet{
+        padding:12px 10px !important;
+    }
+
+    #boatyardPage .trim-card-body-performance{
+        grid-template-columns:minmax(0, 1fr) minmax(132px, .92fr);
+        gap:7px;
+    }
+
+    #boatyardPage .trim-performance{
+        min-width:132px;
+        padding-left:7px;
+    }
+
+    #boatyardPage .trim-performance-row{
+        grid-template-columns:auto minmax(80px, 1fr);
+        gap:4px;
+    }
+
+    #boatyardPage .trim-performance-row span{
+        font-size:9px !important;
+    }
+
+    #boatyardPage .trim-performance-row b{
+        font-size:10px !important;
+    }
+
+    #boatyardPage .trim-stats-diet b,
+    #trimDeckDetail .trim-stats-diet b{
+        font-size:14px !important;
+    }
+}

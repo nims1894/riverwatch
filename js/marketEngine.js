@@ -299,11 +299,12 @@ const RiverWatchMarketEngine = (() => {
         Object.keys(csvData).forEach(rawKey => {
             const key = String(rawKey).trim().toUpperCase();
             const value = csvData[rawKey];
-            if (key === "USDKRW") riverwatch.auto.usdkrw = Number(value);
-            else if (key === "VIX") riverwatch.auto.vix = Number(value);
+            const parsed = parseNumber(value, null);
+            if (key === "USDKRW") riverwatch.auto.usdkrw = parsed;
+            else if (key === "VIX") riverwatch.auto.vix = parsed;
             else {
-                riverwatch.auto.marketPrices[key] = Number(value);
-                riverwatch.auto[key] = Number(value);
+                riverwatch.auto.marketPrices[key] = parsed;
+                riverwatch.auto[key] = parsed;
             }
         });
 
@@ -374,7 +375,7 @@ const RiverWatchMarketEngine = (() => {
             "boatAdjustment"
         ].forEach(key => {
             if (riverwatch.manualConfig[key] !== undefined) {
-                riverwatch.manualConfig[key] = parseNumber(riverwatch.manualConfig[key], 0);
+                riverwatch.manualConfig[key] = parseNumber(riverwatch.manualConfig[key], null);
             }
         });
 

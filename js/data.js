@@ -65,26 +65,31 @@ const riverwatch = {
         },
 
         riverHealthScoring: {
+            // Numeric metric rules are the SSoT for both River Health and Environment.
+            // score is linearly interpolated between finite anchors to avoid step changes.
             usdkrw: [
-                { max: 1350, score: 95, label: "Risk-on friendly" },
-                { max: 1450, score: 88, label: "Normal" },
-                { max: 1525, score: 78, label: "Caution" },
-                { max: 1600, score: 62, label: "FX pressure" },
-                { max: Infinity, score: 40, label: "FX stress" }
+                { max: 1350, score: 95, growth: 2, defensive: -1, label: "Risk-on friendly" },
+                { max: 1450, score: 88, growth: 1, defensive: 0, label: "Normal" },
+                { max: 1525, score: 78, growth: 0, defensive: 1, label: "Caution" },
+                { max: 1600, score: 62, growth: -1, defensive: 2, label: "Defensive favored" },
+                { max: 1700, score: 40, growth: -3, defensive: 3, label: "FX stress" },
+                { max: Infinity, score: 40, growth: -3, defensive: 3, label: "FX stress" }
             ],
             vix: [
-                { max: 15, score: 95, label: "Calm" },
-                { max: 20, score: 85, label: "Stable" },
-                { max: 25, score: 75, label: "Neutral" },
-                { max: 35, score: 62, label: "Fear rising" },
-                { max: Infinity, score: 40, label: "Stress" }
+                { max: 15, score: 95, growth: 2, defensive: -1, label: "Calm" },
+                { max: 20, score: 85, growth: 1, defensive: 0, label: "Stable" },
+                { max: 25, score: 75, growth: 0, defensive: 0, label: "Neutral" },
+                { max: 35, score: 62, growth: -2, defensive: 2, label: "Fear rising" },
+                { max: 50, score: 40, growth: -3, defensive: 3, label: "Stress" },
+                { max: Infinity, score: 40, growth: -3, defensive: 3, label: "Stress" }
             ],
             oilPressure: [
-                { max: 50, score: 50, growth: -2, defensive: 2, label: "Recession risk" },
-                { max: 65, score: 70, growth: -1, defensive: 1, label: "Demand softening" },
+                { max: 50, score: 90, growth: 1, defensive: 0, label: "Low energy pressure" },
+                { max: 65, score: 95, growth: 2, defensive: -1, label: "Favorable energy" },
                 { max: 85, score: 95, growth: 2, defensive: -1, label: "Normal growth zone" },
                 { max: 100, score: 75, growth: -1, defensive: 1, label: "Inflation pressure" },
                 { max: 120, score: 50, growth: -2, defensive: 2, label: "Energy shock" },
+                { max: 140, score: 20, growth: -3, defensive: 3, label: "Severe oil stress" },
                 { max: Infinity, score: 20, growth: -3, defensive: 3, label: "Severe oil stress" }
             ],
             fedRateState: {
@@ -155,6 +160,8 @@ const riverwatch = {
             recoverCourse: 80
         },
 
+        // Deprecated compatibility table. Runtime Environment calculation uses
+        // riverHealthScoring above as its single source of truth.
         riverMatrix: {
             usdkrw: [
                 { max: 1350, growth: 2, defensive: -1, label: "Risk-on friendly" },
