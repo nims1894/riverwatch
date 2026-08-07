@@ -4183,3 +4183,69 @@ body{
         font-size:14px !important;
     }
 }
+
+/* ===========================================================================
+   CAB-030 / Galaxy S26 Portrait Trim Metric Compact
+   - Keep the two-pane Current Deck card introduced in CAB-028.
+   - Compact only CURRENT / TARGET / GAP on narrow mobile viewports.
+   - Preserve performance-value typography and desktop/tablet layout.
+   - Prefer dynamic viewport height on mobile browsers with visible toolbars.
+   =========================================================================== */
+
+@supports (min-height: 100dvh){
+    .screen{
+        min-height:100dvh;
+    }
+}
+
+@media (max-width:520px){
+    #boatyardPage .trim-stats-diet{
+        gap:4px !important;
+        margin-top:7px !important;
+    }
+
+    #boatyardPage .trim-stats-diet div{
+        min-width:0 !important;
+        padding:7px 3px !important;
+        border-radius:9px !important;
+    }
+
+    #boatyardPage .trim-stats-diet span,
+    #trimDeckDetail .trim-stats-diet span{
+        font-size:8px !important;
+        line-height:1.05 !important;
+        letter-spacing:0 !important;
+        margin-bottom:3px !important;
+        white-space:nowrap;
+    }
+
+    #boatyardPage .trim-stats-diet b,
+    #trimDeckDetail .trim-stats-diet b{
+        font-size:13px !important;
+        line-height:1.08 !important;
+        letter-spacing:-.035em !important;
+        white-space:nowrap;
+        font-variant-numeric:tabular-nums;
+    }
+}
+
+@media (max-width:380px){
+    #boatyardPage .trim-stats-diet{
+        gap:3px !important;
+    }
+
+    #boatyardPage .trim-stats-diet div{
+        padding:6px 2px !important;
+    }
+
+    #boatyardPage .trim-stats-diet span,
+    #trimDeckDetail .trim-stats-diet span{
+        font-size:7.5px !important;
+    }
+
+    #boatyardPage .trim-stats-diet b,
+    #trimDeckDetail .trim-stats-diet b{
+        font-size:12px !important;
+        letter-spacing:-.045em !important;
+    }
+}

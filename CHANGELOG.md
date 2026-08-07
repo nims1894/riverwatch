@@ -253,3 +253,8 @@ Status: Eye Comfort patch ready for review.
 - Preserved Holdings and Current / Target / Gap.
 - Added profit-red / loss-blue performance colors and full KRW thousands formatting.
 - Added responsive width protection for 10B+ values and Galaxy S26 portrait-class mobile widths.
+
+## CAB-030 — Galaxy S26 Portrait Trim Metric Compact
+- Compacted Current / Target / Gap boxes at <=520px, with an additional <=380px refinement.
+- Preserved Current Deck performance typography and two-pane layout.
+- Added dynamic viewport height (`100dvh`) support for mobile browsers with visible browser chrome.
