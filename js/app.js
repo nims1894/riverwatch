@@ -925,7 +925,7 @@ function updateDecisionEngine() {
     const voyage = Number.isFinite(riverwatch.calc.voyageHealth) ? riverwatch.calc.voyageHealth : null;
     const phase = String(riverwatch.calc.voyagePhase || "").toUpperCase();
 
-    let status = "STAY THE COURSE";
+    let status = "ON COURSE";
     let action = "NO ACTION";
 
     if (phase === "OPEN_SEA_REACHED") {
@@ -950,7 +950,7 @@ function updateDecisionEngine() {
         status = "OPEN SEA IN SIGHT";
         action = "HOLD COURSE";
     } else if (river >= 80 && boat >= 85 && voyage !== null && voyage >= 85) {
-        status = "STAY THE COURSE";
+        status = "ON COURSE";
         action = "NO ACTION";
     } else {
         status = "KEEP WATCH";
@@ -1480,6 +1480,15 @@ function formatKRWFull(value, signed = false) {
     return `${sign}${rounded.toLocaleString("ko-KR")}`;
 }
 
+function formatKRWThousands(value, signed = false) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "-";
+
+    const roundedThousands = Math.round(amount / 1000);
+    const sign = signed && roundedThousands > 0 ? "+" : "";
+    return `${sign}${roundedThousands.toLocaleString("ko-KR")}`;
+}
+
 function getPnLToneClass(value) {
     const amount = Number(value);
     if (!Number.isFinite(amount) || amount === 0) return "is-neutral";
@@ -1500,11 +1509,11 @@ function renderBoatyard() {
 
         deck.innerHTML = `
             <div class="portfolio-summary" aria-label="Portfolio all assets summary">
-                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS)</div>
+                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS) · ₩K</div>
                 <div class="portfolio-summary-grid">
-                    <div class="portfolio-summary-item"><span>COST</span><b>${formatKRWFull(totalCost)}</b></div>
-                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="${totalToneClass}">${formatKRWFull(totalCurrent)}</b></div>
-                    <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWFull(totalPnL, true)}</b></div>
+                    <div class="portfolio-summary-item"><span>COST</span><b>${formatKRWThousands(totalCost)}</b></div>
+                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="${totalToneClass}">${formatKRWThousands(totalCurrent)}</b></div>
+                    <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWThousands(totalPnL, true)}</b></div>
                     <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${totalReturn > 0 ? "+" : ""}${totalReturn.toFixed(1)}%</b></div>
                 </div>
             </div>

@@ -309,7 +309,7 @@ const riverwatch = {
      * [CALC] 계산값 fallback
      * ======================================================================*/
     calc: {
-        status: "STAY THE COURSE",
+        status: "ON COURSE",
         recommendedAction: "NO ACTION",
         daysSinceAction: 36,
         lastRebalance: "2026.05.17",

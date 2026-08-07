@@ -4601,3 +4601,17 @@ body{
   .portfolio-summary-item span{font-size:7.5px}
   .portfolio-summary-item b{font-size:9.5px;letter-spacing:-.06em}
 }
+
+
+/* CAB-038 · Summary readability + semantic status/title refinement */
+.mission-text,
+.koru-accent-title{color:#68c2df !important}
+
+/* Portfolio Summary values use ₩K to free width; labels retain CAB-037 sizing/position. */
+.portfolio-summary-item b{text-align:right}
+@media(max-width:640px){
+  .portfolio-summary-item b{font-size:15px;line-height:1.15;letter-spacing:-.025em}
+}
+@media(max-width:380px){
+  .portfolio-summary-item b{font-size:14px;letter-spacing:-.03em}
+}
