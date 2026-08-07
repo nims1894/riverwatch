@@ -1,0 +1,36 @@
+{
+  "id": "/riverwatch/",
+  "name": "RiverWatch · RV Koru",
+  "short_name": "RiverWatch",
+  "description": "RV Koru personal navigation system for staying the course.",
+  "start_url": "/riverwatch/",
+  "scope": "/riverwatch/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#08111f",
+  "theme_color": "#08111f",
+  "categories": [
+    "finance",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "icons/riverwatch-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/riverwatch-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/riverwatch-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

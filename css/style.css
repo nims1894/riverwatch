@@ -4519,3 +4519,42 @@ body{
         gap:2px;
     }
 }
+
+/* CAB-034 · PWA / standalone safe-area support */
+html{
+    background:#08111f;
+    min-height:100%;
+}
+
+body{
+    min-height:100dvh;
+    overscroll-behavior-y:none;
+}
+
+.screen{
+    min-height:100dvh;
+    padding-top:max(30px, env(safe-area-inset-top));
+    padding-right:max(30px, env(safe-area-inset-right));
+    padding-bottom:max(30px, env(safe-area-inset-bottom));
+    padding-left:max(30px, env(safe-area-inset-left));
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen){
+    body{
+        -webkit-user-select:none;
+        user-select:none;
+    }
+    input, textarea, [contenteditable="true"]{
+        -webkit-user-select:text;
+        user-select:text;
+    }
+}
+
+@media(max-width:640px){
+    .screen{
+        padding-top:max(18px, env(safe-area-inset-top));
+        padding-right:max(14px, env(safe-area-inset-right));
+        padding-bottom:max(18px, env(safe-area-inset-bottom));
+        padding-left:max(14px, env(safe-area-inset-left));
+    }
+}
