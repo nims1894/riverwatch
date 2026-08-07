@@ -1489,6 +1489,13 @@ function formatKRWThousands(value, signed = false) {
     return `${sign}${roundedThousands.toLocaleString("ko-KR")}`;
 }
 
+function formatSignedPercent1(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "-";
+    const sign = amount > 0 ? "+" : "";
+    return `${sign}${amount.toLocaleString("en-US", { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+}
+
 function getPnLToneClass(value) {
     const amount = Number(value);
     if (!Number.isFinite(amount) || amount === 0) return "is-neutral";
@@ -1514,7 +1521,7 @@ function renderBoatyard() {
                     <div class="portfolio-summary-item"><span>COST</span><b>${formatKRWThousands(totalCost)}</b></div>
                     <div class="portfolio-summary-item"><span>CURRENT</span><b class="${totalToneClass}">${formatKRWThousands(totalCurrent)}</b></div>
                     <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWThousands(totalPnL, true)}</b></div>
-                    <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${totalReturn > 0 ? "+" : ""}${totalReturn.toFixed(1)}%</b></div>
+                    <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${formatSignedPercent1(totalReturn)}</b></div>
                 </div>
             </div>
             <div class="trim-deck-detail trim-deck-detail-only" id="trimDeckDetail"></div>

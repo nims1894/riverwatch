@@ -4615,3 +4615,13 @@ body{
 @media(max-width:380px){
   .portfolio-summary-item b{font-size:14px;letter-spacing:-.03em}
 }
+
+
+/* CAB-039 · Portfolio Summary RETURN width + grouped percent formatting */
+@media(max-width:640px){
+  /* Reserve RETURN width for values through +1,234.5% without shrinking CAB-038 value typography. */
+  .portfolio-summary-grid{grid-template-columns:25fr 25fr 24fr 26fr}
+}
+@media(max-width:380px){
+  .portfolio-summary-grid{grid-template-columns:25fr 25fr 23fr 27fr}
+}
