@@ -1,3 +1,12 @@
+# RiverWatch v1.0 — Official Release
+- Promoted the RC4a/CAB-032 baseline to the official RiverWatch v1.0 release.
+- Rebuilt the intro identity around vessel name `RV Koru`.
+- Added a scalable Koru fern emblem as inline SVG.
+- Added official crew roles: Captain NIMS / First Officer ChatGPT.
+- Added ACTIVE status, `Stay the Course` mission, and retained the three-line voyage doctrine.
+- Changed intro entry action to `ENTER RIVERWATCH`.
+- No calculation, data pipeline, Health Engine, or portfolio-control logic changes.
+
 ## CAB-032 — Current Deck WATCH Badge Fix
 - Fixed WATCH status badge background by styling the actual `building` class emitted by the allocation engine.
 - No calculation or data logic changes.
@@ -267,4 +276,9 @@ Status: Eye Comfort patch ready for review.
 - Added compact filled pill badges for WATCH / KEEP with white text.
 - Expanded the mobile allocation pane and narrowed the performance pane to approximately 62:38.
 - Tightened performance label/value spacing while preserving large KRW value readability.
+- No calculation or data logic changes.
+
+## CAB-033 — Current Deck Mobile 70:30 Layout
+- Rebalanced mobile Current Deck cards to approx. 70:30 allocation/performance width.
+- Preserved existing font sizes and typography.
 - No calculation or data logic changes.

@@ -3,23 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RiverWatch v1.0 RC4a</title>
+    <title>RiverWatch v1.0 · RV Koru</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <!-- Intro Screen -->
-    <section id="intro" class="screen intro-screen">
-        <div class="boat-icon">⛵</div>
-        <div class="brand">RiverWatch</div>
-        <div class="subtitle">Personal Navigation System<br>for Reaching the Open Sea</div>
-        <div class="version">Version 1.0 RC4a</div>
-
-        <div class="operator">
-            Operator : NIMS <span class="online">● ONLINE</span>
+    <!-- Intro Screen · RiverWatch v1.0 / RV Koru -->
+    <section id="intro" class="screen intro-screen koru-intro">
+        <div class="koru-mark" aria-label="Koru fern symbol">
+            <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
+                <path class="koru-stem" d="M61 104 C58 86 59 71 67 59 C76 46 91 44 98 53 C105 62 99 76 88 78 C76 80 68 70 72 61 C76 52 88 51 92 57 C96 63 91 69 86 68"/>
+                <path class="koru-leaf" d="M61 88 C49 84 40 77 34 67 M59 77 C48 72 41 64 38 55 M62 68 C53 61 49 53 49 44 M68 59 C62 51 61 42 64 34 M77 52 C74 43 76 34 82 27"/>
+                <path class="koru-leaf" d="M49 82 C43 86 37 88 30 88 M43 72 C36 74 29 73 23 69 M42 61 C34 60 28 56 23 50 M50 51 C43 47 39 41 37 34 M61 43 C56 36 55 29 57 22"/>
+            </svg>
         </div>
 
-        <div class="line"></div>
+        <div class="vessel-name">RV Koru</div>
+        <div class="brand">RiverWatch <span class="brand-version">v1.0</span></div>
+
+        <div class="intro-rule"></div>
+
+        <div class="crew-block">
+            <div><span>Captain</span><b>NIMS</b></div>
+            <div><span>First Officer</span><b>ChatGPT</b></div>
+        </div>
+
+        <div class="intro-rule"></div>
+
+        <div class="mission-block">
+            <div><span>Status</span><b class="active-status">ACTIVE</b></div>
+            <div><span>Mission</span><b>Stay the Course</b></div>
+        </div>
 
         <div class="philosophy">
             <p>Observe the River.</p>
@@ -27,9 +41,7 @@
             <p>Continue the Voyage.</p>
         </div>
 
-        <div class="line"></div>
-
-        <button onclick="showDashboard()">ENTER DASHBOARD</button>
+        <button class="enter-voyage" onclick="showDashboard()">ENTER RIVERWATCH</button>
     </section>
 
     <!-- Dashboard Screen -->
