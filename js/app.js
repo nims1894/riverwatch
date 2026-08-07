@@ -1489,18 +1489,25 @@ function getPnLToneClass(value) {
 function renderBoatyard() {
     setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
     setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
-    setText("boatyardCostBasis", formatKRWM(riverwatch.calc.costBasis));
-    // Reuse Voyage Health Current Position as the single source of truth.
-    setText("boatyardCurrentValue", formatKRWM(riverwatch.calc.currentPosition));
-    setText(
-        "boatyardReturn",
-        `${formatSignedKRWM(riverwatch.calc.boatPnL)} (${formatSigned(riverwatch.calc.boatReturn, 1)}%)`
-    );
-
     const deck = document.getElementById("trimDeckList");
     if (deck) {
         const holdings = riverwatch.calc.allocationHoldings || [];
+        const totalCost = holdings.reduce((sum, item) => sum + Number(item.costBasisKRW ?? 0), 0);
+        const totalCurrent = holdings.reduce((sum, item) => sum + Number(item.valueKRW ?? 0), 0);
+        const totalPnL = totalCurrent - totalCost;
+        const totalReturn = totalCost > 0 ? (totalPnL / totalCost) * 100 : 0;
+        const totalToneClass = getPnLToneClass(totalPnL);
+
         deck.innerHTML = `
+            <div class="portfolio-summary" aria-label="Portfolio all assets summary">
+                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS)</div>
+                <div class="portfolio-summary-grid">
+                    <div class="portfolio-summary-item"><span>COST</span><b>${formatKRWFull(totalCost)}</b></div>
+                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="${totalToneClass}">${formatKRWFull(totalCurrent)}</b></div>
+                    <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWFull(totalPnL, true)}</b></div>
+                    <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${totalReturn > 0 ? "+" : ""}${totalReturn.toFixed(1)}%</b></div>
+                </div>
+            </div>
             <div class="trim-deck-detail trim-deck-detail-only" id="trimDeckDetail"></div>
         `;
 

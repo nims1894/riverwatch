@@ -57,9 +57,16 @@
     <section id="dashboard" class="screen dashboard-screen hidden">
 
         <header class="topbar">
-            <div class="brand-wrap">
-                <div class="boat-icon-small">⛵</div>
+            <div class="brand-wrap koru-header-wrap">
+                <div class="koru-mark koru-mark-small" aria-label="Koru fern symbol">
+                    <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
+                        <path class="koru-stem" d="M61 104 C58 86 59 71 67 59 C76 46 91 44 98 53 C105 62 99 76 88 78 C76 80 68 70 72 61 C76 52 88 51 92 57 C96 63 91 69 86 68"/>
+                        <path class="koru-leaf" d="M61 88 C49 84 40 77 34 67 M59 77 C48 72 41 64 38 55 M62 68 C53 61 49 53 49 44 M68 59 C62 51 61 42 64 34 M77 52 C74 43 76 34 82 27"/>
+                        <path class="koru-leaf" d="M49 82 C43 86 37 88 30 88 M43 72 C36 74 29 73 23 69 M42 61 C34 60 28 56 23 50 M50 51 C43 47 39 41 37 34 M61 43 C56 36 55 29 57 22"/>
+                    </svg>
+                </div>
                 <div>
+                    <div class="vessel-name-small">RV Koru</div>
                     <div class="brand-small">RiverWatch</div>
                     <div class="subtitle-small">Personal Navigation System for Reaching the Open Sea</div>
                 </div>
@@ -67,7 +74,7 @@
 
             <div class="topbar-right">
                 <div class="operator-small">
-                    Operator : NIMS <span class="online">● ONLINE</span>
+                    Captain : NIMS <span class="active-header">● ACTIVE</span>
                 </div>
                 <div class="last-sync">
                     Last Sync <span id="lastSync"></span> · <span id="dataSource">FALLBACK</span> <button id="refreshDashboardBtn" class="refresh-button" type="button" title="Refresh dashboard" onclick="refreshDashboard()">↻</button>
@@ -219,9 +226,6 @@
                 <div class="boatyard-kpis boat-profile-grid">
                     <div><span>Boat Archetype</span><b id="boatyardArchetype">-</b></div>
                     <div><span>Voyage Phase</span><b id="boatyardPhase">-</b></div>
-                    <div><span>Cost Basis</span><b id="boatyardCostBasis">-</b></div>
-                    <div><span>Current Value</span><b id="boatyardCurrentValue">-</b></div>
-                    <div><span>Boat Return</span><b id="boatyardReturn">-</b></div>
                 </div>
             </section>
 
