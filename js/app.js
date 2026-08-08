@@ -1151,13 +1151,26 @@ function formatSyncDetail() {
     }).join(" · ");
 }
 
+function getDoctrineCompliance(boatHealth) {
+    const score = Number(boatHealth);
+    if (!Number.isFinite(score)) return { label: "--", className: "unknown" };
+    if (score >= 85) return { label: "ALIGNED", className: "aligned" };
+    if (score >= 70) return { label: "DRIFTING", className: "drifting" };
+    return { label: "BREACHED", className: "breached" };
+}
+
 function renderMission() {
     setText("mission", riverwatch.const.mission);
     setText("status", riverwatch.calc.status);
     setText("recommendedAction", riverwatch.calc.recommendedAction);
     setText("daysSinceAction", riverwatch.calc.daysSinceAction);
     setText("lastRebalance", (riverwatch.manualConfig || {}).lastActionDate || riverwatch.calc.lastRebalance || "--");
-    setText("doctrineCompliance", riverwatch.calc.doctrineCompliance + "%");
+
+    const doctrine = getDoctrineCompliance(riverwatch.calc.boatHealth);
+    riverwatch.calc.doctrineCompliance = doctrine.label;
+    setText("doctrineCompliance", doctrine.label);
+    const doctrineEl = document.getElementById("doctrineCompliance");
+    if (doctrineEl) doctrineEl.className = "value doctrine-status " + doctrine.className;
 
     const statusEl = document.getElementById("status");
     if (statusEl) {
@@ -1167,10 +1180,10 @@ function renderMission() {
 
 function getMissionStatusClass(status) {
     const value = String(status || "").toUpperCase();
-    if (value.includes("RECOVER")) return "recover";
-    if (value.includes("ADAPT")) return "adapt";
-    if (value.includes("BUILD")) return "watch";
-    if (value.includes("WATCH")) return "watch";
+    if (!value || value === "--" || value.includes("UNKNOWN") || value.includes("N/A")) return "unknown";
+    if (value.includes("RECOVER") || value.includes("LOST") || value.includes("CRITICAL")) return "recover";
+    if (value.includes("ADAPT") || value.includes("CORRECTION") || value.includes("REBAL") || value.includes("COURSE RESET")) return "adapt";
+    if (value.includes("BUILD") || value.includes("WATCH")) return "watch";
     return "";
 }
 
@@ -1518,8 +1531,8 @@ function renderBoatyard() {
             <div class="portfolio-summary" aria-label="Portfolio all assets summary">
                 <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS) · ₩K</div>
                 <div class="portfolio-summary-grid">
-                    <div class="portfolio-summary-item"><span>COST</span><b>${formatKRWThousands(totalCost)}</b></div>
-                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="${totalToneClass}">${formatKRWThousands(totalCurrent)}</b></div>
+                    <div class="portfolio-summary-item"><span>COST</span><b class="is-reference">${formatKRWThousands(totalCost)}</b></div>
+                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="is-neutral">${formatKRWThousands(totalCurrent)}</b></div>
                     <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWThousands(totalPnL, true)}</b></div>
                     <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${formatSignedPercent1(totalReturn)}</b></div>
                 </div>
@@ -1597,17 +1610,17 @@ function renderBoatyard() {
                             <div class="trim-stats trim-stats-diet" aria-label="Current Target Gap">
                                 <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
                                 <div><span>Target</span><b>${limit.toFixed(1)}%</b></div>
-                                <div><span>Gap</span><b>${formatSignedFixed(delta, 1, true)}%</b></div>
+                                <div><span>Gap</span><b class="${delta > 0 ? 'is-profit' : delta < 0 ? 'is-loss' : 'is-neutral'}">${formatSignedFixed(delta, 1, true)}%</b></div>
                             </div>
                         </div>
                         <div class="trim-performance" aria-label="Investment performance">
                             <div class="trim-performance-row">
                                 <span>Cost</span>
-                                <b class="is-neutral">${formatKRWFull(cost)}</b>
+                                <b class="is-reference">${formatKRWFull(cost)}</b>
                             </div>
                             <div class="trim-performance-row">
                                 <span>Current</span>
-                                <b class="${pnlToneClass}">${formatKRWFull(currentValue)}</b>
+                                <b class="is-neutral">${formatKRWFull(currentValue)}</b>
                             </div>
                             <div class="trim-performance-row">
                                 <span>P/L</span>
@@ -1660,16 +1673,38 @@ function renderLogbookKpis(rows) {
     const el = document.getElementById("logbookKpis");
     if (!el) return;
 
-    const latest = rows[rows.length - 1] || {};
+    // Latest means the newest observation, regardless of Milestone TRUE/FALSE.
+    const datedRows = rows.filter(row => row && row.date);
+    const latest = datedRows[datedRows.length - 1] || {};
     const target = Number((riverwatch.manualConfig || {}).openSeaTargetKRW || riverwatch.calc.openSeaTarget || 0);
     const value = Number(latest.marketValueKRW || riverwatch.calc.currentPosition || 0);
+    const planned = Number(latest.targetValueKRW || 0);
     const progress = target > 0 ? (value / target) * 100 : 0;
+    const courseVariance = planned > 0 ? ((value / planned) - 1) * 100 : 0;
+    const latestDate = formatDisplayDate(latest.date) || "-";
+    const targetDate = formatDisplayDate((riverwatch.manualConfig || {}).targetDate) || "-";
 
     el.innerHTML = `
-        <div><span>Latest Value</span><b>${formatKRWM(value)}</b></div>
-        <div><span>Open Sea Target</span><b>${formatKRWM(target)}</b></div>
-        <div><span>Progress</span><b>${progress.toFixed(1)}%</b></div>
+        <div><span>Latest Value <small>(${latestDate})</small></span><b>${formatKRWM(value)}</b></div>
+        <div><span>Open Sea Target <small>(${targetDate})</small></span><b>${formatKRWM(target)}</b></div>
+        <div><span>Progress <small>(${formatKRWM(value)} / ${formatKRWM(planned)}, ${formatSignedPercent2(courseVariance)})</small></span><b>${progress.toFixed(1)}%</b></div>
     `;
+}
+
+function formatDisplayDate(value) {
+    const date = parseDateSafe(value);
+    if (!date) return "";
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}.${m}.${d}`;
+}
+
+function formatSignedPercent2(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "-";
+    const sign = amount > 0 ? "+" : "";
+    return `${sign}${amount.toFixed(2)}%`;
 }
 
 function renderLogbookChart(rows) {

@@ -4777,3 +4777,156 @@ body{
         letter-spacing:.06em;
     }
 }
+
+/* ========================================================================== 
+   CAB-046 · Voyage context + unified RiverWatch semantic color language
+   ========================================================================== */
+:root{
+    --rw-positive:#72c9ae;   /* muted seafoam: favorable */
+    --rw-negative:#7397bd;   /* muted steel blue: unfavorable */
+    --rw-watch:#c9a94f;      /* muted amber: attention */
+    --rw-rebal:#c77d58;      /* muted coral: trim adjustment */
+    --rw-critical:#e05b63;   /* reserved for actual alarms/errors */
+}
+
+/* Captain's Bridge: replace OS emoji with a native line SVG helm. */
+.bridge-card > .label{display:flex;align-items:center;gap:9px}
+.bridge-icon{display:inline-flex;width:24px;height:24px;flex:0 0 24px}
+.bridge-icon img{display:block;width:100%;height:100%}
+
+/* Logbook KPI context is subordinate to the primary value. */
+.logbook-kpis b small{
+    display:inline;
+    color:var(--muted);
+    font-size:.58em;
+    font-weight:600;
+    letter-spacing:-.02em;
+    white-space:nowrap;
+}
+
+/* Portfolio scope/unit is metadata, not a headline. */
+.portfolio-summary-title{
+    color:var(--muted) !important;
+    font-size:12px !important;
+    font-weight:600 !important;
+    letter-spacing:.045em !important;
+    opacity:.9;
+}
+
+/* Values stay neutral; color is reserved for meaningful P/L direction. */
+.portfolio-summary-item b.is-profit,
+#boatyardPage .trim-performance-row b.is-profit{color:var(--rw-positive) !important}
+.portfolio-summary-item b.is-loss,
+#boatyardPage .trim-performance-row b.is-loss{color:var(--rw-negative) !important}
+.portfolio-summary-item b.is-neutral,
+#boatyardPage .trim-performance-row b.is-neutral{color:var(--text-strong) !important}
+
+/* Operational state ladder: KEEP/WITHIN → WATCH → REBAL → CRITICAL. */
+#boatyardPage .trim-head-diet > .badge.normal,
+#boatyardPage .trim-head-diet > .badge.on-target{background:var(--rw-positive) !important}
+#boatyardPage .trim-head-diet > .badge.under,
+#boatyardPage .trim-head-diet > .badge.watch,
+#boatyardPage .trim-head-diet > .badge.building{background:var(--rw-watch) !important}
+#boatyardPage .trim-head-diet > .badge.over,
+#boatyardPage .trim-head-diet > .badge.adapt{background:var(--rw-rebal) !important}
+#boatyardPage .trim-head-diet > .badge.recover{background:var(--rw-critical) !important}
+
+@media(max-width:640px){
+    .portfolio-summary-title{font-size:11px !important}
+    .logbook-kpis b small{font-size:.55em}
+}
+
+/* ========================================================================== 
+   CAB-047 · Information hierarchy refinement
+   - Move Logbook KPI context from value to label
+   - De-emphasize Cost as reference data
+   - Apply semantic direction color to allocation Gap
+   - Strengthen Mission decision hierarchy and status palette
+   ========================================================================== */
+
+/* Logbook KPI: primary number remains isolated; context lives with its label. */
+.logbook-kpis > div > span small{
+    color:var(--muted);
+    font-size:.72em;
+    font-weight:600;
+    letter-spacing:-.015em;
+    white-space:nowrap;
+}
+.logbook-kpis > div > b{ color:var(--text-strong) !important; }
+
+/* Cost is reference history, not a live state signal. */
+.portfolio-summary-item b.is-reference,
+#boatyardPage .trim-performance-row b.is-reference{
+    color:var(--muted) !important;
+    font-weight:650 !important;
+}
+
+/* Gap communicates direction only; action severity remains on the badge. */
+#boatyardPage .trim-stats b.is-profit{color:var(--rw-positive) !important}
+#boatyardPage .trim-stats b.is-loss{color:var(--rw-negative) !important}
+#boatyardPage .trim-stats b.is-neutral{color:var(--text-strong) !important}
+
+/* Mission hierarchy: decision + last intervention are primary; counters are secondary. */
+#recommendedAction{
+    color:var(--text-strong) !important;
+    font-weight:800 !important;
+}
+#lastRebalance{
+    color:var(--text-strong) !important;
+    font-weight:700 !important;
+}
+#daysSinceAction,
+#doctrineCompliance{
+    color:var(--muted) !important;
+    font-weight:650 !important;
+}
+
+/* Mission status uses the same RiverWatch semantic palette. */
+.status-text{color:var(--rw-positive) !important}
+.status-text.watch{color:var(--rw-watch) !important}
+.status-text.adapt{color:var(--rw-rebal) !important}
+.status-text.recover{color:var(--rw-critical) !important}
+.status-text.unknown{color:var(--muted) !important}
+
+@media(max-width:640px){
+    .logbook-kpis > div > span small{font-size:.68em}
+}
+
+
+/* ==========================================================================
+   CAB-048 · Comparative numerics + doctrine state semantics
+   - Keep Cost numeric size aligned with comparable values; de-emphasize by color only
+   - Convert Doctrine Compliance from fixed percentage to Boat Health state
+   - Explicitly map COURSE RESET to action/coral status
+   - Improve Logbook KPI meta readability
+   ========================================================================== */
+
+/* Cost remains visually subordinate by tone, never by numeric scale. */
+.portfolio-summary-item b.is-reference,
+#boatyardPage .trim-performance-row b.is-reference{
+    color:var(--muted) !important;
+}
+
+/* Doctrine is a three-state qualitative reading derived from Boat Health. */
+#doctrineCompliance.doctrine-status.aligned{color:var(--rw-positive) !important}
+#doctrineCompliance.doctrine-status.drifting{color:var(--rw-watch) !important}
+#doctrineCompliance.doctrine-status.breached{color:var(--rw-rebal) !important}
+#doctrineCompliance.doctrine-status.unknown{color:var(--muted) !important}
+
+/* Slightly enlarge contextual metadata while keeping it subordinate to the label. */
+.logbook-kpis > div > span small{font-size:.84em !important}
+
+@media(max-width:640px){
+    .logbook-kpis > div > span small{font-size:.80em !important}
+}
+
+/* ========================================================================== 
+   CAB-050 · Cost comparative typography correction
+   - Cost keeps muted reference color only
+   - Cost now matches Current in font size AND weight for immediate digit comparison
+   ========================================================================== */
+.portfolio-summary-item b.is-reference,
+#boatyardPage .trim-performance-row b.is-reference{
+    color:var(--muted) !important;
+    font-weight:800 !important;
+}

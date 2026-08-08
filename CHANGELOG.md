@@ -1,3 +1,6 @@
+
+## CAB-050
+- Cost typography corrected: same size and weight as Current/P&L, with muted color only.
 # RiverWatch v1.0 — Official Release
 - Promoted the RC4a/CAB-032 baseline to the official RiverWatch v1.0 release.
 - Rebuilt the intro identity around vessel name `RV Koru`.
