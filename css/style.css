@@ -4667,3 +4667,62 @@ body{
     padding-right:6px;
   }
 }
+
+
+/* CAB-043 · Intro centered bridge-entry composition
+   - Remove Status / Mission from intro
+   - Double Koru emblem size
+   - Center crew hierarchy and intro content
+   - ENTER RIVERWATCH -> ENTER BRIDGE
+*/
+.koru-intro .koru-mark{
+  width:184px !important;
+  height:184px !important;
+  margin-bottom:14px !important;
+}
+.koru-intro .vessel-name{margin-top:0 !important;}
+.koru-intro .brand{margin-top:14px !important;}
+.koru-intro .brand-version{
+  display:block !important;
+  margin:8px auto 0 !important;
+  font-size:18px !important;
+  line-height:1.2 !important;
+  color:var(--muted) !important;
+  vertical-align:baseline !important;
+}
+.koru-intro .crew-block{
+  width:min(350px,88vw) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  gap:24px !important;
+  text-align:center !important;
+}
+.koru-intro .crew-block>div{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:center !important;
+  gap:7px !important;
+  text-align:center !important;
+  font-size:16px !important;
+}
+.koru-intro .crew-block span,
+.koru-intro .crew-block b{
+  text-align:center !important;
+}
+.koru-intro .philosophy{margin-top:0 !important;}
+.koru-intro .enter-voyage{
+  width:min(360px,82vw) !important;
+  padding:15px 30px !important;
+  font-size:15px !important;
+}
+@media(max-width:640px){
+  .koru-intro .koru-mark{width:160px !important;height:160px !important;}
+  .koru-intro .brand-version{font-size:17px !important;}
+  .koru-intro .crew-block{gap:20px !important;}
+}
+@media(max-width:390px){
+  .koru-intro .koru-mark{width:144px !important;height:144px !important;}
+  .koru-intro .crew-block>div{font-size:15px !important;}
+  .koru-intro .enter-voyage{width:min(330px,88vw) !important;}
+}
