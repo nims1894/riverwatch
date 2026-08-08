@@ -1722,13 +1722,9 @@ function renderLogbookChart(rows) {
         return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
     }).join(" ");
 
-    const points = (key, className) => enrichedRows.map(row => `
-        <circle class="journey-point ${className}" cx="${xForDate(row.date).toFixed(1)}" cy="${yForValue(row[key]).toFixed(1)}" r="3.5">
-            <title>${row.date} · ${formatKRWM(Number(row[key] || 0))}</title>
-        </circle>
-    `).join("");
-
-    const yearTicks = buildYearTicks(startDate, xEnd, xForDate);
+    const yearDividers = buildYearDividers(startDate, xEnd, xForDate);
+    const startLabel = formatJourneyEdgeDate(startDate, true);
+    const endLabel = formatJourneyEdgeDate(xEnd, startDate?.getFullYear() !== xEnd?.getFullYear());
 
     el.innerHTML = `
         <div class="journey-legend">
@@ -1740,29 +1736,38 @@ function renderLogbookChart(rows) {
             <svg class="journey-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Portfolio journey line chart">
                 <line class="journey-axis" x1="${pad.left}" y1="${pad.top + plotH}" x2="${chartWidth - pad.right}" y2="${pad.top + plotH}"></line>
                 <line class="journey-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + plotH}"></line>
-                ${yearTicks.map(t => `<g class="journey-tick"><line x1="${t.x}" y1="${pad.top}" x2="${t.x}" y2="${pad.top + plotH}"></line><text x="${t.x}" y="${chartHeight - 18}" text-anchor="middle">${t.label}</text></g>`).join("")}
+                ${yearDividers.map(t => `<line class="journey-year-divider" x1="${t.x}" y1="${pad.top}" x2="${t.x}" y2="${pad.top + plotH}"></line>`).join("")}
                 <path class="journey-line principal" d="${linePath("principalKRW")}"></path>
                 <path class="journey-line market" d="${linePath("marketValueKRW")}"></path>
                 <path class="journey-line course" d="${linePath("targetValueKRW")}"></path>
-                ${points("principalKRW", "principal")}
-                ${points("marketValueKRW", "market")}
-                ${points("targetValueKRW", "course")}
+                <text class="journey-edge-label start" x="${pad.left}" y="${chartHeight - 18}" text-anchor="start">${startLabel}</text>
+                <text class="journey-edge-label end" x="${chartWidth - pad.right}" y="${chartHeight - 18}" text-anchor="end">${endLabel}</text>
             </svg>
         </div>
     `;
 }
 
-function buildYearTicks(startDate, endDate, xForDate) {
+function buildYearDividers(startDate, endDate, xForDate) {
     if (!startDate || !endDate || endDate <= startDate) return [];
     const startYear = startDate.getFullYear();
     const endYear = endDate.getFullYear();
-    const ticks = [];
-    for (let year = startYear; year <= endYear; year += 1) {
-        if (year === startYear || year === endYear || year % 2 === 0) {
-            ticks.push({ label: String(year), x: xForDate(`${year}-01-01`).toFixed(1) });
+    const dividers = [];
+
+    for (let year = startYear + 1; year <= endYear; year += 1) {
+        const boundary = new Date(year, 0, 1);
+        if (boundary > startDate && boundary < endDate) {
+            dividers.push({ year, x: xForDate(boundary).toFixed(1) });
         }
     }
-    return ticks;
+    return dividers;
+}
+
+function formatJourneyEdgeDate(date, includeYear = false) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return "";
+    const yy = String(date.getFullYear()).slice(-2);
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return includeYear ? `'${yy}.${mm}/${dd}` : `${mm}/${dd}`;
 }
 
 function calculateLogbookTargetValue(dateText, rows) {

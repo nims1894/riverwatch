@@ -1437,13 +1437,15 @@ body{
     stroke:rgba(203,213,225,0.16);
     stroke-width:1;
 }
-.journey-tick line{
-    stroke:rgba(203,213,225,0.075);
+.journey-year-divider{
+    stroke:rgba(203,213,225,0.065);
     stroke-width:1;
+    vector-effect:non-scaling-stroke;
 }
-.journey-tick text{
+.journey-edge-label{
     fill:var(--muted);
     font-size:11px;
+    letter-spacing:.01em;
 }
 .journey-line{
     fill:none;
@@ -1463,10 +1465,6 @@ body{
     stroke-width:2;
     stroke-dasharray:8 7;
 }
-.journey-point{ stroke:var(--bg); stroke-width:2; }
-.journey-point.principal{ fill:var(--text-soft); }
-.journey-point.market{ fill:var(--cyan); }
-.journey-point.course{ fill:var(--muted); }
 
 .open-sea-timeline{
     max-height:440px;

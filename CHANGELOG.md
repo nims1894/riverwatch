@@ -7,6 +7,12 @@
 - Changed intro entry action to `ENTER RIVERWATCH`.
 - No calculation, data pipeline, Health Engine, or portfolio-control logic changes.
 
+## CAB-045 — Portfolio Journey Time Axis Cleanup & CAB Archive
+- Removed persistent Portfolio Journey point markers for a cleaner long-horizon chart.
+- Added first/latest X-axis date labels and subtle annual boundary dividers.
+- Moved individual CAB changelog files into `/CAB`; root backlog and aggregate changelog remain in place.
+- No investment calculation or Health Engine logic changes.
+
 ## CAB-032 — Current Deck WATCH Badge Fix
 - Fixed WATCH status badge background by styling the actual `building` class emitted by the allocation engine.
 - No calculation or data logic changes.
