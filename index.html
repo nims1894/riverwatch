@@ -19,13 +19,7 @@
 
     <!-- Intro Screen · RiverWatch v1.0 / RV Koru -->
     <section id="intro" class="screen intro-screen koru-intro">
-        <div class="koru-mark" aria-label="Koru fern symbol">
-            <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
-                <path class="koru-stem" d="M61 104 C58 86 59 71 67 59 C76 46 91 44 98 53 C105 62 99 76 88 78 C76 80 68 70 72 61 C76 52 88 51 92 57 C96 63 91 69 86 68"/>
-                <path class="koru-leaf" d="M61 88 C49 84 40 77 34 67 M59 77 C48 72 41 64 38 55 M62 68 C53 61 49 53 49 44 M68 59 C62 51 61 42 64 34 M77 52 C74 43 76 34 82 27"/>
-                <path class="koru-leaf" d="M49 82 C43 86 37 88 30 88 M43 72 C36 74 29 73 23 69 M42 61 C34 60 28 56 23 50 M50 51 C43 47 39 41 37 34 M61 43 C56 36 55 29 57 22"/>
-            </svg>
-        </div>
+        <div class="koru-mark" aria-label="Koru fern symbol"><img src="icons/koru-mark.svg" alt="" aria-hidden="true"></div>
 
         <div class="vessel-name">RV Koru</div>
         <div class="brand">RiverWatch <span class="brand-version">v1.0</span></div>
@@ -58,13 +52,7 @@
 
         <header class="topbar">
             <div class="brand-wrap koru-header-wrap">
-                <div class="koru-mark koru-mark-small" aria-label="Koru fern symbol">
-                    <svg viewBox="0 0 120 120" role="img" aria-hidden="true">
-                        <path class="koru-stem" d="M61 104 C58 86 59 71 67 59 C76 46 91 44 98 53 C105 62 99 76 88 78 C76 80 68 70 72 61 C76 52 88 51 92 57 C96 63 91 69 86 68"/>
-                        <path class="koru-leaf" d="M61 88 C49 84 40 77 34 67 M59 77 C48 72 41 64 38 55 M62 68 C53 61 49 53 49 44 M68 59 C62 51 61 42 64 34 M77 52 C74 43 76 34 82 27"/>
-                        <path class="koru-leaf" d="M49 82 C43 86 37 88 30 88 M43 72 C36 74 29 73 23 69 M42 61 C34 60 28 56 23 50 M50 51 C43 47 39 41 37 34 M61 43 C56 36 55 29 57 22"/>
-                    </svg>
-                </div>
+                <div class="koru-mark koru-mark-small" aria-label="Koru fern symbol"><img src="icons/koru-mark.svg" alt="" aria-hidden="true"></div>
                 <div>
                     <div class="vessel-name-small">RV Koru</div>
                     <div class="brand-small">RiverWatch</div>
@@ -145,17 +133,17 @@
 
                 <div class="health-matrix-summary" id="healthMatrixSummary">
                     <div class="health-summary-row">
-                        <span class="health-summary-name"><span class="health-icon">🧭</span> Voyage Health</span>
+                        <span class="health-summary-name"><span class="health-icon"><img src="icons/voyage-health.svg" alt="" aria-hidden="true"></span> Voyage Health</span>
                         <span class="health-summary-score" id="summaryVoyageHealth">--</span>
                         <span class="health-summary-status" id="summaryVoyageStatus">--</span>
                     </div>
                     <div class="health-summary-row">
-                        <span class="health-summary-name"><span class="health-icon">🌊</span> River Health</span>
+                        <span class="health-summary-name"><span class="health-icon"><img src="icons/river-health.svg" alt="" aria-hidden="true"></span> River Health</span>
                         <span class="health-summary-score" id="summaryRiverHealth">--</span>
                         <span class="health-summary-status" id="summaryRiverStatus">--</span>
                     </div>
                     <div class="health-summary-row">
-                        <span class="health-summary-name"><span class="health-icon">⛵</span> Boat Health</span>
+                        <span class="health-summary-name"><span class="health-icon"><img src="icons/boat-health.svg" alt="" aria-hidden="true"></span> Boat Health</span>
                         <span class="health-summary-score" id="summaryBoatHealth">--</span>
                         <span class="health-summary-status" id="summaryBoatStatus">--</span>
                     </div>
@@ -163,7 +151,7 @@
 
                 <div class="health-matrix-detail" id="healthMatrixDetail" hidden>
                     <section class="health-card voyage-card" data-health-detail="voyage">
-                        <div class="label"><span class="health-icon">🧭</span> Voyage Health</div>
+                        <div class="label"><span class="health-icon"><img src="icons/voyage-health.svg" alt="" aria-hidden="true"></span> Voyage Health</div>
                         <div class="health-value"><span id="voyageHealth">--</span></div>
                         <div class="status-sub" id="voyageStatus">--</div>
 
@@ -180,14 +168,14 @@
                     </section>
 
                     <section class="health-card" data-health-detail="river">
-                        <div class="label"><span class="health-icon">🌊</span> River Health</div>
+                        <div class="label"><span class="health-icon"><img src="icons/river-health.svg" alt="" aria-hidden="true"></span> River Health</div>
                         <div class="health-value"><span id="riverHealth">--</span></div>
                         <div class="status-sub" id="riverStatus">--</div>
                         <div class="metric-list" id="riverMetricList"></div>
                     </section>
 
                     <section class="health-card" data-health-detail="boat">
-                        <div class="label"><span class="health-icon">⛵</span> Boat Health</div>
+                        <div class="label"><span class="health-icon"><img src="icons/boat-health.svg" alt="" aria-hidden="true"></span> Boat Health</div>
                         <div class="health-value"><span id="boatHealth">--</span></div>
                         <div class="status-sub" id="boatStatus">--</div>
                         <div class="metric-list boat-health-list">

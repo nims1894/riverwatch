@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.0-pwa-cab039";
+const CACHE_NAME = "riverwatch-v1.0-pwa-cab041";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -9,7 +9,12 @@ const APP_SHELL = [
   "./manifest.webmanifest",
   "./icons/riverwatch-192.png",
   "./icons/riverwatch-512.png",
-  "./icons/riverwatch-maskable-512.png"
+  "./icons/riverwatch-maskable-512.png",
+  "./icons/riverwatch-icon.svg",
+  "./icons/koru-mark.svg",
+  "./icons/voyage-health.svg",
+  "./icons/river-health.svg",
+  "./icons/boat-health.svg"
 ];
 
 self.addEventListener("install", (event) => {

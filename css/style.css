@@ -4625,3 +4625,27 @@ body{
 @media(max-width:380px){
   .portfolio-summary-grid{grid-template-columns:25fr 25fr 23fr 27fr}
 }
+
+
+/* CAB-040 · Koru vector identity + mobile alignment polish */
+.koru-mark img{display:block;width:100%;height:100%;object-fit:contain}
+.health-icon{display:inline-flex!important;align-items:center;justify-content:center;width:24px;height:24px;margin-right:7px!important;vertical-align:middle}
+.health-icon img{display:block;width:100%;height:100%;object-fit:contain}
+.health-summary-score{min-width:3ch;text-align:right!important;font-variant-numeric:tabular-nums}
+
+/* Intro: use one optical center axis; only the label/value pairs remain two-column. */
+.koru-intro{box-sizing:border-box;align-items:center!important;text-align:center!important;padding-left:max(20px,env(safe-area-inset-left))!important;padding-right:max(20px,env(safe-area-inset-right))!important}
+.koru-intro>.koru-mark,.koru-intro>.vessel-name,.koru-intro>.brand,.koru-intro>.intro-rule,.koru-intro>.crew-block,.koru-intro>.mission-block,.koru-intro>.philosophy,.koru-intro>.enter-voyage{margin-left:auto!important;margin-right:auto!important}
+.koru-intro .crew-block,.koru-intro .mission-block{width:min(326px,88vw)!important;box-sizing:border-box}
+.koru-intro .crew-block>div,.koru-intro .mission-block>div{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(124px,1fr)!important;column-gap:18px!important;align-items:center!important;text-align:left!important}
+.koru-intro .crew-block span,.koru-intro .mission-block span{text-align:left!important}
+.koru-intro .crew-block b,.koru-intro .mission-block b{text-align:left!important}
+.koru-intro .intro-rule{width:min(390px,92vw)!important}
+.koru-intro .philosophy{width:min(326px,88vw)!important;text-align:center!important}
+.koru-intro .enter-voyage{width:min(216px,72vw)!important}
+@media (max-width:430px){
+  .koru-intro{padding-left:18px!important;padding-right:18px!important}
+  .koru-intro .crew-block,.koru-intro .mission-block,.koru-intro .philosophy{width:min(324px,90vw)!important}
+  .koru-intro .crew-block>div,.koru-intro .mission-block>div{grid-template-columns:108px minmax(0,1fr)!important;column-gap:16px!important}
+  .koru-intro .intro-rule{width:min(354px,94vw)!important}
+}

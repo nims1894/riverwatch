@@ -1204,7 +1204,7 @@ function renderRiverHealth() {
     const scores = riverwatch.calc.riverMetricScores || {};
     const config = riverwatch.manualConfig || {};
     const metrics = [
-        ["USDKRW", `${formatInteger(riverwatch.auto.usdkrw)} (${scoreText(scores.usdkrw)})`],
+        ["USDKRW", `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
         ["VIX", `${formatInteger(riverwatch.auto.vix)} (${scoreText(scores.vix)})`],
         ["Brent", `${formatBrentPrice(riverwatch.calc.brentPrice, config.BrentPriceAsOf ?? config.brentPriceAsOf)} (${scoreText(scores.oil)})`],
         ["Fed Policy", `${String(config.fedRateState || "-").toUpperCase()} (${scoreText(scores.fedRate)})`],
@@ -1250,7 +1250,7 @@ function renderAllocation() {
             <span>${formatTicker(label)}</span>
             <span>${current.toFixed(1)}%</span>
             <span>${target.toFixed(1)}%</span>
-            <span>${formatSigned(delta)}%</span>
+            <span>${formatSignedFixed(delta, 1, true)}%</span>
             <span class="badge ${status.className}">${status.label}</span>
         `;
         list.appendChild(row);
@@ -1565,7 +1565,7 @@ function renderBoatyard() {
                     <div class="trim-summary-values" aria-label="Current Target Gap">
                         <span class="trim-summary-current">${current.toFixed(1)}%</span>
                         <span class="trim-summary-target">${limit.toFixed(1)}%</span>
-                        <span class="trim-summary-delta">${formatSigned(delta)}%</span>
+                        <span class="trim-summary-delta">${formatSignedFixed(delta, 1, true)}%</span>
                     </div>
                 `;
                 summary.appendChild(row);
@@ -1597,7 +1597,7 @@ function renderBoatyard() {
                             <div class="trim-stats trim-stats-diet" aria-label="Current Target Gap">
                                 <div><span>Current</span><b>${current.toFixed(1)}%</b></div>
                                 <div><span>Target</span><b>${limit.toFixed(1)}%</b></div>
-                                <div><span>Gap</span><b>${formatSigned(delta)}%</b></div>
+                                <div><span>Gap</span><b>${formatSignedFixed(delta, 1, true)}%</b></div>
                             </div>
                         </div>
                         <div class="trim-performance" aria-label="Investment performance">
@@ -1986,6 +1986,20 @@ function formatNumber(value, maximumFractionDigits = 2) {
         minimumFractionDigits: 0,
         maximumFractionDigits
     });
+}
+
+function formatFixedNumber(value, fractionDigits = 2) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    return value.toLocaleString("ko-KR", {
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
+    });
+}
+
+function formatSignedFixed(value, digits = 1, showPlusForZero = false) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    const sign = value > 0 || (showPlusForZero && Object.is(value, 0)) ? "+" : "";
+    return sign + formatFixedNumber(value, digits);
 }
 
 function formatInteger(value) {
