@@ -200,6 +200,7 @@ const RiverWatchMarketEngine = (() => {
 
         const dateIdx = idx("Date");
         const eventIdx = idx("EventType");
+        const voyageStateIdx = idx("VoyageState");
         const titleIdx = idx("Title");
         const principalIdx = idx("PrincipalKRW");
         const marketIdx = idx("MarketValueKRW");
@@ -223,6 +224,9 @@ const RiverWatchMarketEngine = (() => {
             const eventType = eventIdx >= 0
                 ? String(cols[eventIdx] || "").trim().toUpperCase()
                 : (markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "LOG");
+            const voyageState = voyageStateIdx >= 0
+                ? String(cols[voyageStateIdx] || "").trim().toUpperCase()
+                : "";
             const memo = memoIdx >= 0
                 ? String(cols[memoIdx] || "").trim()
                 : (noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : "");
@@ -233,6 +237,7 @@ const RiverWatchMarketEngine = (() => {
             return {
                 date,
                 eventType,
+                voyageState,
                 title,
                 principalKRW: principal,
                 marketValueKRW: market,

@@ -1636,6 +1636,7 @@ function normalizeLogbookRows(rows) {
         return {
             ...row,
             eventType: String(row.eventType || row.marker || "LOG").toUpperCase(),
+            voyageState: String(row.voyageState || "").trim().toUpperCase(),
             title: row.title || row.note || "Log Entry",
             memo: row.memo || row.note || "",
             milestone: String(row.milestone ?? "TRUE").toUpperCase() === "TRUE",
@@ -1810,7 +1811,10 @@ function renderLogbookTimeline(rows) {
             <div class="timeline-entry">
                 <div class="timeline-dot"></div>
                 <div>
-                    <div class="timeline-meta">${row.eventType || "LOG"}</div>
+                    <div class="timeline-classification">
+                        <div class="timeline-meta">${row.eventType || "LOG"}</div>
+                        ${row.voyageState ? `<div class="timeline-voyage-state state-${row.voyageState.toLowerCase()}">${row.voyageState}</div>` : ""}
+                    </div>
                     <div class="timeline-date">${row.date || "-"}</div>
                     <div class="timeline-title">${row.title || "Log Entry"}</div>
                     <div class="timeline-values">

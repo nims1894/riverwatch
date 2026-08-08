@@ -4726,3 +4726,56 @@ body{
   .koru-intro .crew-block>div{font-size:15px !important;}
   .koru-intro .enter-voyage{width:min(330px,88vw) !important;}
 }
+
+
+/* CAB-044: Voyage Timeline dual-axis classification
+   EventType = what happened / VoyageState = river condition */
+.timeline-classification{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    min-width:0;
+}
+.timeline-voyage-state{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:22px;
+    padding:3px 9px;
+    border:1px solid rgba(255,255,255,0.16);
+    border-radius:999px;
+    background:rgba(255,255,255,0.035);
+    color:var(--text-soft);
+    font-size:10px;
+    line-height:1;
+    font-weight:700;
+    letter-spacing:.08em;
+    white-space:nowrap;
+}
+.timeline-voyage-state::before{
+    display:inline-block;
+    margin-right:5px;
+    font-size:10px;
+    line-height:1;
+    opacity:.9;
+}
+.timeline-voyage-state.state-tailwind::before{ content:"↗"; }
+.timeline-voyage-state.state-calm::before{ content:"—"; }
+.timeline-voyage-state.state-headwind::before{ content:"↙"; }
+.timeline-voyage-state.state-storm::before{ content:"≋"; }
+.timeline-voyage-state.state-tailwind{ border-color:rgba(102,217,239,.30); }
+.timeline-voyage-state.state-calm{ border-color:rgba(190,200,214,.22); }
+.timeline-voyage-state.state-headwind{ border-color:rgba(246,190,80,.32); }
+.timeline-voyage-state.state-storm{ border-color:rgba(255,112,112,.38); }
+
+@media(max-width:640px){
+    .timeline-classification{ gap:8px; }
+    .timeline-voyage-state{
+        min-height:20px;
+        padding:3px 7px;
+        font-size:9px;
+        letter-spacing:.06em;
+    }
+}
