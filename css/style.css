@@ -4649,3 +4649,21 @@ body{
   .koru-intro .crew-block>div,.koru-intro .mission-block>div{grid-template-columns:108px minmax(0,1fr)!important;column-gap:16px!important}
   .koru-intro .intro-rule{width:min(354px,94vw)!important}
 }
+
+/* CAB-042 · Health Matrix score inset / 3-digit-safe alignment */
+.health-summary-score{
+  min-width:3ch;
+  justify-self:end;
+  padding-right:8px;
+  box-sizing:border-box;
+  text-align:right!important;
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:560px){
+  .health-summary-row{
+    grid-template-columns:minmax(0,1fr) max-content;
+  }
+  .health-summary-score{
+    padding-right:6px;
+  }
+}

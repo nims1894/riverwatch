@@ -282,3 +282,8 @@ Status: Eye Comfort patch ready for review.
 - Rebalanced mobile Current Deck cards to approx. 70:30 allocation/performance width.
 - Preserved existing font sizes and typography.
 - No calculation or data logic changes.
+
+## CAB-042 — Health Score Inset + PWA Cache Refresh
+- Moved Health Matrix summary scores slightly inward from the right edge on desktop and mobile.
+- Preserved up-to-100 score width while using content-sized score allocation on narrow screens.
+- Bumped service-worker cache key to CAB042 for deployed PWA refresh.
