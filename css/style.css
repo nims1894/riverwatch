@@ -5669,9 +5669,7 @@ body{
 }
 
 @media (prefers-reduced-motion:reduce){
-    .rw-header-rear-wave,
-    .rw-header-front-wave,
-    .rw-header-boat{animation:none !important;transform:none !important}
+    /* CAB079: removed legacy header freeze rule */
 }
 
 /* ===========================================================================
@@ -6511,5 +6509,41 @@ body{
     }
     .rw-header-seagulls{
         animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
+    }
+}
+
+
+/* ===========================================================================
+   CAB-079 · Mobile Header motion root-cause fix + Boat position trim
+   SSoT: CAB078(1)
+   =========================================================================== */
+
+/* Mobile Boat: CAB078 -3px -> CAB079 +7px (10px upward). */
+@media (max-width:640px){
+    .rw-header-boat{
+        bottom:7px !important;
+    }
+
+    /* Explicit final motion set after removing the legacy transform:none !important
+       blocker. Intro animation remains untouched. */
+    .rw-header-rear-wave{
+        animation:rwHeaderRearMobile076 4.6s ease-in-out infinite alternate !important;
+        animation-play-state:running !important;
+        will-change:transform !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontMobile076 3.25s ease-in-out infinite alternate !important;
+        animation-play-state:running !important;
+        will-change:transform !important;
+    }
+    .rw-header-boat{
+        animation:rwHeaderBoatMobile076 5s ease-in-out infinite !important;
+        animation-play-state:running !important;
+        will-change:transform !important;
+    }
+    .rw-header-seagulls{
+        animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
+        animation-play-state:running !important;
+        will-change:transform !important;
     }
 }
