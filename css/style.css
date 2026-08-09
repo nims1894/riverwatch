@@ -6394,3 +6394,122 @@ body{
         animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
     }
 }
+
+
+/* ===========================================================================
+   CAB-077 · Header Boat waterline contact correction
+   SSoT: CAB076(1)
+   Only the Header Boat vertical resting position is adjusted.
+   Intro and all animation timing/travel parameters remain unchanged.
+   =========================================================================== */
+
+/* Wide / desktop header: lower hull slightly into the wave line. */
+.rw-header-boat{
+    bottom:20px !important;
+}
+
+/* Compact / mobile header: independent responsive waterline correction. */
+@media (max-width:640px){
+    .rw-header-boat{
+        bottom:17px !important;
+    }
+}
+
+
+/* ===========================================================================
+   CAB-078 · Header waterline + authoritative responsive motion
+   SSoT: CAB077(1)
+   =========================================================================== */
+
+/* Boat waterline: ~20px lower than CAB077, independently calibrated. */
+.rw-header-boat{
+    bottom:0px !important;
+}
+
+/* One final authoritative desktop header motion set. */
+.rw-header-rear-wave{
+    animation-name:rwHeaderRear076 !important;
+    animation-duration:6.8s !important;
+    animation-timing-function:ease-in-out !important;
+    animation-iteration-count:infinite !important;
+    animation-direction:alternate !important;
+    animation-play-state:running !important;
+}
+.rw-header-front-wave{
+    animation-name:rwHeaderFront076 !important;
+    animation-duration:4.8s !important;
+    animation-timing-function:ease-in-out !important;
+    animation-iteration-count:infinite !important;
+    animation-direction:alternate !important;
+    animation-play-state:running !important;
+}
+.rw-header-boat{
+    animation-name:rwHeaderBoat076 !important;
+    animation-duration:5.6s !important;
+    animation-timing-function:ease-in-out !important;
+    animation-iteration-count:infinite !important;
+    animation-play-state:running !important;
+}
+.rw-header-seagulls{
+    animation-name:rwHeaderGulls076 !important;
+    animation-duration:6.2s !important;
+    animation-timing-function:ease-in-out !important;
+    animation-iteration-count:infinite !important;
+    animation-direction:alternate !important;
+    animation-play-state:running !important;
+}
+
+@media (max-width:640px){
+    /* CAB077 17px -> CAB078 approx. 20px lower. */
+    .rw-header-boat{
+        bottom:-3px !important;
+    }
+    .rw-header-rear-wave{
+        animation-name:rwHeaderRearMobile076 !important;
+        animation-duration:4.6s !important;
+        animation-timing-function:ease-in-out !important;
+        animation-iteration-count:infinite !important;
+        animation-direction:alternate !important;
+        animation-play-state:running !important;
+    }
+    .rw-header-front-wave{
+        animation-name:rwHeaderFrontMobile076 !important;
+        animation-duration:3.25s !important;
+        animation-timing-function:ease-in-out !important;
+        animation-iteration-count:infinite !important;
+        animation-direction:alternate !important;
+        animation-play-state:running !important;
+    }
+    .rw-header-boat{
+        animation-name:rwHeaderBoatMobile076 !important;
+        animation-duration:5s !important;
+        animation-timing-function:ease-in-out !important;
+        animation-iteration-count:infinite !important;
+        animation-play-state:running !important;
+    }
+    .rw-header-seagulls{
+        animation-name:rwHeaderGullsMobile076 !important;
+        animation-duration:4.8s !important;
+        animation-timing-function:ease-in-out !important;
+        animation-iteration-count:infinite !important;
+        animation-direction:alternate !important;
+        animation-play-state:running !important;
+    }
+}
+
+/* Prevent legacy reduced-motion header rules from selectively freezing waves/boat.
+   Intro is intentionally untouched. */
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+    .rw-header-rear-wave{
+        animation:rwHeaderRearMobile076 4.6s ease-in-out infinite alternate !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontMobile076 3.25s ease-in-out infinite alternate !important;
+    }
+    .rw-header-boat{
+        animation:rwHeaderBoatMobile076 5s ease-in-out infinite !important;
+    }
+    .rw-header-seagulls{
+        animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
+    }
+}
