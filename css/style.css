@@ -5205,3 +5205,62 @@ body{
         transform:translateY(-46px) !important;
     }
 }
+
+/* CAB-058 · Intro top-flow + Mission desktop KPI row
+   - Intro composition is top-flowed rather than vertically centered on tall screens.
+   - Mobile/compact intro keeps ~1.6 button-heights of bottom breathing room without bottom anchoring.
+   - Mission KPI cards follow the same desktop card rhythm as Open Sea Logbook; narrow screens remain stacked. */
+.koru-intro{
+    justify-content:flex-start !important;
+    min-height:100dvh !important;
+    padding-top:clamp(64px, 8vh, 96px) !important;
+    padding-bottom:72px !important;
+}
+
+/* Mission desktop: use the same five-column metric rhythm as Logbook.
+   Three mission cards occupy the first three slots, leaving deliberate open space to the right. */
+.mission-kpis{
+    grid-template-columns:repeat(5, minmax(0, 1fr)) !important;
+    align-items:stretch;
+}
+
+@media(max-width:900px){
+    .mission-kpis{
+        grid-template-columns:1fr !important;
+    }
+}
+
+@media(max-width:640px), (max-height:820px){
+    .koru-intro{
+        justify-content:flex-start !important;
+        padding-top:clamp(72px, 10.5dvh, 88px) !important;
+        padding-bottom:72px !important;
+    }
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .brand-version,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:none !important;
+    }
+}
+
+@media(max-height:700px){
+    .koru-intro{
+        padding-top:64px !important;
+        padding-bottom:64px !important;
+    }
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .brand-version,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:none !important;
+    }
+}
