@@ -304,6 +304,10 @@ const RiverWatchMarketEngine = (() => {
         Object.keys(csvData).forEach(rawKey => {
             const key = String(rawKey).trim().toUpperCase();
             const value = csvData[rawKey];
+            if (key === "FX_ASOF") {
+                riverwatch.auto.fxAsOf = String(value ?? "").trim();
+                return;
+            }
             const parsed = parseNumber(value, null);
             if (key === "USDKRW") riverwatch.auto.usdkrw = parsed;
             else if (key === "VIX") riverwatch.auto.vix = parsed;
@@ -490,7 +494,7 @@ const RiverWatchMarketEngine = (() => {
         return applyLogbook(parseLogbookCsv(csvText));
     }
 
-    async function loadAllData() {
+    async function loadCoreData() {
         const labels = ["MarketData", "PortfolioConfig", "ControlRules", "Portfolio", "ManualConfig"];
 
         try {
@@ -504,12 +508,10 @@ const RiverWatchMarketEngine = (() => {
 
             const syncStatus = {};
             const syncErrors = {};
-
             results.forEach((result, index) => {
                 const label = labels[index];
                 const ok = result.status === "fulfilled" && result.value === true;
                 syncStatus[label] = ok;
-
                 if (!ok) {
                     const message = result.status === "rejected"
                         ? String(result.reason?.message || result.reason || "Load failed")
@@ -520,38 +522,36 @@ const RiverWatchMarketEngine = (() => {
             });
 
             const okCount = Object.values(syncStatus).filter(Boolean).length;
-
-            riverwatch.auto.lastSync = nowString();
             riverwatch.auto.syncStatus = syncStatus;
             riverwatch.auto.syncErrors = syncErrors;
             riverwatch.auto.dataSource = okCount === 5 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
 
+            if (okCount === 5) riverwatch.auto.lastSync = nowString();
             console.table(syncStatus);
-
-            try {
-                await loadOpenSeaLogbook();
-            } catch (logError) {
-                console.warn("RiverWatch OpenSeaLogbook optional load failed", logError);
-            }
-
             return okCount === 5;
         } catch (error) {
             riverwatch.auto.dataSource = "FALLBACK";
-            riverwatch.auto.syncStatus = {
-                MarketData: false,
-                PortfolioConfig: false,
-                ControlRules: false,
-                Portfolio: false,
-                ManualConfig: false
-            };
             riverwatch.auto.syncErrors = { General: String(error?.message || error) };
-            console.warn("RiverWatch Google Sheet v2.0 FALLBACK", error);
+            console.warn("RiverWatch Core Data load failed", error);
+            return false;
+        }
+    }
+
+    async function loadAllData() {
+        const coreOk = await loadCoreData();
+        if (!coreOk) return false;
+        try {
+            const logbookOk = await loadOpenSeaLogbook();
+            return logbookOk === true;
+        } catch (logError) {
+            console.warn("RiverWatch OpenSeaLogbook load failed", logError);
             return false;
         }
     }
 
     return {
         loadAllData,
+        loadCoreData,
         loadMarketData,
         loadPortfolioConfig,
         loadControlRules,

@@ -6,16 +6,78 @@
  ****************************************************************************************/
 
 let riverwatchDashboardInitialized = false;
+let riverwatchBootReady = false;
 
-async function showDashboard(forceReload = false) {
-    document.getElementById("intro").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
+function setBootState(state, text) {
+    const monitor = document.getElementById("bootMonitor");
+    const retry = document.getElementById("bootRetryBtn");
+    const failure = document.getElementById("bootFailureText");
+    const enter = document.getElementById("enterBridgeBtn");
+    const steps = {
+        init: document.getElementById("bootStepInit"),
+        core: document.getElementById("bootStepCore"),
+        logbook: document.getElementById("bootStepLogbook"),
+        ready: document.getElementById("bootStepReady")
+    };
+    const order = ["init", "core", "logbook", "ready"];
+    let activeKey = "init";
+    if (text === "SYNCING CORE DATA" || text === "CORE SYNC FAILED") activeKey = "core";
+    else if (text === "SYNCING LOGBOOK" || text === "LOGBOOK SYNC FAILED") activeKey = "logbook";
+    else if (text === "BRIDGE READY") activeKey = "ready";
 
-    if (forceReload || !riverwatchDashboardInitialized) {
-        await initializeMarketData();
-        riverwatchDashboardInitialized = true;
+    const activeIndex = order.indexOf(activeKey);
+    order.forEach((key, i) => {
+        const el = steps[key];
+        if (!el) return;
+        el.classList.remove("pending", "active", "done", "failed");
+        if (state === "failed" && key === activeKey) el.classList.add("failed");
+        else if (i < activeIndex || (state === "ready" && i <= activeIndex)) el.classList.add("done");
+        else if (i === activeIndex) el.classList.add("active");
+        else el.classList.add("pending");
+        const mark = el.querySelector(".boot-mark");
+        if (mark) mark.textContent = el.classList.contains("done") ? "✓" : (el.classList.contains("failed") ? "✕" : "●");
+    });
+
+    if (monitor) monitor.dataset.state = state;
+    if (failure) failure.classList.toggle("hidden", state !== "failed");
+    if (retry) {
+        const failed = state === "failed";
+        retry.disabled = !failed;
+        retry.setAttribute("aria-disabled", String(!failed));
+    }
+    if (enter) enter.disabled = state !== "ready";
+}
+
+async function bootRiverWatch() {
+    riverwatchBootReady = false;
+    setBootState("syncing", "SYNCING CORE DATA");
+    const coreOk = await initializeCoreData(false);
+    if (!coreOk) {
+        setBootState("failed", "CORE SYNC FAILED");
+        return;
     }
 
+    setBootState("syncing", "SYNCING LOGBOOK");
+    const logbookOk = await initializeLogbookData();
+    if (!logbookOk) {
+        setBootState("failed", "LOGBOOK SYNC FAILED");
+        return;
+    }
+
+    runCalculationEngines();
+    riverwatchDashboardInitialized = true;
+    riverwatchBootReady = true;
+    setBootState("ready", "BRIDGE READY");
+}
+
+function retryBoot() {
+    window.location.reload();
+}
+
+async function showDashboard() {
+    if (!riverwatchBootReady) return;
+    document.getElementById("intro").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
     runCalculationEngines();
     renderDashboard();
     showAppPage("dashboardPage");
@@ -23,21 +85,14 @@ async function showDashboard(forceReload = false) {
 
 async function refreshDashboard() {
     const button = document.getElementById("refreshDashboardBtn");
-    if (button) {
-        button.disabled = true;
-        button.classList.add("refreshing");
+    if (button) { button.disabled = true; button.classList.add("refreshing"); }
+    const ok = await initializeCoreData(true);
+    if (ok) {
+        runCalculationEngines();
+        renderDashboard();
     }
-
-    await initializeMarketData();
-    riverwatchDashboardInitialized = true;
-    runCalculationEngines();
-    renderDashboard();
     showAppPage(document.querySelector(".nav-tab.active")?.dataset?.page || "dashboardPage");
-
-    if (button) {
-        button.disabled = false;
-        button.classList.remove("refreshing");
-    }
+    if (button) { button.disabled = false; button.classList.remove("refreshing"); }
 }
 
 function showIntro() {
@@ -45,41 +100,53 @@ function showIntro() {
     document.getElementById("intro").classList.remove("hidden");
 }
 
+async function navigateAppPage(pageId) {
+    if (pageId === "dashboardPage" || pageId === "boatyardPage") {
+        const ok = await initializeCoreData(true);
+        if (ok) { runCalculationEngines(); renderDashboard(); }
+    } else if (pageId === "logbookPage") {
+        await initializeLogbookData();
+    }
+    showAppPage(pageId);
+}
 
 function showAppPage(pageId) {
-    document.querySelectorAll(".app-page").forEach(page => {
-        page.classList.toggle("hidden", page.id !== pageId);
-    });
-
-    document.querySelectorAll(".nav-tab").forEach(tab => {
-        tab.classList.toggle("active", tab.dataset.page === pageId);
-    });
-
+    document.querySelectorAll(".app-page").forEach(page => page.classList.toggle("hidden", page.id !== pageId));
+    document.querySelectorAll(".nav-tab").forEach(tab => tab.classList.toggle("active", tab.dataset.page === pageId));
     if (pageId === "boatyardPage") renderBoatyard();
     if (pageId === "logbookPage") renderOpenSeaLogbook();
 }
 
-async function initializeMarketData() {
+async function initializeCoreData(preserveLkg = true) {
+    const hub = riverwatch?.policy?.marketDataHub;
+    if (!hub || hub.enabled !== true || typeof RiverWatchMarketEngine === "undefined" ||
+        typeof RiverWatchMarketEngine.loadCoreData !== "function") return false;
+
+    const snapshot = preserveLkg ? JSON.parse(JSON.stringify(riverwatch)) : null;
     try {
-        const hub = riverwatch?.policy?.marketDataHub;
-
-        if (!hub || hub.enabled !== true) {
-            riverwatch.auto.dataSource = "FALLBACK";
-            console.warn("RiverWatch Google Sheet Hub disabled. Using FALLBACK values.");
-            return;
+        const ok = await RiverWatchMarketEngine.loadCoreData();
+        if (!ok && snapshot) {
+            Object.keys(riverwatch).forEach(key => delete riverwatch[key]);
+            Object.assign(riverwatch, snapshot);
         }
-
-        if (typeof RiverWatchMarketEngine === "undefined" ||
-            typeof RiverWatchMarketEngine.loadAllData !== "function") {
-            riverwatch.auto.dataSource = "FALLBACK";
-            console.warn("RiverWatchMarketEngine v0.4 is not available. Using FALLBACK values.");
-            return;
-        }
-
-        await RiverWatchMarketEngine.loadAllData();
+        return ok === true;
     } catch (error) {
-        riverwatch.auto.dataSource = "FALLBACK";
-        console.warn("RiverWatch Google Sheet v2.0 failed. Using FALLBACK values.", error);
+        if (snapshot) {
+            Object.keys(riverwatch).forEach(key => delete riverwatch[key]);
+            Object.assign(riverwatch, snapshot);
+        }
+        console.warn("RiverWatch Core Data sync failed. LKG retained.", error);
+        return false;
+    }
+}
+
+async function initializeLogbookData() {
+    try {
+        if (typeof RiverWatchMarketEngine === "undefined" || typeof RiverWatchMarketEngine.loadOpenSeaLogbook !== "function") return false;
+        return await RiverWatchMarketEngine.loadOpenSeaLogbook() === true;
+    } catch (error) {
+        console.warn("RiverWatch Logbook sync failed.", error);
+        return false;
     }
 }
 
@@ -826,10 +893,8 @@ function calculateRequiredCAGR() {
     return high;
 }
 
-function formatBrentPrice(price, asOf) {
-    const priceText = `${formatNumber(price)} USD`;
-    const dateText = formatMonthDay(asOf);
-    return dateText ? `${priceText} @ ${dateText}` : priceText;
+function formatBrentPrice(price) {
+    return `${formatNumber(price)} USD`;
 }
 
 function formatMonthDay(value) {
@@ -1077,6 +1142,9 @@ function syncHealthMatrixSummary() {
     setText("summaryVoyageStatus", stripScoreSuffix(voyageStatus));
     setText("summaryRiverStatus", stripScoreSuffix(riverStatus));
     setText("summaryBoatStatus", stripScoreSuffix(boatStatus));
+    applyHealthSemanticClass("summaryVoyageStatus", Number(voyage));
+    applyHealthSemanticClass("summaryRiverStatus", Number(river));
+    applyHealthSemanticClass("summaryBoatStatus", Number(boat));
 }
 
 function stripScoreSuffix(value) {
@@ -1162,20 +1230,20 @@ function getDoctrineCompliance(boatHealth) {
 function renderMission() {
     setText("mission", riverwatch.const.mission);
     setText("status", riverwatch.calc.status);
-    setText("recommendedAction", riverwatch.calc.recommendedAction);
-    setText("daysSinceAction", riverwatch.calc.daysSinceAction);
-    setText("lastRebalance", (riverwatch.manualConfig || {}).lastActionDate || riverwatch.calc.lastRebalance || "--");
+
+    const lastActionDate = (riverwatch.manualConfig || {}).lastActionDate || riverwatch.calc.lastRebalance || "--";
+    const days = riverwatch.calc.daysSinceAction ?? "--";
+    setText("daysSinceAction", `${days} Days`);
+    setText("lastActionDateMeta", `(${formatDisplayDate(lastActionDate) || lastActionDate})`);
 
     const doctrine = getDoctrineCompliance(riverwatch.calc.boatHealth);
     riverwatch.calc.doctrineCompliance = doctrine.label;
     setText("doctrineCompliance", doctrine.label);
     const doctrineEl = document.getElementById("doctrineCompliance");
-    if (doctrineEl) doctrineEl.className = "value doctrine-status " + doctrine.className;
+    if (doctrineEl) doctrineEl.className = "mission-kpi-value doctrine-status " + doctrine.className;
 
     const statusEl = document.getElementById("status");
-    if (statusEl) {
-        statusEl.className = "status-text " + getMissionStatusClass(riverwatch.calc.status);
-    }
+    if (statusEl) statusEl.className = "mission-kpi-value " + getMissionStatusClass(riverwatch.calc.status);
 }
 
 function getMissionStatusClass(status) {
@@ -1195,6 +1263,7 @@ function renderVoyageHealth() {
 
     setText("voyageHealth", scoreText(riverwatch.calc.voyageHealth));
     setText("voyageStatus", getVoyageStatus(riverwatch.calc.voyageHealth));
+    applyHealthSemanticClass("voyageStatus", riverwatch.calc.voyageHealth);
     setText("currentPosition", formatKRWM(riverwatch.calc.currentPosition));
     setText("remainingTime", riverwatch.calc.remainingTime);
     setText("effectiveCAGR", formatEffectiveCAGR(riverwatch.calc.effectiveCAGR));
@@ -1208,6 +1277,7 @@ function renderVoyageHealth() {
 function renderRiverHealth() {
     setText("riverHealth", riverwatch.calc.riverHealth);
     setText("riverStatus", getRiverStatus(riverwatch.calc.riverHealth));
+    applyHealthSemanticClass("riverStatus", riverwatch.calc.riverHealth);
 
     const list = document.getElementById("riverMetricList");
     if (!list) return;
@@ -1216,10 +1286,12 @@ function renderRiverHealth() {
 
     const scores = riverwatch.calc.riverMetricScores || {};
     const config = riverwatch.manualConfig || {};
+    const fxAsOf = formatDisplayDate(riverwatch.auto.fxAsOf);
+    const brentAsOf = formatDisplayDate(config.BrentPriceAsOf ?? config.brentPriceAsOf);
     const metrics = [
-        ["USDKRW", `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
+        [`USDKRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
         ["VIX", `${formatInteger(riverwatch.auto.vix)} (${scoreText(scores.vix)})`],
-        ["Brent", `${formatBrentPrice(riverwatch.calc.brentPrice, config.BrentPriceAsOf ?? config.brentPriceAsOf)} (${scoreText(scores.oil)})`],
+        [`Brent${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, `${formatBrentPrice(riverwatch.calc.brentPrice)} (${scoreText(scores.oil)})`],
         ["Fed Policy", `${String(config.fedRateState || "-").toUpperCase()} (${scoreText(scores.fedRate)})`],
         ["AI CAPEX", `${String(config.aiCapexTrend || "-").toUpperCase()} (${scoreText(scores.aiCapex)})`],
         ["NVDA DC Rev", `${formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth))} (${scoreText(scores.nvdaDcRevenue)})`],
@@ -1238,6 +1310,7 @@ function renderRiverHealth() {
 function renderBoatHealth() {
     setText("boatHealth", riverwatch.calc.boatHealth);
     setText("boatStatus", getBoatStatus(riverwatch.calc.boatHealth));
+    applyHealthSemanticClass("boatStatus", riverwatch.calc.boatHealth);
     setText("allocationAlignment", `${getAlignmentLabel(riverwatch.calc.allocationAlignment)} (${riverwatch.calc.allocationAlignment})`);
     setText("riverSuitability", `${getSuitabilityLabel(riverwatch.calc.riverSuitability)} (${riverwatch.calc.riverSuitability})`);
     setText("structuralIntegrity", `${getIntegrityLabel(riverwatch.calc.structuralIntegrity)} (${riverwatch.calc.structuralIntegrity})`);
@@ -1273,7 +1346,34 @@ function renderAllocation() {
 function renderCaptainBridge() {
     setHTML("bridgeCaptainNote", formatBridgeNote(riverwatch.calc.captainNote || "-"));
     setText("bridgeOrder", riverwatch.calc.recommendedAction || "-");
+    const orderEl = document.getElementById("bridgeOrder");
+    if (orderEl) orderEl.className = "bridge-order-value " + getOrderSemanticClass(riverwatch.calc.recommendedAction);
     setHTML("bridgeOrderRationale", formatBridgeNote(buildOrderRationale()));
+}
+
+function getOrderSemanticClass(action) {
+    const value = String(action || "").toUpperCase();
+    if (!value || value === "-" || value.includes("N/A")) return "semantic-unknown";
+    if (value.includes("INCREASE EFFORT") || value.includes("RECOVER")) return "semantic-critical";
+    if (value.includes("REBALANCE") || value.includes("RECALCULATE")) return "semantic-action";
+    if (value.includes("REVIEW") || value.includes("WATCH")) return "semantic-watch";
+    return "semantic-good";
+}
+
+function getHealthSemanticClass(score) {
+    const value = Number(score);
+    if (!Number.isFinite(value)) return "semantic-unknown";
+    if (value >= 75) return "semantic-good";
+    if (value >= 60) return "semantic-watch";
+    if (value >= 40) return "semantic-action";
+    return "semantic-critical";
+}
+
+function applyHealthSemanticClass(id, score) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove("semantic-good", "semantic-watch", "semantic-action", "semantic-critical", "semantic-unknown");
+    el.classList.add(getHealthSemanticClass(score));
 }
 
 function formatBridgeNote(text) {
@@ -2095,7 +2195,8 @@ function scrollToTop() {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    // Intro first. Market data loads when user enters dashboard.
+    setBootState("syncing", "INITIALIZING");
+    bootRiverWatch();
 });
 
 /* Sprint #008 Patch-1 : Health Matrix Toggle + Summary Binding */

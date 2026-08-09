@@ -296,3 +296,22 @@ Status: Eye Comfort patch ready for review.
 - Moved Health Matrix summary scores slightly inward from the right edge on desktop and mobile.
 - Preserved up-to-100 score width while using content-sized score allocation on narrow screens.
 - Bumped service-worker cache key to CAB042 for deployed PWA refresh.
+
+## CAB-053 — Intro Boot Sequence Monitor
+- Moved the Intro boot monitor from the upper-right to the upper-left.
+- Expanded boot status into a left-aligned four-step sequence: INITIALIZING → SYNCING CORE DATA → SYNCING LOGBOOK → BRIDGE READY.
+- Added progressive step markers for pending, active, completed, failed, and ready states.
+- Kept ENTER BRIDGE interlocked until BRIDGE READY.
+- On boot failure, displays SYNC FAILED and a RETRY button below the monitor; RETRY performs a full page reload.
+- Bumped the PWA cache key to CAB053.
+
+
+## CAB-054
+- Intro Boot Monitor converted to non-layout overlay HUD.
+- Persistent disabled RETRY slot; activates on boot failure and reloads the page.
+- Compact-height intro positioning improves ENTER BRIDGE visibility on mobile.
+
+## CAB-055
+- Tightened intro vertical spacing on compact/mobile screens to keep ENTER BRIDGE in the first viewport.
+- Reduced RETRY to a compact badge-style control while preserving failure-only activation.
+- Updated PWA cache namespace to CAB055.

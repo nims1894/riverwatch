@@ -40,7 +40,17 @@
             <p>Continue the Voyage.</p>
         </div>
 
-        <button class="enter-voyage" onclick="showDashboard()">ENTER BRIDGE</button>
+        <div id="bootMonitor" class="boot-monitor" aria-live="polite" data-state="initializing">
+            <div class="boot-monitor-title">BOOT SEQUENCE</div>
+            <div id="bootStepInit" class="boot-step active"><span class="boot-mark">●</span><span>INITIALIZING</span></div>
+            <div id="bootStepCore" class="boot-step pending"><span class="boot-mark">●</span><span>SYNCING CORE DATA</span></div>
+            <div id="bootStepLogbook" class="boot-step pending"><span class="boot-mark">●</span><span>SYNCING LOGBOOK</span></div>
+            <div id="bootStepReady" class="boot-step pending"><span class="boot-mark">●</span><span>BRIDGE READY</span></div>
+            <div id="bootFailureText" class="boot-failure hidden">SYNC FAILED</div>
+            <button id="bootRetryBtn" class="boot-retry" type="button" onclick="retryBoot()" disabled aria-disabled="true">↻ RETRY</button>
+        </div>
+
+        <button id="enterBridgeBtn" class="enter-voyage" type="button" onclick="showDashboard()" disabled>ENTER BRIDGE</button>
     </section>
 
     <!-- Dashboard Screen -->
@@ -69,19 +79,19 @@
 
 
         <nav class="app-nav" aria-label="RiverWatch navigation">
-            <button class="nav-tab active" data-page="dashboardPage" onclick="showAppPage('dashboardPage')">
+            <button class="nav-tab active" data-page="dashboardPage" onclick="navigateAppPage('dashboardPage')">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24"><path d="M12 2.5l2.7 6.8 6.8 2.7-6.8 2.7L12 21.5l-2.7-6.8-6.8-2.7 6.8-2.7L12 2.5zm0 5.2l-1.4 3.5-3.5 1.4 3.5 1.4L12 17.5l1.4-3.5 3.5-1.4-3.5-1.4L12 7.7z"/></svg>
                 </span>
                 Dashboard
             </button>
-            <button class="nav-tab" data-page="boatyardPage" onclick="showAppPage('boatyardPage')">
+            <button class="nav-tab" data-page="boatyardPage" onclick="navigateAppPage('boatyardPage')">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24"><path d="M21.7 6.3l-4 4-4-4 4-4a6.5 6.5 0 0 0-8.2 8.2L2.8 17.2a2.8 2.8 0 1 0 4 4l6.7-6.7a6.5 6.5 0 0 0 8.2-8.2zM4.8 19.8a.8.8 0 1 1 1.1-1.1.8.8 0 0 1-1.1 1.1z"/></svg>
                 </span>
                 Boatyard
             </button>
-            <button class="nav-tab" data-page="logbookPage" onclick="showAppPage('logbookPage')">
+            <button class="nav-tab" data-page="logbookPage" onclick="navigateAppPage('logbookPage')">
                 <span class="nav-icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24"><path d="M5 4.5A3.5 3.5 0 0 1 8.5 1H21v18H8.5A3.5 3.5 0 0 0 5 22.5V4.5zm3.5-1A1.5 1.5 0 0 0 7 5v12.4A5.4 5.4 0 0 1 8.5 17H19V3.5H8.5zM3 5h2v17.5H3V5z"/></svg>
                 </span>
@@ -91,32 +101,23 @@
 
         <main id="dashboardPage" class="app-page dashboard-grid">
 
-            <section class="card mission-card">
+            <section class="card mission-card page-hero mission-hero">
                 <div class="label">Mission</div>
-                <div class="mission-text" id="mission">Stay the Course</div>
+                <div class="mission-text koru-accent-title" id="mission">Stay the Course</div>
+                <p class="page-subtitle mission-subtitle">Monitor the current mission status and maintain discipline throughout the voyage.</p>
 
-                <div class="label">Status</div>
-                <div class="status-text" id="status">--</div>
-
-                <div class="mini-grid">
+                <div class="mission-kpis">
                     <div>
-                        <div class="label">Recommended Action</div>
-                        <div class="value" id="recommendedAction">--</div>
+                        <span>Status</span>
+                        <b id="status">--</b>
                     </div>
-
                     <div>
-                        <div class="label">Days Since Action</div>
-                        <div class="value" id="daysSinceAction">--</div>
+                        <span>Days Since Action <small id="lastActionDateMeta">(--)</small></span>
+                        <b id="daysSinceAction">--</b>
                     </div>
-
                     <div>
-                        <div class="label">Last Action</div>
-                        <div class="value" id="lastRebalance">--</div>
-                    </div>
-
-                    <div>
-                        <div class="label">Doctrine Compliance</div>
-                        <div class="value" id="doctrineCompliance">--</div>
+                        <span>Doctrine Compliance</span>
+                        <b id="doctrineCompliance">--</b>
                     </div>
                 </div>
             </section>

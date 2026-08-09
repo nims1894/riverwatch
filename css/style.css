@@ -4930,3 +4930,249 @@ body{
     color:var(--muted) !important;
     font-weight:800 !important;
 }
+
+/* ========================================================================== 
+   CAB-051 · Page grammar + semantic state color unification
+   ========================================================================== */
+:root{
+    --rw-primary-cyan:#72d4f2;
+    --rw-meta-white:#dce7f2;
+}
+
+/* Primary page identity: titles carry more visual authority than secondary cyan. */
+.koru-accent-title{ color:var(--rw-primary-cyan) !important; }
+
+/* Logbook label metadata: preserve scale, improve legibility only. */
+.logbook-kpis > div > span small{ color:var(--rw-meta-white) !important; opacity:.92; }
+
+/* Mission now follows the same page grammar as Boatyard / Open Sea Logbook. */
+.mission-hero .mission-text{ margin-bottom:8px !important; }
+.mission-subtitle{ margin-bottom:20px !important; }
+.mission-kpis{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:12px;
+}
+.mission-kpis > div{
+    min-height:72px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:rgba(255,255,255,.025);
+    padding:14px 16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:8px;
+}
+.mission-kpis span{
+    color:var(--text-soft);
+    font-size:14px;
+    line-height:1.2;
+}
+.mission-kpis b{
+    color:var(--text-strong);
+    font-size:22px;
+    line-height:1.15;
+    font-weight:800;
+    text-align:right;
+}
+.mission-kpis b small{
+    color:var(--rw-meta-white);
+    font-size:.62em;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+/* One semantic language across Mission, Captain's Order, Health summary/detail. */
+.semantic-good,
+.mission-kpi-value:not(.watch):not(.adapt):not(.recover):not(.unknown),
+#doctrineCompliance.aligned{ color:var(--rw-positive) !important; }
+.semantic-watch,
+.mission-kpi-value.watch,
+#doctrineCompliance.drifting{ color:var(--rw-watch) !important; }
+.semantic-action,
+.mission-kpi-value.adapt,
+#doctrineCompliance.breached{ color:var(--rw-rebal) !important; }
+.semantic-critical,
+.mission-kpi-value.recover{ color:var(--rw-critical) !important; }
+.semantic-unknown,
+.mission-kpi-value.unknown,
+#doctrineCompliance.unknown{ color:var(--muted) !important; }
+
+/* Days-since-action is neutral information, not a health state. */
+#daysSinceAction{ color:var(--text-strong) !important; }
+
+/* Status text in health detail follows semantic state rather than a fixed green. */
+.health-matrix-detail .status-sub.semantic-good,
+.health-summary-status.semantic-good{ color:var(--rw-positive) !important; }
+.health-matrix-detail .status-sub.semantic-watch,
+.health-summary-status.semantic-watch{ color:var(--rw-watch) !important; }
+.health-matrix-detail .status-sub.semantic-action,
+.health-summary-status.semantic-action{ color:var(--rw-rebal) !important; }
+.health-matrix-detail .status-sub.semantic-critical,
+.health-summary-status.semantic-critical{ color:var(--rw-critical) !important; }
+.health-matrix-detail .status-sub.semantic-unknown,
+.health-summary-status.semantic-unknown{ color:var(--muted) !important; }
+
+/* Captain's Order uses the same semantic tokens, but typography keeps it subordinate. */
+.bridge-order-value.semantic-good{ color:var(--rw-positive) !important; }
+.bridge-order-value.semantic-watch{ color:var(--rw-watch) !important; }
+.bridge-order-value.semantic-action{ color:var(--rw-rebal) !important; }
+.bridge-order-value.semantic-critical{ color:var(--rw-critical) !important; }
+.bridge-order-value.semantic-unknown{ color:var(--muted) !important; }
+
+@media(max-width:640px){
+    .mission-kpis > div{ min-height:64px; padding:12px 14px; }
+    .mission-kpis span{ font-size:13px; }
+    .mission-kpis b{ font-size:20px; }
+}
+
+
+/* CAB-053 · Intro boot sequence monitor */
+.koru-intro{ position:relative; }
+.koru-intro .boot-monitor{
+    position:absolute; top:16px; left:18px; z-index:2;
+    display:flex; flex-direction:column; align-items:flex-start;
+    min-width:150px; gap:4px; text-align:left;
+    font-size:9px; font-weight:700; letter-spacing:.07em; color:var(--muted);
+}
+.koru-intro .boot-monitor-title{ margin-bottom:3px; font-size:8px; letter-spacing:.16em; color:var(--muted); opacity:.82; }
+.koru-intro .boot-step{ display:flex; align-items:center; gap:6px; line-height:1.35; white-space:nowrap; }
+.koru-intro .boot-mark{ width:10px; display:inline-block; text-align:center; }
+.koru-intro .boot-step.pending{ color:var(--muted); opacity:.38; }
+.koru-intro .boot-step.done{ color:var(--cyan); opacity:.66; }
+.koru-intro .boot-step.active{ color:var(--cyan); opacity:1; }
+.koru-intro .boot-step.failed{ color:var(--red); opacity:1; }
+.koru-intro .boot-step#bootStepReady.done{ color:var(--green); opacity:1; }
+.koru-intro .boot-failure{ margin-top:4px; color:var(--red); }
+.koru-intro .boot-retry{ margin-top:1px; border:1px solid currentColor; border-radius:5px; background:transparent; color:var(--red); font:inherit; letter-spacing:inherit; padding:4px 7px; cursor:pointer; }
+.koru-intro .enter-voyage:disabled{ opacity:.32; cursor:not-allowed; filter:saturate(.35); }
+.koru-intro .enter-voyage:not(:disabled){ opacity:1; cursor:pointer; }
+@media(max-width:640px){ .koru-intro .boot-monitor{ top:12px; left:12px; font-size:8px; min-width:138px; } }
+
+
+
+/* CAB-054 · Intro boot HUD overlay + persistent retry slot
+   - Boot monitor is viewport-overlayed and must never consume intro layout height.
+   - Retry keeps a fixed slot; disabled in normal states, enabled only on boot failure.
+   - Compact-height screens pull the bridge-entry composition upward to keep ENTER BRIDGE in view. */
+.koru-intro .boot-monitor{
+    position:fixed !important;
+    top:max(12px, env(safe-area-inset-top)) !important;
+    left:max(12px, env(safe-area-inset-left)) !important;
+    z-index:20 !important;
+    pointer-events:auto;
+}
+.koru-intro .boot-retry{
+    display:inline-flex !important;
+    align-items:center;
+    justify-content:center;
+    min-width:64px;
+    min-height:24px;
+    margin-top:3px !important;
+    color:var(--red);
+    opacity:1;
+}
+.koru-intro .boot-retry:disabled{
+    color:var(--muted) !important;
+    border-color:rgba(154,166,186,.42) !important;
+    opacity:.42 !important;
+    cursor:default !important;
+    filter:none !important;
+}
+.koru-intro .boot-retry:not(:disabled){
+    color:var(--red) !important;
+    border-color:currentColor !important;
+    opacity:1 !important;
+    cursor:pointer !important;
+}
+@media(max-width:640px), (max-height:820px){
+    .koru-intro{
+        min-height:100dvh !important;
+        padding-top:16px !important;
+        padding-bottom:16px !important;
+    }
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-18px);
+    }
+}
+@media(max-height:700px){
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-28px);
+    }
+}
+
+/* CAB-055 · Intro vertical tightening + compact retry badge
+   - Keep the boot monitor as a HUD overlay.
+   - Reduce the intro composition's top breathing room to about half on compact/mobile layouts.
+   - Retry uses the same visual weight as small voyage-state badges. */
+.koru-intro .boot-retry{
+    min-width:0 !important;
+    min-height:0 !important;
+    width:auto !important;
+    height:auto !important;
+    padding:4px 8px !important;
+    margin-top:4px !important;
+    border-radius:999px !important;
+    font-size:9px !important;
+    line-height:1 !important;
+    font-weight:700 !important;
+    letter-spacing:.06em !important;
+}
+
+@media(max-width:640px), (max-height:820px){
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-72px) !important;
+    }
+}
+
+@media(max-height:700px){
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-86px) !important;
+    }
+}
+
+
+/* CAB-056 · Timestamp grammar + intro version alignment
+   - Keep v1.0 coupled to the RiverWatch title when compact intro content is translated.
+   - Move Days Since Action date metadata to the label.
+   - Use label-level As-Of metadata for USDKRW and Brent. */
+@media(max-width:640px), (max-height:820px){
+    .koru-intro > .brand-version{ transform:translateY(-72px) !important; }
+}
+@media(max-height:700px){
+    .koru-intro > .brand-version{ transform:translateY(-86px) !important; }
+}
+.mission-kpis span small,
+.health-matrix-detail .metric-list span small{
+    display:inline !important;
+    margin-left:3px;
+    font-size:.78em !important;
+    color:var(--text-soft, #cfd8e6) !important;
+    opacity:.92;
+    white-space:nowrap;
+}
