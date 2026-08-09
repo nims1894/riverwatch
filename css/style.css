@@ -5264,3 +5264,208 @@ body{
         transform:none !important;
     }
 }
+
+
+/* ===========================================================================
+   CAB-059 · River motion language
+   =========================================================================== */
+:root{ --rw-ocean-cyan:94,219,227; --rw-ocean-blue:47,164,206; }
+.rw-ocean{position:absolute;inset:0;overflow:hidden;pointer-events:none;border-radius:inherit;z-index:0;isolation:isolate}
+.rw-wave{position:absolute;left:-22%;width:max(148%,1120px);height:auto;overflow:visible;fill:none;vector-effect:non-scaling-stroke;transform-origin:center}
+.rw-wave path{fill:none;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.rw-wave-back{bottom:-45px;opacity:.10;animation:rwWaveDriftA 23s ease-in-out infinite alternate}.rw-wave-back path{stroke:rgba(var(--rw-ocean-blue),.62);stroke-width:3}
+.rw-wave-mid{bottom:-55px;opacity:.13;animation:rwWaveDriftB 18s ease-in-out infinite alternate}.rw-wave-mid path{stroke:rgba(var(--rw-ocean-cyan),.72);stroke-width:2.5}
+.rw-wave-front{bottom:-67px;opacity:.09;animation:rwWaveDriftC 27s ease-in-out infinite alternate}.rw-wave-front path{stroke:rgba(130,235,238,.72);stroke-width:2}
+.rw-koru-boat{position:absolute;width:clamp(44px,5.2vw,72px);height:auto;overflow:visible;filter:drop-shadow(0 5px 10px rgba(0,0,0,.25));transform-origin:50% 78%;animation:rwBoatBob 7.8s ease-in-out infinite}
+.rw-boat-hull{fill:rgba(104,225,224,.54);stroke:rgba(139,241,238,.78);stroke-width:2}.rw-boat-cabin{fill:rgba(76,181,198,.34);stroke:rgba(112,221,226,.66);stroke-width:1.8}.rw-boat-window{fill:rgba(7,24,38,.85)}.rw-boat-mast{fill:none;stroke:rgba(142,234,235,.72);stroke-width:2;stroke-linecap:round}.rw-boat-flag{fill:rgba(111,227,225,.70)}
+@keyframes rwWaveDriftA{from{transform:translate3d(-2.5%,0,0)}to{transform:translate3d(3.5%,-2px,0)}}
+@keyframes rwWaveDriftB{from{transform:translate3d(3%,1px,0)}to{transform:translate3d(-3%,-2px,0)}}
+@keyframes rwWaveDriftC{from{transform:translate3d(-1%,0,0)}to{transform:translate3d(4%,1px,0)}}
+@keyframes rwBoatBob{0%,100%{transform:translate3d(0,0,0) rotate(-1.1deg)}25%{transform:translate3d(0,-3px,0) rotate(.7deg)}55%{transform:translate3d(0,2px,0) rotate(1.1deg)}78%{transform:translate3d(0,-2px,0) rotate(-.5deg)}}
+.koru-intro{overflow:hidden;isolation:isolate}.koru-intro>:not(.rw-ocean){position:relative;z-index:2}
+.koru-intro .rw-ocean-intro{position:fixed;inset:0;border-radius:0;background:radial-gradient(circle at 50% 25%,rgba(59,212,219,.050),transparent 30%),linear-gradient(180deg,rgba(3,18,34,.05),rgba(0,12,25,.18))}
+.koru-intro .rw-ocean-intro .rw-wave{bottom:auto;top:clamp(180px,31dvh,310px);opacity:.10}.koru-intro .rw-ocean-intro .rw-wave-back{top:clamp(166px,29.5dvh,290px)}.koru-intro .rw-ocean-intro .rw-wave-mid{top:clamp(188px,32dvh,315px)}.koru-intro .rw-ocean-intro .rw-wave-front{top:clamp(206px,34dvh,334px)}
+.koru-intro .rw-koru-boat-intro{top:clamp(205px,33dvh,330px);left:calc(50% + clamp(110px,18vw,250px));opacity:.34}
+.intro-animate>.koru-mark{animation:rwIntroKoruIn .82s cubic-bezier(.2,.75,.2,1) both,rwKoruBreath 7.5s ease-in-out 1.2s infinite}.intro-animate>.vessel-name,.intro-animate>.brand,.intro-animate>.brand-version{animation:rwIntroTextIn .62s ease-out both}.intro-animate>.vessel-name{animation-delay:.38s}.intro-animate>.brand{animation-delay:.48s}.intro-animate>.brand-version{animation-delay:.58s}.intro-animate>.intro-rule:first-of-type{animation:rwIntroTextIn .55s .70s ease-out both}.intro-animate>.crew-block{animation:rwIntroTextIn .60s .80s ease-out both}.intro-animate>.intro-rule:nth-of-type(2){animation:rwIntroTextIn .55s .96s ease-out both}.intro-animate>.philosophy p{opacity:0;animation:rwDoctrineIn .58s ease-out forwards}.intro-animate>.philosophy p:nth-child(1){animation-delay:1.02s}.intro-animate>.philosophy p:nth-child(2){animation-delay:1.20s}.intro-animate>.philosophy p:nth-child(3){animation-delay:1.38s}.intro-animate>.enter-voyage{animation:rwIntroTextIn .56s 1.52s ease-out both;position:relative;overflow:hidden}
+@keyframes rwIntroKoruIn{from{opacity:0;transform:translateY(5px) scale(.955);filter:drop-shadow(0 0 0 rgba(100,230,228,0))}to{opacity:1;transform:translateY(0) scale(1);filter:drop-shadow(0 0 12px rgba(100,230,228,.10))}}@keyframes rwKoruBreath{0%,100%{filter:drop-shadow(0 0 8px rgba(100,230,228,.05))}50%{filter:drop-shadow(0 0 16px rgba(100,230,228,.14))}}@keyframes rwIntroTextIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}@keyframes rwDoctrineIn{from{opacity:0;transform:translateY(4px);color:var(--muted)}to{opacity:1;transform:translateY(0)}}
+.koru-intro.bridge-ready .enter-voyage::after{content:"";position:absolute;inset:-2px auto -2px -38%;width:30%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);animation:rwBridgeSweep 1.15s ease-out 1 both}@keyframes rwBridgeSweep{from{left:-38%;opacity:0}20%{opacity:1}to{left:112%;opacity:0}}
+.topbar{position:relative;overflow:hidden;isolation:isolate;border-radius:18px}.topbar>:not(.rw-ocean){position:relative;z-index:2}.topbar .rw-ocean-header{background:linear-gradient(180deg,transparent 24%,rgba(5,40,56,.08) 100%)}.topbar .rw-ocean-header .rw-wave-back{bottom:-96px;opacity:.085}.topbar .rw-ocean-header .rw-wave-mid{bottom:-90px;opacity:.11}.topbar .rw-ocean-header .rw-wave-front{bottom:-105px;opacity:.075}.topbar .rw-koru-boat-header{right:clamp(250px,29vw,380px);bottom:11px;width:clamp(40px,4.2vw,58px);opacity:.34}
+@media(max-width:900px){.topbar .rw-ocean-header .rw-wave{opacity:.065}.topbar .rw-koru-boat-header{right:25%;opacity:.24;width:42px}.koru-intro .rw-ocean-intro .rw-wave{opacity:.075}.koru-intro .rw-koru-boat-intro{left:72%;opacity:.24}}
+@media(max-width:640px){.topbar .rw-koru-boat-header{display:none}.topbar .rw-ocean-header .rw-wave{width:max(190%,900px);opacity:.05}.koru-intro .rw-ocean-intro .rw-wave{width:max(205%,980px);opacity:.06}.koru-intro .rw-koru-boat-intro{display:none}}
+@media(prefers-reduced-motion:reduce){.rw-wave,.rw-koru-boat,.intro-animate>.koru-mark,.intro-animate>.vessel-name,.intro-animate>.brand,.intro-animate>.brand-version,.intro-animate>.intro-rule,.intro-animate>.crew-block,.intro-animate>.philosophy p,.intro-animate>.enter-voyage,.koru-intro.bridge-ready .enter-voyage::after{animation:none!important;opacity:1;transform:none}}
+
+/* ===========================================================================
+   CAB-060 · Compact responsive intro voyage scene
+   - Reclaims the former large Koru mark area for a sailboat + wave animation.
+   - Koru identity is preserved as a compact mark beside the RiverWatch wordmark.
+   - The scene scales by container and keeps a stable vertical footprint on mobile.
+   =========================================================================== */
+.koru-intro{
+    padding-top:clamp(58px,7vh,82px) !important;
+    padding-bottom:clamp(58px,7vh,74px) !important;
+}
+.koru-intro > .rw-ocean-intro{display:none !important;}
+.koru-intro > .koru-mark{display:none !important;}
+
+.rw-intro-scene{
+    position:relative !important;
+    z-index:1 !important;
+    width:min(760px,86vw);
+    height:clamp(188px,25vh,250px);
+    margin:0 auto clamp(10px,1.6vh,18px);
+    overflow:hidden;
+    border-radius:28px;
+    isolation:isolate;
+    background:
+        radial-gradient(ellipse at 50% 70%,rgba(80,222,228,.075),transparent 40%),
+        linear-gradient(180deg,rgba(7,25,43,.10),rgba(5,22,39,.03));
+}
+.rw-intro-stars{
+    position:absolute;inset:0;opacity:.36;
+    background-image:
+        radial-gradient(circle at 18% 27%,rgba(95,229,232,.85) 0 1px,transparent 1.5px),
+        radial-gradient(circle at 71% 18%,rgba(90,217,229,.58) 0 1px,transparent 1.4px),
+        radial-gradient(circle at 82% 42%,rgba(99,235,235,.56) 0 1px,transparent 1.4px),
+        radial-gradient(circle at 35% 16%,rgba(107,224,235,.45) 0 1px,transparent 1.3px),
+        radial-gradient(circle at 58% 35%,rgba(99,221,233,.42) 0 1px,transparent 1.3px);
+    animation:rwIntroStars 8s ease-in-out infinite;
+}
+.rw-intro-wave{
+    position:absolute;left:-12%;width:124%;height:72%;bottom:-17%;
+    fill:none;overflow:visible;transform-origin:center;
+}
+.rw-intro-wave path{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke;}
+.rw-intro-wave-back{opacity:.22;animation:rwSceneWaveA 19s ease-in-out infinite alternate;}
+.rw-intro-wave-back path{stroke:rgba(44,161,205,.55);stroke-width:1.8;}
+.rw-intro-wave-mid{opacity:.30;animation:rwSceneWaveB 15s ease-in-out infinite alternate;}
+.rw-intro-wave-mid path{stroke:rgba(75,216,224,.66);stroke-width:1.55;}
+.rw-intro-wave-front{opacity:.22;animation:rwSceneWaveC 23s ease-in-out infinite alternate;}
+.rw-intro-wave-front path{stroke:rgba(112,235,235,.72);stroke-width:1.35;}
+
+.rw-sailboat-intro{
+    position:absolute;
+    width:clamp(92px,12vw,132px);
+    height:auto;
+    left:50%;top:51%;
+    transform:translate(-50%,-50%);
+    overflow:visible;
+    filter:drop-shadow(0 7px 16px rgba(0,0,0,.26)) drop-shadow(0 0 10px rgba(77,221,225,.09));
+}
+.rw-sailboat-bob{transform-origin:50% 82%;animation:rwSailboatBob 7.2s ease-in-out infinite;}
+.rw-sailboat-shadow{fill:rgba(42,210,218,.11);filter:blur(4px);}
+.rw-sailboat-mast{fill:none;stroke:rgba(113,238,237,.82);stroke-width:1.7;stroke-linecap:round;}
+.rw-sailboat-boom{fill:none;stroke:rgba(91,213,220,.54);stroke-width:1.25;stroke-linecap:round;}
+.rw-sailboat-sail-main{fill:url(#rwSailMainGrad);stroke:rgba(104,236,234,.72);stroke-width:1.45;stroke-linejoin:round;}
+.rw-sailboat-sail-main-highlight{fill:none;stroke:rgba(175,255,251,.46);stroke-width:1.1;stroke-linecap:round;}
+.rw-sailboat-sail-jib{fill:url(#rwSailJibGrad);stroke:rgba(75,211,220,.62);stroke-width:1.35;stroke-linejoin:round;}
+.rw-sailboat-sail-jib-highlight{fill:none;stroke:rgba(135,239,239,.28);stroke-width:.95;stroke-linecap:round;}
+.rw-sailboat-hull{fill:url(#rwHullGrad);stroke:rgba(90,226,229,.78);stroke-width:1.55;stroke-linejoin:round;}
+.rw-sailboat-deck{fill:none;stroke:rgba(151,246,243,.40);stroke-width:1.1;stroke-linecap:round;}
+.rw-sailboat-cockpit{fill:rgba(4,18,29,.82);stroke:rgba(78,194,205,.34);stroke-width:.8;}
+.rw-sailboat-bow-highlight{fill:none;stroke:rgba(162,250,246,.48);stroke-width:1.05;stroke-linecap:round;}
+.rw-sailboat-waterline{fill:none;stroke-linecap:round;}
+.rw-sailboat-waterline-back{stroke:rgba(47,177,201,.34);stroke-width:1.55;}
+.rw-sailboat-waterline-front{stroke:rgba(101,234,233,.60);stroke-width:1.45;}
+.rw-sailboat-flag{fill:rgba(70,215,218,.58);stroke:rgba(116,240,238,.30);stroke-width:.55;}
+.rw-intro-birds{position:absolute;left:calc(50% + clamp(54px,8vw,84px));top:35%;display:flex;gap:8px;opacity:.38;color:rgba(100,228,230,.88);font-size:18px;transform:rotate(-7deg);}
+.rw-intro-birds span:nth-child(2){transform:translateY(-10px) scale(.8)}
+.rw-intro-birds span:nth-child(3){transform:translateY(4px) scale(.65)}
+
+.intro-brand-lockup{
+    position:relative !important;
+    z-index:2 !important;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin-top:0;
+}
+.intro-brand-koru{display:block;width:clamp(42px,4.6vw,56px);height:clamp(42px,4.6vw,56px);flex:none;}
+.intro-brand-koru img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 8px rgba(96,228,227,.08));}
+.koru-intro .intro-brand-lockup .brand{font-size:clamp(40px,4.1vw,52px) !important;line-height:1 !important;}
+.koru-intro > .vessel-name{margin-top:9px !important;}
+.koru-intro > .brand-version{margin-top:6px !important;}
+
+.intro-animate>.rw-intro-scene{animation:rwIntroSceneIn .72s .20s cubic-bezier(.2,.75,.2,1) both;}
+.intro-animate>.intro-brand-lockup{animation:rwIntroTextIn .62s .62s ease-out both;}
+.intro-animate>.vessel-name{animation-delay:.72s;}
+.intro-animate>.brand-version{animation-delay:.80s;}
+
+@keyframes rwSceneWaveA{from{transform:translate3d(-2%,0,0)}to{transform:translate3d(3%,-2px,0)}}
+@keyframes rwSceneWaveB{from{transform:translate3d(3%,1px,0)}to{transform:translate3d(-3%,-2px,0)}}
+@keyframes rwSceneWaveC{from{transform:translate3d(-1%,1px,0)}to{transform:translate3d(4%,0,0)}}
+@keyframes rwSailboatBob{0%,100%{transform:translateY(0) rotate(-1deg)}25%{transform:translateY(-4px) rotate(.8deg)}55%{transform:translateY(2px) rotate(1.2deg)}78%{transform:translateY(-2px) rotate(-.6deg)}}
+@keyframes rwIntroStars{0%,100%{opacity:.24}50%{opacity:.42}}
+@keyframes rwIntroSceneIn{from{opacity:0;transform:translateY(5px) scale(.985)}to{opacity:1;transform:none}}
+
+@media(max-width:640px){
+    .koru-intro{
+        padding-top:clamp(54px,7.2dvh,68px) !important;
+        padding-bottom:60px !important;
+    }
+    .rw-intro-scene{
+        width:min(390px,90vw);
+        height:clamp(150px,19dvh,176px);
+        margin-bottom:8px;
+        border-radius:22px;
+    }
+    .rw-intro-wave{left:-34%;width:168%;height:70%;bottom:-14%;}
+    .rw-sailboat-intro{width:clamp(76px,23vw,94px);top:52%;}
+    .rw-intro-birds{left:calc(50% + 43px);top:31%;gap:5px;font-size:14px;}
+    .intro-brand-lockup{gap:8px;}
+    .intro-brand-koru{width:42px;height:42px;}
+    .koru-intro .intro-brand-lockup .brand{font-size:42px !important;}
+    .koru-intro > .vessel-name{margin-top:7px !important;}
+    .koru-intro > .brand-version{margin-top:4px !important;}
+    .koru-intro > .intro-rule{margin:22px 0 !important;}
+    .koru-intro > .crew-block{gap:24px !important;}
+    .koru-intro > .philosophy{line-height:1.65 !important;}
+    .koru-intro > .enter-voyage{margin-top:26px !important;}
+}
+
+@media(max-width:390px){
+    .rw-intro-scene{width:92vw;height:146px;}
+    .rw-sailboat-intro{width:74px;}
+    .intro-brand-koru{width:38px;height:38px;}
+    .koru-intro .intro-brand-lockup .brand{font-size:38px !important;}
+}
+
+@media(max-height:760px){
+    .rw-intro-scene{height:142px;margin-bottom:4px;}
+    .rw-sailboat-intro{width:76px;}
+    .koru-intro > .intro-rule{margin:18px 0 !important;}
+    .koru-intro > .crew-block{gap:18px !important;}
+    .koru-intro > .philosophy{line-height:1.55 !important;}
+    .koru-intro > .enter-voyage{margin-top:22px !important;}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .rw-intro-stars,.rw-intro-wave,.rw-sailboat-bob,.intro-animate>.rw-intro-scene,.intro-animate>.intro-brand-lockup{animation:none!important;opacity:1;transform:none;}
+}
+
+/* CAB-062 · Approved mobile intro art direction */
+.rw-intro-scene{height:clamp(190px,25vh,255px);background:none!important;border-radius:0!important;overflow:hidden!important}
+.rw-voyage-art{display:block;width:100%;height:100%;overflow:visible}
+.rw-voyage-art .rw-stars{opacity:.42;animation:rwIntroStars 8s ease-in-out infinite}
+.rw-voyage-art .rw-wave-back{animation:rwSceneWaveA 19s ease-in-out infinite alternate;transform-origin:center}
+.rw-voyage-art .rw-wave-mid{animation:rwSceneWaveB 15s ease-in-out infinite alternate;transform-origin:center}
+.rw-voyage-art .rw-wave-front{animation:rwSceneWaveC 23s ease-in-out infinite alternate;transform-origin:center}
+.rw-voyage-art .rw-boat-bob{transform-origin:50% 74%;animation:rwSailboatBob 7.2s ease-in-out infinite}
+.intro-brand-lockup{align-items:center!important}
+.intro-brand-koru{align-self:center;transform:translateY(0)!important}
+.intro-brand-koru img{vertical-align:middle}
+.koru-intro .enter-voyage{display:flex!important;align-items:center;justify-content:center;gap:14px;border-radius:9px!important;border:1px solid rgba(96,232,239,.78)!important;background:linear-gradient(110deg,#14bdd1 0%,#37a8d8 58%,#1597cb 100%)!important;box-shadow:0 0 20px rgba(24,188,213,.13),inset 0 1px 0 rgba(255,255,255,.20);color:#f4fbff!important;font-weight:800!important}
+.koru-intro .enter-voyage:not(:disabled):hover{filter:brightness(1.06)}
+.koru-intro .enter-voyage:disabled{opacity:.72}
+.helm-icon{font-size:25px;line-height:1;font-weight:400;letter-spacing:0;text-shadow:0 0 8px rgba(255,255,255,.15)}
+@media(max-width:640px){
+  .rw-intro-scene{width:min(430px,100vw);height:clamp(176px,22dvh,205px);margin-bottom:5px}
+  .rw-voyage-art{width:118%;max-width:none;margin-left:-9%}
+  .intro-brand-lockup{gap:8px!important}
+  .intro-brand-koru{width:44px!important;height:44px!important}
+  .koru-intro .intro-brand-lockup .brand{font-size:42px!important;line-height:1!important}
+  .koru-intro .enter-voyage{width:min(360px,84vw);min-height:49px;padding:12px 24px!important;gap:12px}
+  .helm-icon{font-size:23px}
+}
+@media(max-width:390px){.intro-brand-koru{width:39px!important;height:39px!important}.koru-intro .intro-brand-lockup .brand{font-size:38px!important}.rw-intro-scene{height:170px}}
+@media(prefers-reduced-motion:reduce){.rw-voyage-art .rw-stars,.rw-voyage-art .rw-wave-layer,.rw-voyage-art .rw-boat-bob{animation:none!important}}

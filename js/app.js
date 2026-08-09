@@ -46,6 +46,8 @@ function setBootState(state, text) {
         retry.setAttribute("aria-disabled", String(!failed));
     }
     if (enter) enter.disabled = state !== "ready";
+    const intro = document.getElementById("intro");
+    if (intro) intro.classList.toggle("bridge-ready", state === "ready");
 }
 
 async function bootRiverWatch() {
@@ -97,7 +99,10 @@ async function refreshDashboard() {
 
 function showIntro() {
     document.getElementById("dashboard").classList.add("hidden");
-    document.getElementById("intro").classList.remove("hidden");
+    const intro = document.getElementById("intro");
+    intro.classList.remove("hidden", "intro-animate");
+    void intro.offsetWidth;
+    intro.classList.add("intro-animate");
 }
 
 async function navigateAppPage(pageId) {

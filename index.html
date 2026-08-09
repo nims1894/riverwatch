@@ -18,11 +18,41 @@
 <body>
 
     <!-- Intro Screen · RiverWatch v1.0 / RV Koru -->
-    <section id="intro" class="screen intro-screen koru-intro">
-        <div class="koru-mark" aria-label="Koru fern symbol"><img src="icons/koru-mark.svg" alt="" aria-hidden="true"></div>
+    <section id="intro" class="screen intro-screen koru-intro intro-animate">
+        <div class="rw-intro-scene" aria-hidden="true">
+            <svg class="rw-voyage-art" viewBox="0 0 1200 430" preserveAspectRatio="xMidYMid meet" role="presentation">
+              <defs>
+                <linearGradient id="seaBack" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b5272" stop-opacity=".42"/><stop offset="1" stop-color="#07182b" stop-opacity=".18"/></linearGradient>
+                <linearGradient id="seaMid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#087b9a" stop-opacity=".50"/><stop offset="1" stop-color="#06243a" stop-opacity=".26"/></linearGradient>
+                <linearGradient id="seaFront" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#12c7d6" stop-opacity=".58"/><stop offset=".35" stop-color="#087c9f" stop-opacity=".44"/><stop offset="1" stop-color="#06192c" stop-opacity=".42"/></linearGradient>
+                <linearGradient id="sailL" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#61edf0"/><stop offset=".28" stop-color="#0db4c8"/><stop offset=".7" stop-color="#075173"/><stop offset="1" stop-color="#06182a"/></linearGradient>
+                <linearGradient id="sailR" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#43e4e7"/><stop offset=".32" stop-color="#0a91ad"/><stop offset=".72" stop-color="#07334f"/><stop offset="1" stop-color="#061526"/></linearGradient>
+                <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d6680"/><stop offset=".18" stop-color="#0a3e58"/><stop offset="1" stop-color="#04111e"/></linearGradient>
+                <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              </defs>
+              <g class="rw-stars" fill="#58e4e8"><circle cx="150" cy="90" r="2"/><circle cx="260" cy="62" r="1.4"/><circle cx="830" cy="75" r="1.6"/><circle cx="1010" cy="110" r="1.3"/></g>
+              <g class="rw-birds" fill="none" stroke="#1cc2d2" stroke-width="4" stroke-linecap="round"><path d="M800 135 q14-13 28 0 q14-13 28 0"/><path d="M880 170 q10-9 20 0 q10-9 20 0"/></g>
+              <g class="rw-wave-layer rw-wave-back"><path fill="url(#seaBack)" d="M-40 300 C105 235 220 340 370 285 S655 235 805 292 S1075 337 1240 270 L1240 430 L-40 430Z"/><path d="M-40 300 C105 235 220 340 370 285 S655 235 805 292 S1075 337 1240 270" fill="none" stroke="#0b8eb0" stroke-width="4" opacity=".72"/></g>
+              <g class="rw-wave-layer rw-wave-mid"><path fill="url(#seaMid)" d="M-40 335 C120 278 245 355 410 315 S680 265 845 330 S1095 355 1240 305 L1240 430 L-40 430Z"/><path d="M-40 335 C120 278 245 355 410 315 S680 265 845 330 S1095 355 1240 305" fill="none" stroke="#19c7d4" stroke-width="4.5" opacity=".80"/></g>
+              <g class="rw-boat-bob" filter="url(#softGlow)">
+                <ellipse cx="604" cy="319" rx="128" ry="12" fill="#29dfe2" opacity=".13"/>
+                <path d="M600 92 L600 286" stroke="#7df4ef" stroke-width="6" stroke-linecap="round"/>
+                <path d="M590 108 C535 158 493 220 468 276 C515 266 554 263 590 274 Z" fill="url(#sailL)" stroke="#59e9e8" stroke-width="3"/>
+                <path d="M611 112 C672 156 713 211 728 270 C683 264 645 264 611 274 Z" fill="url(#sailR)" stroke="#47d9df" stroke-width="3"/>
+                <path d="M600 92 C626 91 638 101 651 106 C633 112 618 111 600 108Z" fill="#18b6c4"/>
+                <path d="M438 282 C515 292 617 294 764 278 L735 322 C660 341 546 342 474 322Z" fill="url(#hull)" stroke="#53e1e1" stroke-width="4"/>
+                <path d="M466 283 C548 289 641 290 742 281" fill="none" stroke="#a2fbf6" stroke-width="2.5" opacity=".62"/>
+                <path d="M538 281 L568 268 L643 268 L671 282" fill="#061625" stroke="#20a8ba" stroke-width="2"/>
+              </g>
+              <g class="rw-wave-layer rw-wave-front"><path fill="url(#seaFront)" d="M-40 375 C125 318 270 395 430 347 S695 306 860 368 S1095 390 1240 340 L1240 430 L-40 430Z"/><path d="M-40 375 C125 318 270 395 430 347 S695 306 860 368 S1095 390 1240 340" fill="none" stroke="#72f1ee" stroke-width="5" opacity=".88"/></g>
+            </svg>
+        </div>
 
+        <div class="intro-brand-lockup">
+            <span class="intro-brand-koru" aria-hidden="true"><img src="icons/koru-mark.svg" alt=""></span>
+            <span class="brand">RiverWatch</span>
+        </div>
         <div class="vessel-name">RV Koru</div>
-        <div class="brand">RiverWatch</div>
         <div class="brand-version">v1.0</div>
 
         <div class="intro-rule"></div>
@@ -50,13 +80,19 @@
             <button id="bootRetryBtn" class="boot-retry" type="button" onclick="retryBoot()" disabled aria-disabled="true">↻ RETRY</button>
         </div>
 
-        <button id="enterBridgeBtn" class="enter-voyage" type="button" onclick="showDashboard()" disabled>ENTER BRIDGE</button>
+        <button id="enterBridgeBtn" class="enter-voyage" type="button" onclick="showDashboard()" disabled><span class="helm-icon" aria-hidden="true">☸</span><span>ENTER BRIDGE</span></button>
     </section>
 
     <!-- Dashboard Screen -->
     <section id="dashboard" class="screen dashboard-screen hidden">
 
         <header class="topbar">
+            <div class="rw-ocean rw-ocean-header" aria-hidden="true">
+                <svg class="rw-wave rw-wave-back" viewBox="0 0 1600 180" preserveAspectRatio="xMidYMid meet"><path d="M0 112 C130 58 250 151 390 101 S665 63 805 111 S1075 155 1218 94 S1470 62 1600 110"/></svg>
+                <svg class="rw-wave rw-wave-mid" viewBox="0 0 1600 180" preserveAspectRatio="xMidYMid meet"><path d="M0 125 C110 84 228 142 352 116 S600 72 730 121 S1010 150 1140 105 S1425 74 1600 123"/></svg>
+                <svg class="rw-wave rw-wave-front" viewBox="0 0 1600 180" preserveAspectRatio="xMidYMid meet"><path d="M0 139 C145 105 250 151 395 130 S674 90 818 137 S1090 157 1234 120 S1480 99 1600 138"/></svg>
+                <svg class="rw-koru-boat rw-koru-boat-header" viewBox="0 0 120 58"><path class="rw-boat-hull" d="M15 35h88l-12 13H31z"/><path class="rw-boat-cabin" d="M43 20h33l10 15H35z"/><path class="rw-boat-window" d="M50 24h9v7h-9zm14 0h9v7h-9z"/><path class="rw-boat-mast" d="M60 7v14"/><path class="rw-boat-flag" d="M60 8l16 5-16 5z"/></svg>
+            </div>
             <div class="brand-wrap koru-header-wrap">
                 <div class="koru-mark koru-mark-small" aria-label="Koru fern symbol"><img src="icons/koru-mark.svg" alt="" aria-hidden="true"></div>
                 <div>

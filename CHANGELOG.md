@@ -1,3 +1,20 @@
+## CAB-061 · Refined RV Koru Sailboat Artwork
+- Reworked the intro sailboat from a simple outline icon into a layered nautical silhouette with asymmetric filled sails, tonal gradients, fine edge highlights, cockpit/deck detail, and integrated waterline layers.
+- Preserved the existing responsive intro layout and gentle bob/roll animation while improving visual depth and theme consistency.
+- No investment calculation, data pipeline, Health Engine, or navigation logic changes.
+
+## CAB-060 · Compact Intro Voyage Scene
+- Replaced the large standalone Koru intro mark with a compact Koru + RiverWatch wordmark lockup.
+- Reused the former emblem area as a responsive animated sailboat and layered-wave scene.
+- Added a theme-matched sailboat silhouette, subtle birds/stars, gentle bob/roll motion, and low-amplitude wave drift.
+- Preserved intro boot sequence, crew/doctrine content, button behavior, and reduced-motion accessibility.
+- Tightened mobile vertical footprint without hiding the boat.
+## CAB-059
+- Added responsive SVG ocean-wave motion to the Intro and persistent application header.
+- Added restrained RV Koru boat bob/roll motion, staged intro entrance, and one-shot ENTER BRIDGE readiness sweep.
+- Added narrow-screen attenuation and `prefers-reduced-motion` accessibility fallback.
+- No investment calculation, data pipeline, or Health Engine logic changes.
+
 
 ## CAB-050
 - Cost typography corrected: same size and weight as Current/P&L, with muted color only.
