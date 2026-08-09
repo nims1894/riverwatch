@@ -1,3 +1,8 @@
+## CAB-070 · Header Boat Visibility + Motion Tuning
+- Enlarged RV Koru boat responsively for wide, intermediate, and mobile headers.
+- Increased existing header scene animation speed by 1.5x versus CAB069 while preserving motion paths.
+- Preserved CAB069 wave band, responsive placement, PNG assets, and all application/data logic.
+
 ## CAB-061 · Refined RV Koru Sailboat Artwork
 - Reworked the intro sailboat from a simple outline icon into a layered nautical silhouette with asymmetric filled sails, tonal gradients, fine edge highlights, cockpit/deck detail, and integrated waterline layers.
 - Preserved the existing responsive intro layout and gentle bob/roll animation while improving visual depth and theme consistency.
@@ -336,3 +341,8 @@ Status: Eye Comfort patch ready for review.
 ## CAB057
 - Rebalanced the mobile intro vertically by moving the content block about 40px downward while leaving the Boot Sequence HUD untouched.
 - Updated PWA cache namespace to CAB057.
+
+## CAB-066
+- Fixed missing layered PNG header scene and corrected general-header responsive alignment above 640px.
+
+- CAB067: Corrected responsive header balance and layered PNG ocean-scene visibility.

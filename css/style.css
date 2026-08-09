@@ -4603,7 +4603,7 @@ body{
 
 /* CAB-038 · Summary readability + semantic status/title refinement */
 .mission-text,
-.koru-accent-title{color:#68c2df !important}
+.koru-accent-title{color:#4FD7FF !important}
 
 /* Portfolio Summary values use ₩K to free width; labels retain CAB-037 sizing/position. */
 .portfolio-summary-item b{text-align:right}
@@ -5512,3 +5512,543 @@ body{
     .koru-intro{padding-top:104px!important}
     .rw-intro-scene{height:auto!important}
 }
+
+/* ===========================================================================
+   CAB-065 · Responsive dual-mode header + layered PNG ocean scene
+   - Desktop/tablet retains the full operational header.
+   - Mobile switches to a compact brand + sync-only header.
+   - Rear wave / boat / front wave are independent transparent PNG layers.
+   =========================================================================== */
+.topbar{
+    min-height:116px;
+    padding:18px 20px 34px !important;
+    border-radius:18px;
+}
+.topbar > :not(.rw-header-scene){position:relative;z-index:3}
+.rw-header-scene{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    pointer-events:none;
+    border-radius:inherit;
+    z-index:1;
+    background:linear-gradient(180deg,transparent 42%,rgba(4,35,54,.10) 100%);
+}
+.rw-header-layer{
+    position:absolute;
+    display:block;
+    height:auto;
+    max-width:none;
+    pointer-events:none;
+    user-select:none;
+    will-change:transform;
+}
+.rw-header-rear-wave{
+    left:-8%;
+    bottom:-2px;
+    width:116%;
+    opacity:.26;
+    animation:rwHeaderRearDrift 28s ease-in-out infinite alternate;
+}
+.rw-header-front-wave{
+    left:-10%;
+    bottom:-13px;
+    width:120%;
+    opacity:.34;
+    animation:rwHeaderFrontDrift 19s ease-in-out infinite alternate;
+}
+.rw-header-boat{
+    left:56%;
+    bottom:7px;
+    width:clamp(42px,4.2vw,58px);
+    opacity:.58;
+    transform-origin:50% 78%;
+    animation:rwHeaderBoatBob 8.4s ease-in-out infinite;
+    filter:drop-shadow(0 3px 7px rgba(0,0,0,.26));
+}
+@keyframes rwHeaderRearDrift{
+    from{transform:translate3d(-1.5%,0,0)}
+    to{transform:translate3d(1.8%,-1px,0)}
+}
+@keyframes rwHeaderFrontDrift{
+    from{transform:translate3d(1.8%,0,0)}
+    to{transform:translate3d(-1.6%,1px,0)}
+}
+@keyframes rwHeaderBoatBob{
+    0%,100%{transform:translate3d(0,0,0) rotate(-.45deg)}
+    50%{transform:translate3d(0,-1.5px,0) rotate(.55deg)}
+}
+
+/* Desktop / general header stays information-rich. */
+@media (min-width:641px){
+    .topbar .subtitle-small{display:block}
+    .topbar .operator-small{display:block}
+    .topbar .sync-detail{display:block}
+}
+
+/* Mobile compact header: identity + sync only. */
+@media (max-width:640px){
+    .topbar{
+        display:grid !important;
+        grid-template-columns:1fr;
+        align-content:start;
+        justify-items:start;
+        gap:3px;
+        min-height:146px;
+        padding:13px 14px 49px !important;
+    }
+    .topbar .koru-header-wrap{
+        width:100%;
+        gap:9px !important;
+        align-items:center !important;
+    }
+    .topbar .koru-mark-small{
+        width:42px !important;
+        height:42px !important;
+        flex:0 0 42px !important;
+    }
+    .topbar .vessel-name-small{
+        font-size:11px !important;
+        margin-bottom:0 !important;
+        line-height:1.1;
+    }
+    .topbar .brand-small{
+        font-size:27px !important;
+        line-height:1 !important;
+    }
+    .topbar .subtitle-small{display:none !important}
+
+    .topbar .topbar-right{
+        width:auto;
+        margin-left:51px;
+        text-align:left !important;
+    }
+    .topbar .operator-small,
+    .topbar .sync-detail{
+        display:none !important;
+    }
+    .topbar .last-sync{
+        margin-top:4px !important;
+        font-size:10.5px !important;
+        line-height:1.25;
+        white-space:nowrap;
+    }
+    .topbar .refresh-button{
+        margin-left:4px !important;
+        transform:scale(.86);
+        transform-origin:left center;
+    }
+
+    .rw-header-rear-wave{
+        left:-32%;
+        bottom:0;
+        width:166%;
+        opacity:.22;
+    }
+    .rw-header-front-wave{
+        left:-36%;
+        bottom:-13px;
+        width:174%;
+        opacity:.31;
+    }
+    .rw-header-boat{
+        left:67%;
+        bottom:8px;
+        width:38px;
+        opacity:.56;
+    }
+}
+
+@media (max-width:390px){
+    .topbar{min-height:140px;padding-left:12px !important;padding-right:12px !important}
+    .topbar .koru-mark-small{width:39px !important;height:39px !important;flex-basis:39px !important}
+    .topbar .brand-small{font-size:25px !important}
+    .topbar .topbar-right{margin-left:48px}
+    .topbar .last-sync{font-size:10px !important}
+    .rw-header-boat{left:68%;width:35px}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .rw-header-rear-wave,
+    .rw-header-front-wave,
+    .rw-header-boat{animation:none !important;transform:none !important}
+}
+
+/* ===========================================================================
+   CAB-066 · Header scene mount fix + responsive alignment correction
+   - Actually mount the three PNG scene layers in the header DOM.
+   - Restore horizontal alignment for every non-mobile viewport (>640px),
+     overriding the legacy <=900px column rule.
+   =========================================================================== */
+@media (min-width:641px){
+    .topbar{
+        display:flex !important;
+        flex-direction:row !important;
+        align-items:center !important;
+        justify-content:space-between !important;
+        gap:clamp(18px,2.2vw,34px) !important;
+        min-height:116px;
+        padding:18px 20px 34px !important;
+    }
+    .topbar .koru-header-wrap{
+        flex:1 1 auto;
+        min-width:0;
+        width:auto;
+        align-items:center !important;
+    }
+    .topbar .topbar-right{
+        flex:0 0 auto;
+        width:auto;
+        margin-left:auto;
+        text-align:right !important;
+        align-self:center;
+    }
+}
+
+/* Intermediate widths keep the general header mode but trim only the tagline
+   so the brand/status columns remain optically balanced without stacking. */
+@media (min-width:641px) and (max-width:760px){
+    .topbar{gap:14px !important;padding-left:16px !important;padding-right:16px !important}
+    .topbar .subtitle-small{display:none !important}
+    .topbar .koru-mark-small{width:50px;height:50px;flex-basis:50px}
+    .topbar .brand-small{font-size:22px}
+    .topbar .operator-small{font-size:12px}
+    .topbar .last-sync{font-size:10.5px}
+    .topbar .sync-detail{font-size:10px}
+}
+
+/* ===========================================================================
+   CAB-067 · Header scene visibility + responsive balance correction
+   - Force layered PNG ocean scene above the panel background with stronger,
+     theme-consistent contrast.
+   - Balance desktop header left/right optical margins via a 2-column grid.
+   - Preserve compact mobile header below 640px.
+   =========================================================================== */
+.topbar{
+    position:relative !important;
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    column-gap:28px;
+    padding:18px 28px 36px !important;
+    min-height:126px;
+    overflow:hidden;
+}
+.topbar .brand-wrap{
+    justify-self:start;
+    min-width:0;
+}
+.topbar .topbar-right{
+    justify-self:end;
+    margin-left:0 !important;
+    min-width:max-content;
+}
+.rw-header-scene{
+    display:block !important;
+    position:absolute !important;
+    inset:0 !important;
+    z-index:1 !important;
+    opacity:1 !important;
+    visibility:visible !important;
+}
+.rw-header-layer{
+    display:block !important;
+    visibility:visible !important;
+}
+.rw-header-rear-wave{
+    left:-6%;
+    bottom:1px;
+    width:112%;
+    opacity:.52;
+    mix-blend-mode:screen;
+}
+.rw-header-front-wave{
+    left:-8%;
+    bottom:-7px;
+    width:116%;
+    opacity:.64;
+    mix-blend-mode:screen;
+}
+.rw-header-boat{
+    left:56%;
+    bottom:9px;
+    width:clamp(44px,4vw,56px);
+    opacity:.82;
+    mix-blend-mode:screen;
+}
+.topbar > .brand-wrap,
+.topbar > .topbar-right{
+    position:relative;
+    z-index:3;
+}
+
+@media (max-width:900px) and (min-width:641px){
+    .topbar{
+        padding-left:22px !important;
+        padding-right:22px !important;
+        column-gap:18px;
+    }
+    .topbar .subtitle-small{display:none !important}
+    .rw-header-boat{left:58%;width:44px}
+}
+
+@media (max-width:640px){
+    .topbar{
+        display:grid !important;
+        grid-template-columns:1fr;
+        justify-items:start;
+        align-content:start;
+        row-gap:3px;
+        min-height:146px;
+        padding:13px 14px 49px !important;
+    }
+    .topbar .brand-wrap{justify-self:start;width:100%}
+    .topbar .topbar-right{
+        justify-self:start;
+        margin-left:51px !important;
+        min-width:0;
+    }
+    .rw-header-rear-wave{
+        left:-22%;
+        bottom:1px;
+        width:144%;
+        opacity:.46;
+    }
+    .rw-header-front-wave{
+        left:-26%;
+        bottom:-7px;
+        width:152%;
+        opacity:.58;
+    }
+    .rw-header-boat{
+        left:67%;
+        bottom:9px;
+        width:38px;
+        opacity:.78;
+    }
+}
+
+/* ===========================================================================
+   CAB-068 · Wide-header optical inset + PNG scene render hardening
+   - Keep the <=640px compact header unchanged.
+   - On wide screens, anchor brand/status to equal 28px inner insets.
+   - Keep the existing three transparent PNG assets visible above the panel
+     background without altering any application/data logic.
+   =========================================================================== */
+@media (min-width:901px){
+    .topbar{
+        grid-template-columns:minmax(0,1fr) auto !important;
+        padding-left:28px !important;
+        padding-right:28px !important;
+    }
+    .topbar > .brand-wrap{
+        justify-self:start !important;
+        margin-left:0 !important;
+        transform:none !important;
+    }
+    .topbar > .topbar-right{
+        justify-self:end !important;
+        margin-left:0 !important;
+        margin-right:0 !important;
+        transform:none !important;
+    }
+    .rw-header-scene{
+        display:block !important;
+        position:absolute !important;
+        inset:0 !important;
+        z-index:2 !important;
+        opacity:1 !important;
+        visibility:visible !important;
+    }
+    .topbar > .brand-wrap,
+    .topbar > .topbar-right{z-index:3 !important}
+    .rw-header-layer{
+        display:block !important;
+        visibility:visible !important;
+    }
+    .rw-header-rear-wave{opacity:.58 !important;mix-blend-mode:normal !important}
+    .rw-header-front-wave{opacity:.70 !important;mix-blend-mode:normal !important}
+    .rw-header-boat{opacity:.92 !important;mix-blend-mode:normal !important}
+}
+
+/* ===========================================================================
+   CAB-069 · Responsive boat placement + restrained wave band + 1.2x motion
+   - Keep the existing three PNG assets and application logic unchanged.
+   - Wide: waves stay in a shallow lower band; boat is centered and visible.
+   - Mobile: boat uses its own right-side placement/size above the wave crest.
+   - Existing header animations run 1.2x faster (duration x 0.8333).
+   =========================================================================== */
+.rw-header-rear-wave{
+    animation-duration:23.333s !important;
+}
+.rw-header-front-wave{
+    animation-duration:15.833s !important;
+}
+.rw-header-boat{
+    animation-duration:7s !important;
+}
+
+@media (min-width:901px){
+    .rw-header-rear-wave{
+        left:-6% !important;
+        bottom:0 !important;
+        width:112% !important;
+        height:54px !important;
+        object-fit:fill;
+        opacity:.52 !important;
+    }
+    .rw-header-front-wave{
+        left:-8% !important;
+        bottom:-4px !important;
+        width:116% !important;
+        height:62px !important;
+        object-fit:fill;
+        opacity:.64 !important;
+    }
+    .rw-header-boat{
+        left:50% !important;
+        bottom:28px !important;
+        width:72px !important;
+        opacity:.96 !important;
+        z-index:2 !important;
+    }
+}
+
+@media (min-width:641px) and (max-width:900px){
+    .rw-header-rear-wave{
+        bottom:0 !important;
+        height:50px !important;
+        object-fit:fill;
+    }
+    .rw-header-front-wave{
+        bottom:-4px !important;
+        height:58px !important;
+        object-fit:fill;
+    }
+    .rw-header-boat{
+        left:58% !important;
+        bottom:25px !important;
+        width:62px !important;
+        opacity:.94 !important;
+        z-index:2 !important;
+    }
+}
+
+@media (max-width:640px){
+    .rw-header-rear-wave{
+        left:-22% !important;
+        bottom:0 !important;
+        width:144% !important;
+        height:43px !important;
+        object-fit:fill;
+    }
+    .rw-header-front-wave{
+        left:-26% !important;
+        bottom:-4px !important;
+        width:152% !important;
+        height:51px !important;
+        object-fit:fill;
+    }
+    .rw-header-boat{
+        left:74% !important;
+        bottom:22px !important;
+        width:50px !important;
+        opacity:.96 !important;
+        z-index:2 !important;
+    }
+}
+
+@media (max-width:390px){
+    .rw-header-boat{
+        left:72% !important;
+        bottom:21px !important;
+        width:46px !important;
+    }
+}
+
+/* ===========================================================================
+   CAB-070 · Boat visibility scale-up + faster header motion
+   - Keep CAB069 wave band, layer order, asset files, and responsive positions.
+   - Enlarge boat independently by viewport so RV Koru reads clearly.
+   - Increase existing CAB069 header animation speed by 1.5x
+     (duration x 0.6667), without changing keyframes or motion paths.
+   =========================================================================== */
+.rw-header-rear-wave{
+    animation-duration:15.556s !important;
+}
+.rw-header-front-wave{
+    animation-duration:10.556s !important;
+}
+.rw-header-boat{
+    animation-duration:4.667s !important;
+}
+
+@media (min-width:901px){
+    .rw-header-boat{
+        left:50% !important;
+        bottom:28px !important;
+        width:180px !important;
+    }
+}
+
+@media (min-width:641px) and (max-width:900px){
+    .rw-header-boat{
+        left:58% !important;
+        bottom:25px !important;
+        width:140px !important;
+    }
+}
+
+@media (max-width:640px){
+    .rw-header-boat{
+        left:74% !important;
+        bottom:22px !important;
+        width:105px !important;
+    }
+}
+
+@media (max-width:390px){
+    .rw-header-boat{
+        left:72% !important;
+        bottom:21px !important;
+        width:96px !important;
+    }
+}
+
+/* ===========================================================================
+   CAB-072 · Boat waterline seating + mobile scale + faster wave flow
+   - Mobile boat scale: CAB070 x1.4.
+   - Wide/mobile boat lowered independently so hull visually meets wave crest.
+   - Rear/front wave motion: CAB070 x2.0 speed (duration x0.5).
+   - Boat bobbing duration/path retained from CAB070.
+   =========================================================================== */
+.rw-header-rear-wave{
+    animation-duration:7.778s !important;
+}
+.rw-header-front-wave{
+    animation-duration:5.278s !important;
+}
+
+@media (min-width:901px){
+    .rw-header-boat{
+        bottom:18px !important;
+    }
+}
+
+@media (max-width:640px){
+    .rw-header-boat{
+        bottom:12px !important;
+        width:147px !important;
+    }
+}
+
+@media (max-width:390px){
+    .rw-header-boat{
+        bottom:11px !important;
+        width:134px !important;
+    }
+}
+
+
+/* CAB-072 · Page hero title accent clarity */
+/* Strengthen only major page titles; preserve eyebrow labels, body text, and status colors. */
