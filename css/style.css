@@ -5469,3 +5469,46 @@ body{
 }
 @media(max-width:390px){.intro-brand-koru{width:39px!important;height:39px!important}.koru-intro .intro-brand-lockup .brand{font-size:38px!important}.rw-intro-scene{height:170px}}
 @media(prefers-reduced-motion:reduce){.rw-voyage-art .rw-stars,.rw-voyage-art .rw-wave-layer,.rw-voyage-art .rw-boat-bob{animation:none!important}}
+
+
+/* ===========================================================================
+   CAB-064 · Patch static intro artwork rendering + optical alignment
+   - Replaces the intro SVG animation with a high-quality fixed-size PNG scene.
+   - Prevents the sailing artwork from enlarging on wide screens.
+   - Optically aligns Koru/RiverWatch and helm/ENTER BRIDGE.
+   - Adds ~0.8 button-height of extra top breathing room on mobile.
+   =========================================================================== */
+.rw-intro-scene{
+    width:min(430px,92vw)!important;
+    height:auto!important;
+    aspect-ratio:1200/434;
+    margin:0 auto 8px!important;
+    overflow:hidden!important;
+    border-radius:0!important;
+    background:transparent!important;
+}
+.rw-intro-scene-png{
+    display:block;
+    width:100%;
+    max-width:100%;
+    height:auto;
+    object-fit:contain;
+    object-position:center;
+}
+.intro-animate>.rw-intro-scene{animation:none!important;opacity:1!important;transform:none!important}
+.intro-brand-koru{transform:translateY(2px)!important}
+.helm-icon{display:inline-flex;align-items:center;justify-content:center;transform:translateY(2px);line-height:1!important}
+
+@media(max-width:640px){
+    .koru-intro{
+        padding-top:clamp(112px, calc(10.5dvh + 40px), 128px)!important;
+    }
+    .rw-intro-scene{width:min(430px,96vw)!important;margin-bottom:8px!important}
+}
+@media(max-width:390px){
+    .rw-intro-scene{width:96vw!important;height:auto!important}
+}
+@media(max-height:760px) and (max-width:640px){
+    .koru-intro{padding-top:104px!important}
+    .rw-intro-scene{height:auto!important}
+}
