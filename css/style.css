@@ -6052,3 +6052,140 @@ body{
 
 /* CAB-072 · Page hero title accent clarity */
 /* Strengthen only major page titles; preserve eyebrow labels, body text, and status colors. */
+
+
+/* ===========================================================================
+   CAB-073 · Layered intro + restrained compass + mobile motion calibration
+   SSoT: CAB072. Existing RiverWatch functional/data logic is unchanged.
+   =========================================================================== */
+
+/* Intro: replace the former single scene PNG with four independently animated
+   transparent layers while retaining the original scene footprint. */
+.rw-intro-layered{
+    position:relative !important;
+    overflow:hidden !important;
+    background:#020e22 !important;
+    aspect-ratio:1200/435;
+}
+.rw-intro-layer{
+    position:absolute;
+    pointer-events:none;
+    user-select:none;
+    will-change:transform;
+}
+.rw-intro-wave-rear{
+    z-index:1;
+    left:-4%;
+    bottom:11%;
+    width:108%;
+    animation:rwIntroRearDrift 11.5s ease-in-out infinite alternate;
+}
+.rw-intro-boat-koru{
+    z-index:2;
+    left:50%;
+    bottom:20%;
+    width:25%;
+    transform-origin:50% 88%;
+    animation:rwIntroBoatFloat 5.8s ease-in-out infinite;
+}
+.rw-intro-wave-front{
+    z-index:3;
+    left:-5%;
+    bottom:-2%;
+    width:110%;
+    animation:rwIntroFrontDrift 7.8s ease-in-out infinite alternate;
+}
+.rw-intro-seagulls{
+    z-index:4;
+    right:17%;
+    top:16%;
+    width:14%;
+    animation:rwIntroGullsGlide 9.2s ease-in-out infinite alternate;
+}
+@keyframes rwIntroRearDrift{
+    from{transform:translate3d(-1.8%,0,0)}
+    to{transform:translate3d(1.8%,-1px,0)}
+}
+@keyframes rwIntroFrontDrift{
+    from{transform:translate3d(2.0%,1px,0)}
+    to{transform:translate3d(-2.0%,-1px,0)}
+}
+@keyframes rwIntroBoatFloat{
+    0%,100%{transform:translate3d(-50%,1px,0) rotate(-0.35deg)}
+    50%{transform:translate3d(-50%,-3px,0) rotate(0.35deg)}
+}
+@keyframes rwIntroGullsGlide{
+    from{transform:translate3d(-3px,1px,0)}
+    to{transform:translate3d(7px,-3px,0)}
+}
+
+/* Header: a single, low-contrast compass rose in the unused upper sky. */
+.rw-header-compass{
+    z-index:1 !important;
+    left:72% !important;
+    top:8px !important;
+    bottom:auto !important;
+    width:42px !important;
+    opacity:.20 !important;
+    object-fit:contain !important;
+    animation:rwCompassBreathe 8s ease-in-out infinite !important;
+}
+@keyframes rwCompassBreathe{
+    0%,100%{transform:translateX(-50%) scale(.98);opacity:.14}
+    50%{transform:translateX(-50%) scale(1.02);opacity:.24}
+}
+
+/* Mobile: intentionally faster water motion than desktop so movement remains
+   perceptible on the narrow Galaxy-class portrait viewport. 1.5x target. */
+@media (max-width:640px){
+    .rw-header-rear-wave{animation-duration:5.185s !important;}
+    .rw-header-front-wave{animation-duration:3.519s !important;}
+    .rw-header-compass{
+        left:84% !important;
+        top:10px !important;
+        width:34px !important;
+        opacity:.16 !important;
+    }
+    .rw-intro-wave-rear{animation-duration:7.667s !important;}
+    .rw-intro-wave-front{animation-duration:5.2s !important;}
+    .rw-intro-seagulls{animation-duration:6.133s !important;}
+}
+
+/* Keep reduced-motion accessibility intact. */
+@media (prefers-reduced-motion:reduce){
+    .rw-intro-layer,
+    .rw-header-compass{animation:none !important;}
+}
+
+
+/* ===========================================================================
+   CAB-074 · Intro asset cleanup + compass visibility correction
+   =========================================================================== */
+.rw-header-compass{
+    width:46px !important;
+    opacity:.38 !important;
+    filter:drop-shadow(0 0 4px rgba(79,215,255,.22));
+}
+@keyframes rwCompassBreathe{
+    0%,100%{transform:translateX(-50%) scale(.98);opacity:.30}
+    50%{transform:translateX(-50%) scale(1.02);opacity:.48}
+}
+@media (max-width:640px){
+    .rw-header-compass{
+        width:38px !important;
+        opacity:.34 !important;
+    }
+}
+
+/* Cleaned intro PNGs keep the CAB073 motion model; only compositing alignment is refined. */
+.rw-intro-wave-rear{bottom:10% !important;}
+.rw-intro-wave-front{bottom:-1% !important;}
+.rw-intro-boat-koru{
+    bottom:18% !important;
+    width:24% !important;
+}
+.rw-intro-seagulls{
+    right:20% !important;
+    top:15% !important;
+    width:13% !important;
+}
