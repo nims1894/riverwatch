@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.0-pwa-cab075";
+const CACHE_NAME = "riverwatch-v1.0-pwa-cab076";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,7 @@ const APP_SHELL = [
   "./icons/riverwatch-icon.svg",
   "./icons/koru-mark.svg",
   "./icons/intro-sailing-scene.png",
+  "./icons/header-seagulls.png",
   "icons/header-compass.png",
   "icons/intro-seagulls.png",
   "icons/intro-wave-front.png",

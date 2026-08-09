@@ -6286,3 +6286,111 @@ body{
         animation:rwIntroGullsMobile075 5.8s ease-in-out infinite alternate !important;
     }
 }
+
+
+/* ===========================================================================
+   CAB-076 · Approved Intro assets + unified perceptible Header motion
+   =========================================================================== */
+
+/* Compass retired. */
+.rw-header-compass{display:none !important;}
+
+/* Header seagulls share the clean Intro visual language. */
+.rw-header-seagulls{
+    position:absolute !important;
+    z-index:4 !important;
+    width:64px !important;
+    height:auto !important;
+    left:76% !important;
+    top:18px !important;
+    bottom:auto !important;
+    opacity:.72 !important;
+    object-fit:contain !important;
+    pointer-events:none !important;
+    will-change:transform !important;
+    animation:rwHeaderGulls076 6.2s ease-in-out infinite alternate !important;
+}
+
+/* Desktop: header motion is deliberately closer to Intro in perceived tempo. */
+@keyframes rwHeaderRear076{
+    from{transform:translate3d(-5.5%,0,0)}
+    to{transform:translate3d(5.5%,-1px,0)}
+}
+@keyframes rwHeaderFront076{
+    from{transform:translate3d(6.5%,1px,0)}
+    to{transform:translate3d(-6.5%,-1px,0)}
+}
+@keyframes rwHeaderBoat076{
+    0%,100%{transform:translate3d(-50%,2px,0) rotate(-.35deg)}
+    50%{transform:translate3d(-50%,-4px,0) rotate(.35deg)}
+}
+@keyframes rwHeaderGulls076{
+    from{transform:translate3d(-5px,2px,0)}
+    to{transform:translate3d(12px,-4px,0)}
+}
+
+.rw-header-rear-wave{
+    animation:rwHeaderRear076 6.8s ease-in-out infinite alternate !important;
+}
+.rw-header-front-wave{
+    animation:rwHeaderFront076 4.8s ease-in-out infinite alternate !important;
+}
+.rw-header-boat{
+    animation:rwHeaderBoat076 5.6s ease-in-out infinite !important;
+}
+
+/* Mobile: explicit animation assignment and larger relative travel distance.
+   This intentionally follows the Intro's perceptible-motion philosophy. */
+@media (max-width:640px){
+    @keyframes rwHeaderRearMobile076{
+        from{transform:translate3d(-9%,0,0)}
+        to{transform:translate3d(9%,-1px,0)}
+    }
+    @keyframes rwHeaderFrontMobile076{
+        from{transform:translate3d(10%,1px,0)}
+        to{transform:translate3d(-10%,-1px,0)}
+    }
+    @keyframes rwHeaderBoatMobile076{
+        0%,100%{transform:translate3d(-50%,3px,0) rotate(-.45deg)}
+        50%{transform:translate3d(-50%,-5px,0) rotate(.45deg)}
+    }
+    @keyframes rwHeaderGullsMobile076{
+        from{transform:translate3d(-8px,2px,0)}
+        to{transform:translate3d(15px,-5px,0)}
+    }
+
+    .rw-header-rear-wave{
+        animation:rwHeaderRearMobile076 4.6s ease-in-out infinite alternate !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontMobile076 3.25s ease-in-out infinite alternate !important;
+    }
+    .rw-header-boat{
+        animation:rwHeaderBoatMobile076 5.0s ease-in-out infinite !important;
+    }
+    .rw-header-seagulls{
+        width:52px !important;
+        left:78% !important;
+        top:22px !important;
+        opacity:.78 !important;
+        animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
+    }
+}
+
+/* Keep the Header scene moving on mobile even when a device/browser reports
+   reduced-motion, matching CAB075's RiverWatch-specific mobile behavior.
+   Intro rules are intentionally not changed here. */
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+    .rw-header-rear-wave{
+        animation:rwHeaderRearMobile076 4.6s ease-in-out infinite alternate !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontMobile076 3.25s ease-in-out infinite alternate !important;
+    }
+    .rw-header-boat{
+        animation:rwHeaderBoatMobile076 5.0s ease-in-out infinite !important;
+    }
+    .rw-header-seagulls{
+        animation:rwHeaderGullsMobile076 4.8s ease-in-out infinite alternate !important;
+    }
+}
