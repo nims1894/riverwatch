@@ -6189,3 +6189,100 @@ body{
     top:15% !important;
     width:13% !important;
 }
+
+
+/* ===========================================================================
+   CAB-075 · Continuous intro waves + mobile motion + compass visibility
+   =========================================================================== */
+
+/* Compass: intentionally visible, but remains secondary to header content. */
+.rw-header-compass{
+    width:54px !important;
+    opacity:.72 !important;
+    filter:drop-shadow(0 0 5px rgba(79,215,255,.42)) !important;
+}
+@keyframes rwCompassBreathe075{
+    0%,100%{transform:translateX(-50%) scale(.98);opacity:.62}
+    50%{transform:translateX(-50%) scale(1.025);opacity:.82}
+}
+.rw-header-compass{animation:rwCompassBreathe075 7s ease-in-out infinite !important;}
+
+/* Mobile motion calibration: duration + travel distance are both increased
+   so motion remains perceptible on a narrow portrait viewport. */
+@keyframes rwHeaderRearWaveMobile075{
+    from{transform:translate3d(-7%,0,0)}
+    to{transform:translate3d(7%,-1px,0)}
+}
+@keyframes rwHeaderFrontWaveMobile075{
+    from{transform:translate3d(8%,1px,0)}
+    to{transform:translate3d(-8%,-1px,0)}
+}
+@keyframes rwIntroRearMobile075{
+    from{transform:translate3d(-5.5%,0,0)}
+    to{transform:translate3d(5.5%,-1px,0)}
+}
+@keyframes rwIntroFrontMobile075{
+    from{transform:translate3d(6.5%,1px,0)}
+    to{transform:translate3d(-6.5%,-1px,0)}
+}
+@keyframes rwIntroBoatMobile075{
+    0%,100%{transform:translate3d(-50%,2px,0) rotate(-.45deg)}
+    50%{transform:translate3d(-50%,-5px,0) rotate(.45deg)}
+}
+@keyframes rwIntroGullsMobile075{
+    from{transform:translate3d(-7px,2px,0)}
+    to{transform:translate3d(14px,-5px,0)}
+}
+
+@media (max-width:640px){
+    .rw-header-rear-wave{
+        animation:rwHeaderRearWaveMobile075 4.8s ease-in-out infinite alternate !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontWaveMobile075 3.3s ease-in-out infinite alternate !important;
+    }
+    .rw-header-compass{
+        width:46px !important;
+        opacity:.70 !important;
+        animation:rwCompassBreathe075 6.2s ease-in-out infinite !important;
+    }
+    .rw-intro-wave-rear{
+        animation:rwIntroRearMobile075 6.4s ease-in-out infinite alternate !important;
+    }
+    .rw-intro-wave-front{
+        animation:rwIntroFrontMobile075 4.4s ease-in-out infinite alternate !important;
+    }
+    .rw-intro-boat-koru{
+        animation:rwIntroBoatMobile075 5.2s ease-in-out infinite !important;
+    }
+    .rw-intro-seagulls{
+        animation:rwIntroGullsMobile075 5.8s ease-in-out infinite alternate !important;
+    }
+}
+
+/* RiverWatch intentionally keeps these decorative navigation animations active
+   on mobile. This comes after the CAB073 reduced-motion block to prevent the
+   device/browser preference from making the scene appear static. */
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+    .rw-header-rear-wave{
+        animation:rwHeaderRearWaveMobile075 4.8s ease-in-out infinite alternate !important;
+    }
+    .rw-header-front-wave{
+        animation:rwHeaderFrontWaveMobile075 3.3s ease-in-out infinite alternate !important;
+    }
+    .rw-header-compass{
+        animation:rwCompassBreathe075 6.2s ease-in-out infinite !important;
+    }
+    .rw-intro-wave-rear{
+        animation:rwIntroRearMobile075 6.4s ease-in-out infinite alternate !important;
+    }
+    .rw-intro-wave-front{
+        animation:rwIntroFrontMobile075 4.4s ease-in-out infinite alternate !important;
+    }
+    .rw-intro-boat-koru{
+        animation:rwIntroBoatMobile075 5.2s ease-in-out infinite !important;
+    }
+    .rw-intro-seagulls{
+        animation:rwIntroGullsMobile075 5.8s ease-in-out infinite alternate !important;
+    }
+}
