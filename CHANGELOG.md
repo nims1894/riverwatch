@@ -315,3 +315,7 @@ Status: Eye Comfort patch ready for review.
 - Tightened intro vertical spacing on compact/mobile screens to keep ENTER BRIDGE in the first viewport.
 - Reduced RETRY to a compact badge-style control while preserving failure-only activation.
 - Updated PWA cache namespace to CAB055.
+
+## CAB057
+- Rebalanced the mobile intro vertically by moving the content block about 40px downward while leaving the Boot Sequence HUD untouched.
+- Updated PWA cache namespace to CAB057.

@@ -5176,3 +5176,32 @@ body{
     opacity:.92;
     white-space:nowrap;
 }
+
+/* CAB-057 · Intro mobile vertical rebalance
+   - Keep Boot Sequence HUD exactly as-is.
+   - Move only the intro content block about 40px downward from CAB056 compact positioning.
+   - Preserve element spacing and keep ENTER BRIDGE within the first mobile viewport. */
+@media(max-width:640px), (max-height:820px){
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .brand-version,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-32px) !important;
+    }
+}
+@media(max-height:700px){
+    .koru-intro > .koru-mark,
+    .koru-intro > .vessel-name,
+    .koru-intro > .brand,
+    .koru-intro > .brand-version,
+    .koru-intro > .intro-rule,
+    .koru-intro > .crew-block,
+    .koru-intro > .philosophy,
+    .koru-intro > .enter-voyage{
+        transform:translateY(-46px) !important;
+    }
+}
