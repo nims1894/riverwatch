@@ -6547,3 +6547,90 @@ body{
         will-change:transform !important;
     }
 }
+
+/* ===========================================================================
+   CAB-080 · VOYAGE_LOG remap / Compact Captain's Log Timeline
+   - Portfolio Journey remains a marker-free line chart using every dated row.
+   - Voyage Timeline renders only Logbook=TRUE entries.
+   - Timeline financial metrics are compressed to one mobile-friendly line.
+   =========================================================================== */
+.timeline-entry-body{
+    min-width:0;
+}
+.timeline-status-group{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
+    flex-wrap:wrap;
+}
+.timeline-trend{
+    display:inline-flex;
+    align-items:center;
+    min-height:22px;
+    padding:3px 8px;
+    border:1px solid rgba(190,200,214,.22);
+    border-radius:999px;
+    color:var(--muted);
+    font-size:10px;
+    font-weight:700;
+    line-height:1;
+    letter-spacing:.04em;
+    white-space:nowrap;
+}
+.timeline-trend::before{
+    margin-right:4px;
+    opacity:.9;
+}
+.timeline-trend.trend-strong-down::before{ content:"↓↓"; }
+.timeline-trend.trend-down::before{ content:"↓"; }
+.timeline-trend.trend-stable::before{ content:"—"; }
+.timeline-trend.trend-up::before{ content:"↑"; }
+.timeline-trend.trend-strong-up::before{ content:"↑↑"; }
+.timeline-trend.trend-strong-down,
+.timeline-trend.trend-down{ border-color:rgba(255,112,112,.30); }
+.timeline-trend.trend-up,
+.timeline-trend.trend-strong-up{ border-color:rgba(102,217,239,.30); }
+.timeline-metric-line{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px 12px;
+    margin:10px 0 8px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.35;
+}
+.timeline-metric-line span{
+    display:inline-flex;
+    align-items:baseline;
+    gap:5px;
+    white-space:nowrap;
+}
+.timeline-metric-line b{
+    color:var(--text-strong);
+    font-size:13px;
+    font-weight:700;
+}
+@media (max-width:640px){
+    .timeline-classification{
+        align-items:flex-start;
+    }
+    .timeline-status-group{
+        gap:5px;
+    }
+    .timeline-voyage-state,
+    .timeline-trend{
+        min-height:20px;
+        padding:3px 7px;
+        font-size:9px;
+    }
+    .timeline-metric-line{
+        gap:4px 10px;
+        margin:8px 0 7px;
+        font-size:11px;
+    }
+    .timeline-metric-line b{
+        font-size:12px;
+    }
+}

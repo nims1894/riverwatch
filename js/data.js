@@ -49,7 +49,7 @@ const riverwatch = {
             manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
             portfolioConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=283502072",
             controlRulesCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1223105705",
-            openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1725380515",
+            openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1xmJxkPDPyVWjlMJwbvIEA7gtxrhJyXXE8tYVeqhmlRM/export?format=csv&gid=0", // RiverWatch_Voyage_Log / VOYAGE_LOG
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 5000
         },

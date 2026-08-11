@@ -346,3 +346,6 @@ Status: Eye Comfort patch ready for review.
 - Fixed missing layered PNG header scene and corrected general-header responsive alignment above 640px.
 
 - CAB067: Corrected responsive header balance and layered PNG ocean-scene visibility.
+## CAB-081
+- Fixed the standalone Voyage Log CSV source URL and bumped the PWA cache key.
+

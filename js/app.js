@@ -1751,16 +1751,25 @@ function normalizeLogbookRows(rows) {
         const principal = Number(row.principalKRW || 0);
         const market = Number(row.marketValueKRW || 0);
         const target = Number(row.targetValueKRW || 0);
+        const computedPlanGap = target > 0 ? ((market / target) - 1) * 100 : 0;
+        const logbook = typeof row.logbook === "boolean"
+            ? row.logbook
+            : String(row.logbook ?? row.milestone ?? "FALSE").toUpperCase() === "TRUE";
         return {
             ...row,
-            eventType: String(row.eventType || row.marker || "LOG").toUpperCase(),
+            eventType: String(row.eventType || row.marker || "").trim().toUpperCase(),
             voyageState: String(row.voyageState || "").trim().toUpperCase(),
+            trend: String(row.trend || "").trim().toUpperCase(),
             title: row.title || row.note || "Log Entry",
-            memo: row.memo || row.note || "",
-            milestone: String(row.milestone ?? "TRUE").toUpperCase() === "TRUE",
+            message: row.message || row.memo || row.note || "",
+            memo: row.message || row.memo || row.note || "",
+            logbook,
+            milestone: logbook,
             principalKRW: principal,
             marketValueKRW: market,
             targetValueKRW: target,
+            planGap: Number.isFinite(Number(row.planGap)) ? Number(row.planGap) : computedPlanGap,
+            dailyTrend: Number(row.dailyTrend || 0),
             returnPct: principal > 0 ? ((market / principal) - 1) * 100 : Number(row.returnPct || 0)
         };
     }).filter(row => row.date);
@@ -1779,7 +1788,9 @@ function renderLogbookKpis(rows) {
     if (!el) return;
 
     // Latest means the newest observation, regardless of Milestone TRUE/FALSE.
-    const datedRows = rows.filter(row => row && row.date);
+    const datedRows = normalizeLogbookRows(rows)
+        .filter(row => row && row.date)
+        .sort((a, b) => (parseDateSafe(a.date) || 0) - (parseDateSafe(b.date) || 0));
     const latest = datedRows[datedRows.length - 1] || {};
     const target = Number((riverwatch.manualConfig || {}).openSeaTargetKRW || riverwatch.calc.openSeaTarget || 0);
     const value = Number(latest.marketValueKRW || riverwatch.calc.currentPosition || 0);
@@ -1937,8 +1948,10 @@ function renderLogbookTimeline(rows) {
     const el = document.getElementById("openSeaTimeline");
     if (!el) return;
 
+    // Timeline is the Captain's Log view: only explicitly checked Logbook rows.
+    // Portfolio Journey above continues to use every dated VOYAGE_LOG row.
     const timelineRows = normalizeLogbookRows(rows)
-        .filter(row => row.milestone)
+        .filter(row => row.logbook === true)
         .map(row => ({
             ...row,
             targetValueKRW: Number(row.targetValueKRW || 0) || calculateLogbookTargetValue(row.date, rows)
@@ -1946,29 +1959,36 @@ function renderLogbookTimeline(rows) {
         .sort((a, b) => (parseDateSafe(b.date) || 0) - (parseDateSafe(a.date) || 0));
 
     if (!timelineRows.length) {
-        el.innerHTML = `<div class="empty-state">No timeline entries yet.</div>`;
+        el.innerHTML = `<div class="empty-state">No logbook entries yet.</div>`;
         return;
     }
 
     el.innerHTML = timelineRows.map(row => {
-        const ahead = Number(row.marketValueKRW || 0) - Number(row.targetValueKRW || 0);
+        const market = Number(row.marketValueKRW || 0);
+        const planned = Number(row.targetValueKRW || 0);
+        const planGap = planned > 0 ? ((market / planned) - 1) * 100 : Number(row.planGap || 0);
+        const stateClass = row.voyageState ? ` state-${row.voyageState.toLowerCase()}` : "";
+        const trendClass = row.trend ? ` trend-${row.trend.toLowerCase().replace(/_/g, "-")}` : "";
+
         return `
             <div class="timeline-entry">
                 <div class="timeline-dot"></div>
-                <div>
+                <div class="timeline-entry-body">
                     <div class="timeline-classification">
                         <div class="timeline-meta">${row.eventType || "LOG"}</div>
-                        ${row.voyageState ? `<div class="timeline-voyage-state state-${row.voyageState.toLowerCase()}">${row.voyageState}</div>` : ""}
+                        <div class="timeline-status-group">
+                            ${row.voyageState ? `<div class="timeline-voyage-state${stateClass}">${row.voyageState}</div>` : ""}
+                            ${row.trend ? `<div class="timeline-trend${trendClass}">${row.trend.replace(/_/g, " ")}</div>` : ""}
+                        </div>
                     </div>
                     <div class="timeline-date">${row.date || "-"}</div>
                     <div class="timeline-title">${row.title || "Log Entry"}</div>
-                    <div class="timeline-values">
-                        <span>Principal <b>${formatKRWM(Number(row.principalKRW || 0))}</b></span>
-                        <span>Market Value <b>${formatKRWM(Number(row.marketValueKRW || 0))}</b></span>
-                        <span>Planned Course <b>${formatKRWM(Number(row.targetValueKRW || 0))}</b></span>
+                    <div class="timeline-metric-line">
+                        <span>Market <b>${formatKRWM(market)}</b></span>
+                        <span>Plan <b>${formatKRWM(planned)}</b></span>
+                        <span>Gap <b>${formatSignedPercent2(planGap)}</b></span>
                     </div>
-                    <div class="timeline-return">${ahead >= 0 ? "Ahead of Plan" : "Behind Plan"} ${formatSigned(Math.round(ahead / 1000000))}M</div>
-                    <div class="timeline-note">${row.memo || "-"}</div>
+                    <div class="timeline-note">${row.message || row.memo || "-"}</div>
                 </div>
             </div>
         `;

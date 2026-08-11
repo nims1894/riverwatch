@@ -200,19 +200,31 @@ const RiverWatchMarketEngine = (() => {
 
         const dateIdx = idx("Date");
         const eventIdx = idx("EventType");
-        const voyageStateIdx = idx("VoyageState");
-        const titleIdx = idx("Title");
         const principalIdx = idx("PrincipalKRW");
         const marketIdx = idx("MarketValueKRW");
         const targetIdx = idx("TargetValueKRW");
+        const planGapIdx = idx("PlanGap");
+        const dailyTrendIdx = idx("DailyTrend");
+        const voyageStateIdx = idx("VoyageState");
+        const trendIdx = idx("Trend");
+        const titleIdx = idx("Title");
+        const messageIdx = idx("Message");
+        const logbookIdx = idx("Logbook");
+
+        // Backward compatibility with the previous OpenSeaLogbook schema.
         const returnIdx = idx("ReturnPct");
         const memoIdx = idx("Memo");
         const milestoneIdx = idx("Milestone");
-
-        // Backward compatibility with CAB-006 OpenSeaLogbook schema.
         const noteIdx = idx("Note");
         const markerIdx = idx("Marker");
         const phaseIdx = idx("Phase");
+
+        const parsePercent = (value, fallback = 0) => {
+            if (value === null || value === undefined || value === "") return fallback;
+            const cleaned = String(value).trim().replace(/,/g, "").replace(/%/g, "");
+            const number = Number(cleaned);
+            return Number.isNaN(number) ? fallback : number;
+        };
 
         return rows.slice(1).map(cols => {
             const date = String(cols[dateIdx] || "").trim();
@@ -220,33 +232,50 @@ const RiverWatchMarketEngine = (() => {
 
             const principal = parseNumber(cols[principalIdx], 0);
             const market = parseNumber(cols[marketIdx], 0);
-            const returnPct = principal > 0 ? ((market / principal) - 1) * 100 : parseNumber(cols[returnIdx], 0);
+            const target = targetIdx >= 0 ? parseNumber(cols[targetIdx], 0) : 0;
+            const computedPlanGap = target > 0 ? ((market / target) - 1) * 100 : 0;
+            const returnPct = principal > 0 ? ((market / principal) - 1) * 100 : parsePercent(cols[returnIdx], 0);
+
             const eventType = eventIdx >= 0
                 ? String(cols[eventIdx] || "").trim().toUpperCase()
-                : (markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "LOG");
+                : (markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "");
             const voyageState = voyageStateIdx >= 0
                 ? String(cols[voyageStateIdx] || "").trim().toUpperCase()
                 : "";
-            const memo = memoIdx >= 0
-                ? String(cols[memoIdx] || "").trim()
-                : (noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : "");
+            const trend = trendIdx >= 0
+                ? String(cols[trendIdx] || "").trim().toUpperCase()
+                : "";
+            const message = messageIdx >= 0
+                ? String(cols[messageIdx] || "").trim()
+                : (memoIdx >= 0
+                    ? String(cols[memoIdx] || "").trim()
+                    : (noteIdx >= 0 ? String(cols[noteIdx] || "").trim() : ""));
             const title = titleIdx >= 0
                 ? String(cols[titleIdx] || "").trim()
-                : (memo || eventType || "Log Entry");
+                : (message || eventType || "Log Entry");
+
+            const logbook = logbookIdx >= 0
+                ? parseBoolean(cols[logbookIdx], false)
+                : (milestoneIdx >= 0 ? parseBoolean(cols[milestoneIdx], false) : true);
 
             return {
                 date,
                 eventType,
-                voyageState,
-                title,
                 principalKRW: principal,
                 marketValueKRW: market,
-                targetValueKRW: targetIdx >= 0 ? parseNumber(cols[targetIdx], 0) : 0,
+                targetValueKRW: target,
+                planGap: planGapIdx >= 0 ? parsePercent(cols[planGapIdx], computedPlanGap) : computedPlanGap,
+                dailyTrend: dailyTrendIdx >= 0 ? parsePercent(cols[dailyTrendIdx], 0) : 0,
+                voyageState,
+                trend,
+                title,
+                message,
+                logbook,
                 returnPct,
-                memo,
-                milestone: milestoneIdx >= 0 ? String(cols[milestoneIdx] || "").trim().toUpperCase() === "TRUE" : true,
-                // Backward-compatible aliases.
-                note: memo,
+                // Backward-compatible aliases for existing render helpers.
+                memo: message,
+                milestone: logbook,
+                note: message,
                 marker: eventType,
                 phase: phaseIdx >= 0 ? String(cols[phaseIdx] || "").trim().toUpperCase() : ""
             };
@@ -255,13 +284,13 @@ const RiverWatchMarketEngine = (() => {
 
     function applyLogbook(logbookRows) {
         if (!Array.isArray(logbookRows) || logbookRows.length === 0) {
-            console.warn("OpenSeaLogbook CSV parsed but no usable rows found. Keeping fallback logbook.");
+            console.warn("VOYAGE_LOG CSV parsed but no usable rows found. Keeping fallback logbook.");
             return false;
         }
 
         riverwatch.openSeaLogbook = logbookRows;
         riverwatch.logbook = logbookRows;
-        console.log("RiverWatch OpenSeaLogbook AUTO", logbookRows);
+        console.log("RiverWatch VOYAGE_LOG AUTO", logbookRows);
         return true;
     }
 
