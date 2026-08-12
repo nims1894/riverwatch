@@ -51,7 +51,7 @@ const riverwatch = {
             controlRulesCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1223105705",
             openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1xmJxkPDPyVWjlMJwbvIEA7gtxrhJyXXE8tYVeqhmlRM/export?format=csv&gid=0", // RiverWatch_Voyage_Log / VOYAGE_LOG
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
-            timeoutMs: 5000
+            timeoutMs: 12000
         },
 
         riverMetricWeights: {
