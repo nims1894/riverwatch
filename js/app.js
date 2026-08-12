@@ -1664,7 +1664,11 @@ function renderBoatyard() {
 
             const markerPct = 70;
             const blockPct = 6;
-            const blockCountRaw = delta === 0 ? 0 : (delta > 0 ? Math.ceil(delta / 5) : Math.floor(delta / 5));
+            // Keep the displayed GAP as the actual delta, but use a corrected gap
+            // (decimal portion truncated toward zero) for trim-bar block calculation.
+            // This creates a neutral deadband for -1% < GAP < +1%.
+            const effectiveGap = Math.trunc(delta);
+            const blockCountRaw = effectiveGap === 0 ? 0 : (effectiveGap > 0 ? Math.ceil(effectiveGap / 5) : Math.floor(effectiveGap / 5));
             const blockCount = Math.max(-5, Math.min(5, blockCountRaw));
             const currentPct = Math.max(8, Math.min(96, markerPct + blockCount * blockPct));
             const showDeviation = false;
