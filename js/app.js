@@ -492,6 +492,19 @@ function getLogbookDateKey(dateText) {
     return `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`;
 }
 
+function getLatestRefuelDate() {
+    const rows = normalizeLogbookRows(riverwatch.logbook || riverwatch.openSeaLogbook || [])
+        .map((row, index) => ({
+            ...row,
+            _index: index,
+            _dateKey: getLogbookDateKey(row.date),
+            _refuelType: String(row.refuelType || '').trim().toUpperCase()
+        }))
+        .filter(row => row._dateKey && (row._refuelType === 'REFUEL' || row._refuelType === 'EXTRA_REFUEL'))
+        .sort((a, b) => a._dateKey.localeCompare(b._dateKey) || a._index - b._index);
+    return rows.length ? rows[rows.length - 1]._dateKey : null;
+}
+
 function calculateFuelSupplySnapshot(referenceDate = new Date()) {
     const rows = normalizeLogbookRows(riverwatch.logbook || riverwatch.openSeaLogbook || [])
         .map((row, index) => ({ ...row, _index: index, _dateKey: getLogbookDateKey(row.date) }))
@@ -925,7 +938,7 @@ function formatCalendarDuration(startDate, endDate) {
     }
 
     const days = Math.max(0, Math.round((end - cursor) / 86400000));
-    return `${years}y ${months}m ${days}d`;
+    return `${years}y ${String(months).padStart(2, "0")}m ${String(days).padStart(2, "0")}d`;
 }
 
 function formatSignedCalendarDifference(baseDate, comparisonDate) {
@@ -1686,7 +1699,7 @@ function renderVoyageHealth() {
     setText("remainingTime", riverwatch.calc.remainingTime || '-');
     setText("adjustedArrival", formatKRWValueM(riverwatch.calc.adjustedArrival));
     setText("openSeaTarget", formatKRWValueM(target));
-    setText("voyageGap", formatTargetGapKRWM(riverwatch.calc.targetGapKRW));
+    setHTML("voyageGap", formatTargetGapKRWHTML(riverwatch.calc.targetGapKRW));
 
     const etaLabel = document.getElementById('etaLabel');
     if (etaLabel) etaLabel.textContent = `ETA (${riverwatch.calc.etaDeviationLabel || '-'})`;
@@ -1702,7 +1715,6 @@ function renderRiverHealth() {
 
     const list = document.getElementById("riverMetricList");
     if (!list) return;
-
     list.innerHTML = "";
 
     const scores = riverwatch.calc.riverMetricScores || {};
@@ -1712,27 +1724,31 @@ function renderRiverHealth() {
     const freshness = riverwatch.calc.riverMetricFreshness || {};
     const aiDate = formatDisplayDate(config.aiCapexUpdated);
     const nvdaDate = formatDisplayDate(config.nvdaDcRevenueUpdated);
-    const aiLabel = freshness.aiCapex === false
-        ? "AI CAPEX <small>(STALE)</small>"
-        : `AI CAPEX${aiDate ? ` <small>(${aiDate})</small>` : ""}`;
-    const nvdaLabel = freshness.nvdaDcRevenue === false
-        ? "NVDA DC Rev <small>(STALE)</small>"
-        : `NVDA DC Rev${nvdaDate ? ` <small>(${nvdaDate})</small>` : ""}`;
 
-    // Display order: External Market Environment → Financial Environment → AI Growth Drivers.
     const metrics = [
-        [`USD/KRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
-        [`BRENT${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, `${formatBrentPrice(riverwatch.calc.brentPrice)} (${scoreText(scores.oil)})`],
-        ["FED", `${String(config.fedRateState || "-").toUpperCase()} (${scoreText(scores.fedRate)})`],
-        ["M2", `${formatTrendState(config.m2Trend)} (${scoreText(scores.m2)})`],
-        ["VIX", `${formatInteger(riverwatch.auto.vix)} (${scoreText(scores.vix)})`],
-        [aiLabel, `${formatTrendState(config.aiCapexTrend)} (${freshness.aiCapex === false ? '-' : scoreText(scores.aiCapex)})`],
-        [nvdaLabel, `${formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth))} (${freshness.nvdaDcRevenue === false ? '-' : scoreText(scores.nvdaDcRevenue)})`]
+        { label: `USD/KRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, value: formatFixedNumber(riverwatch.auto.usdkrw, 2), score: scores.usdkrw },
+        { label: `BRENT${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, value: formatBrentPrice(riverwatch.calc.brentPrice), score: scores.oil },
+        { label: "FED", value: String(config.fedRateState || "-").toUpperCase(), score: scores.fedRate },
+        { label: "M2", value: formatTrendState(config.m2Trend), score: scores.m2 },
+        { label: "VIX", value: formatInteger(riverwatch.auto.vix), score: scores.vix },
+        {
+            label: freshness.aiCapex === false ? "AI CAPEX <small class=\"stale-meta\">(STALE)</small>" : `AI CAPEX${aiDate ? ` <small>(${aiDate})</small>` : ""}`,
+            value: formatTrendState(config.aiCapexTrend),
+            score: freshness.aiCapex === false ? null : scores.aiCapex,
+            stale: freshness.aiCapex === false
+        },
+        {
+            label: freshness.nvdaDcRevenue === false ? "NVDA DC Rev <small class=\"stale-meta\">(STALE)</small>" : `NVDA DC Rev${nvdaDate ? ` <small>(${nvdaDate})</small>` : ""}`,
+            value: formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth)),
+            score: freshness.nvdaDcRevenue === false ? null : scores.nvdaDcRevenue,
+            stale: freshness.nvdaDcRevenue === false
+        }
     ];
 
-    metrics.forEach(([label, value]) => {
+    metrics.forEach(metric => {
         const row = document.createElement("div");
-        row.innerHTML = `<span>${label}</span><b>${value}</b>`;
+        if (metric.stale) row.classList.add("metric-stale");
+        row.innerHTML = `<span>${metric.label}</span><b>${metric.value} ${metricScoreHTML(metric.score)}</b>`;
         list.appendChild(row);
     });
 }
@@ -1764,27 +1780,23 @@ function renderBoatHealth() {
 
     const engineRaw = riverwatch.calc.enginePowerScore;
     const engineScore = (engineRaw === null || engineRaw === undefined || engineRaw === '') ? null : Number(engineRaw);
-    setText("enginePower", Number.isFinite(engineScore)
-        ? `${getEnginePowerLabel(engineScore)} (${Math.round(engineScore)})`
-        : 'PENDING (-)');
+    setMetricStatusHTML("enginePower", Number.isFinite(engineScore) ? getEnginePowerLabel(engineScore) : 'PENDING', engineScore, Number.isFinite(engineScore) ? '' : 'metric-pending');
+
+    const latestRefuelDate = formatDisplayDate(getLatestRefuelDate());
+    const fuelLabel = document.getElementById("fuelSupplyLabel");
+    if (fuelLabel) fuelLabel.textContent = `Fuel Supply (${latestRefuelDate || '-'})`;
 
     const fuelRaw = riverwatch.calc.fuelSupply;
     const fuelScore = (fuelRaw === null || fuelRaw === undefined || fuelRaw === '') ? null : Number(fuelRaw);
-    setText("fuelSupply", Number.isFinite(fuelScore)
-        ? `${getFuelSupplyLabel(fuelScore)} (${Math.round(fuelScore)})`
-        : 'PENDING (-)');
+    setMetricStatusHTML("fuelSupply", Number.isFinite(fuelScore) ? getFuelSupplyLabel(fuelScore) : 'PENDING', fuelScore, Number.isFinite(fuelScore) ? '' : 'metric-pending');
 
     const trimRaw = riverwatch.calc.trimBalance;
     const trim = (trimRaw === null || trimRaw === undefined || trimRaw === '') ? null : Number(trimRaw);
-    setText("allocationAlignment", Number.isFinite(trim)
-        ? `${getAlignmentLabel(trim)} (${Math.round(trim)})`
-        : 'PENDING (-)');
+    setMetricStatusHTML("allocationAlignment", Number.isFinite(trim) ? getAlignmentLabel(trim) : 'PENDING', trim, Number.isFinite(trim) ? '' : 'metric-pending');
 
     const fitRaw = riverwatch.calc.riverFit;
     const fit = (fitRaw === null || fitRaw === undefined || fitRaw === '') ? null : Number(fitRaw);
-    setText("riverSuitability", Number.isFinite(fit)
-        ? `${getSuitabilityLabel(fit)} (${Math.round(fit)})`
-        : 'PENDING (-)');
+    setMetricStatusHTML("riverSuitability", Number.isFinite(fit) ? getSuitabilityLabel(fit) : 'PENDING', fit, Number.isFinite(fit) ? '' : 'metric-pending');
 }
 
 function renderAllocation() {
@@ -2084,8 +2096,27 @@ function getPnLToneClass(value) {
 }
 
 function renderBoatyard() {
-    setText("boatyardArchetype", riverwatch.calc.boatArchetype || "-");
-    setText("boatyardPhase", riverwatch.calc.voyagePhase || "-");
+    const expectedCagr = toFiniteNumber((riverwatch.manualConfig || {}).expectedCAGR);
+    const requiredCagr = toFiniteNumber((riverwatch.manualConfig || {}).requiredCAGR);
+    const powerRatio = Number.isFinite(expectedCagr) && Number.isFinite(requiredCagr) && requiredCagr > 0
+        ? (expectedCagr / requiredCagr) * 100
+        : null;
+    const cagrGap = Number.isFinite(expectedCagr) && Number.isFinite(requiredCagr)
+        ? expectedCagr - requiredCagr
+        : null;
+
+    setText("boatyardExpectedCagr", Number.isFinite(expectedCagr) ? `${expectedCagr.toFixed(2)}%` : "-");
+    setText("boatyardRequiredCagr", Number.isFinite(requiredCagr) ? `${requiredCagr.toFixed(2)}%` : "-");
+    if (Number.isFinite(cagrGap)) {
+        const gapEl = document.getElementById("boatyardCagrGap");
+        if (gapEl) {
+            const direction = cagrGap >= 0 ? "▲" : "▼";
+            const tone = cagrGap >= 0 ? "gap-up" : "gap-down";
+            gapEl.innerHTML = `<span class="target-gap-direction ${tone}">${direction}</span> ${Math.abs(cagrGap).toFixed(2)}%p`;
+        }
+    } else setText("boatyardCagrGap", "-");
+    setText("boatyardPowerRatio", Number.isFinite(powerRatio) ? `${powerRatio.toFixed(2)}%` : "-");
+
     const deck = document.getElementById("trimDeckList");
     if (deck) {
         const holdings = riverwatch.calc.allocationHoldings || [];
@@ -2250,27 +2281,32 @@ function renderOpenSeaLogbook() {
     renderLogbookTimeline(rows);
 }
 
+function formatKRWK(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "-";
+    return `${Math.round(amount / 1000).toLocaleString("en-US")}K`;
+}
+
 function renderLogbookKpis(rows) {
     const el = document.getElementById("logbookKpis");
     if (!el) return;
 
-    // Latest means the newest observation, regardless of Milestone TRUE/FALSE.
     const datedRows = normalizeLogbookRows(rows)
         .filter(row => row && row.date)
         .sort((a, b) => (parseDateSafe(a.date) || 0) - (parseDateSafe(b.date) || 0));
+    const first = datedRows[0] || {};
     const latest = datedRows[datedRows.length - 1] || {};
-    const target = Number((riverwatch.manualConfig || {}).openSeaTargetKRW || riverwatch.calc.openSeaTarget || 0);
-    const value = Number(latest.marketValueKRW || riverwatch.calc.currentPosition || 0);
-    const planned = Number(latest.targetValueKRW || 0);
-    const progress = target > 0 ? (value / target) * 100 : 0;
-    const courseVariance = planned > 0 ? ((value / planned) - 1) * 100 : 0;
+    const voyageStart = formatDisplayDate(first.date) || "-";
     const latestDate = formatDisplayDate(latest.date) || "-";
-    const targetDate = formatDisplayDate((riverwatch.manualConfig || {}).targetDate) || "-";
+    const targetArrival = formatDisplayDate((riverwatch.manualConfig || {}).targetDate) || "-";
+    const phase = String(riverwatch.calc.voyagePhase || "-").replace(/_/g, " ");
+    const currentStatus = `${formatKRWK(latest.marketValueKRW)} / ${formatKRWK(latest.targetValueKRW)} / ${formatSignedPercent2(latest.planGap)}`;
 
     el.innerHTML = `
-        <div><span>Latest Value <small>(${latestDate})</small></span><b>${formatKRWM(value)}</b></div>
-        <div><span>Open Sea Target <small>(${targetDate})</small></span><b>${formatKRWM(target)}</b></div>
-        <div><span>Progress <small>(${formatKRWM(value)} / ${formatKRWM(planned)}, ${formatSignedPercent2(courseVariance)})</small></span><b>${progress.toFixed(1)}%</b></div>
+        <div><span>Voyage Phase</span><b>${phase}</b></div>
+        <div class="current-status-kpi"><span>Current Status <small>(${latestDate})</small></span><b>${currentStatus}</b></div>
+        <div><span>Voyage Start</span><b>${voyageStart}</b></div>
+        <div><span>Target Arrival</span><b>${targetArrival}</b></div>
     `;
 }
 
@@ -2624,6 +2660,30 @@ function formatTargetGapKRWM(value) {
     if (roundedM === 0) return "KRW 0M";
     const direction = value > 0 ? "▲" : "▼";
     return `${direction} KRW ${roundedM.toLocaleString("ko-KR")}M`;
+}
+
+function formatTargetGapKRWHTML(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    const roundedM = Math.round(Math.abs(value) / 1000000);
+    if (roundedM === 0) return "KRW 0M";
+    const isPositive = value > 0;
+    const direction = isPositive ? "▲" : "▼";
+    const tone = isPositive ? "gap-up" : "gap-down";
+    return `<span class="target-gap-direction ${tone}">${direction}</span> KRW ${roundedM.toLocaleString("ko-KR")}M`;
+}
+
+function metricScoreHTML(score) {
+    const text = score === null || score === undefined || score === '' || !Number.isFinite(Number(score))
+        ? '-'
+        : Math.round(Number(score));
+    return `<small class="metric-score">(${text})</small>`;
+}
+
+function setMetricStatusHTML(id, label, score, stateClass = '') {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = `metric-value${stateClass ? ` ${stateClass}` : ''}`;
+    el.innerHTML = `${label} ${metricScoreHTML(score)}`;
 }
 
 function formatKRWB(value) {

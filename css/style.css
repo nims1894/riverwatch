@@ -6684,3 +6684,200 @@ body{
     }
 }
 @media(max-width:640px){ .mission-kpis{ grid-template-columns:1fr !important; } }
+
+/* ========================================================================== 
+   CAB-085 · Health metric hierarchy + Boatyard Engine Power + Logbook IA
+   ========================================================================== */
+:root{
+    --rw-metric-box-min-height-mobile:60px;
+}
+
+/* Metric cards share one absolute height; health containers fit their content. */
+.health-matrix-detail{ align-items:start !important; }
+.health-matrix-detail .health-card{ height:auto !important; min-height:0 !important; align-self:start !important; }
+.health-matrix-detail .metric-list,
+.health-matrix-detail .voyage-flow,
+.health-matrix-detail .boat-health-list{
+    align-content:start !important;
+}
+@media(max-width:900px){
+    .health-matrix-detail .metric-list,
+    .health-matrix-detail .voyage-flow,
+    .health-matrix-detail .boat-health-list{
+        grid-template-columns:1fr !important;
+        grid-auto-rows:60px !important;
+    }
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step,
+    .health-matrix-detail .boat-health-list > div{
+        height:60px !important;
+        min-height:60px !important;
+    }
+}
+
+/* Time values: fixed-width numeric rhythm for direct vertical comparison. */
+#remainingTime,
+#etaExtension{
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum" 1;
+    white-space:pre;
+}
+
+/* Target Gap: only the direction marker carries semantic color. */
+.target-gap-direction{
+    display:inline-block;
+    margin-right:2px;
+    font-weight:900;
+}
+.target-gap-direction.gap-down{ color:var(--rw-negative) !important; }
+.target-gap-direction.gap-up{ color:var(--red) !important; }
+
+/* Health converted score is diagnostic metadata, not the primary reading. */
+.metric-score{
+    display:inline !important;
+    margin-left:3px;
+    font-size:72% !important;
+    line-height:1 !important;
+    font-weight:500 !important;
+    color:var(--muted) !important;
+    opacity:.72 !important;
+    white-space:nowrap;
+    vertical-align:baseline;
+}
+
+/* Pending / stale / invalid visual hierarchy. */
+.metric-pending{ color:var(--muted) !important; }
+.metric-pending .metric-score{ color:var(--muted) !important; opacity:.72 !important; }
+.metric-stale .stale-meta{ color:var(--rw-watch) !important; opacity:1 !important; font-weight:700 !important; }
+.metric-stale > b{ color:var(--text-strong) !important; }
+.metric-stale > b .metric-score{ color:var(--rw-watch) !important; opacity:1 !important; }
+.metric-invalid,
+.metric-error{ color:var(--rw-critical) !important; }
+
+/* Boatyard: Engine Power is the cyan page identity; detailed diagnostics use Health-card rhythm. */
+.engine-power-hero .page-title{ margin-bottom:18px !important; }
+.engine-power-detail{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--rw-metric-box-gap, 8px);
+}
+.engine-power-detail > div{
+    min-height:var(--rw-metric-box-min-height-desktop, 68px);
+    padding:var(--rw-metric-box-padding-y-desktop, 14px) var(--rw-metric-box-padding-x-desktop, 16px);
+    border:1px solid var(--border);
+    background:rgba(255,255,255,.025);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:8px;
+}
+.engine-power-detail span{
+    color:var(--text-soft);
+    font-size:13px;
+    line-height:1.2;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+.engine-power-detail b{
+    color:var(--text-strong);
+    text-align:right;
+    font-size:20px;
+    line-height:1.15;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+}
+@media(max-width:900px){
+    .engine-power-detail{ grid-template-columns:1fr !important; }
+    .engine-power-detail > div{
+        min-height:60px !important;
+        height:60px !important;
+        padding:9px 14px !important;
+    }
+    .engine-power-detail span{ font-size:12.5px !important; }
+    .engine-power-detail b{ font-size:17px !important; }
+}
+
+/* Logbook hero follows the same concise page grammar. */
+#logbookPage .page-title{ margin-bottom:18px !important; }
+#logbookPage .logbook-kpis{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+}
+#logbookPage .logbook-kpis b{
+    font-variant-numeric:tabular-nums;
+}
+@media(max-width:900px){
+    #logbookPage .logbook-kpis{ grid-template-columns:1fr !important; }
+    #logbookPage .logbook-kpis > div{
+        min-height:60px !important;
+        height:60px !important;
+    }
+}
+
+
+/* ==========================================================================
+   CAB-086 · Metric spacing + Fuel date + Voyage current status
+   ========================================================================== */
+:root{
+    --rw-metric-box-min-height-mobile:62px;
+    --rw-detail-kpi-height-mobile:72px;
+}
+
+/* Dashboard Health: one absolute metric-card height across Voyage/River/Boat. */
+@media(max-width:900px){
+    .health-matrix-detail .metric-list,
+    .health-matrix-detail .voyage-flow,
+    .health-matrix-detail .boat-health-list{
+        grid-auto-rows:62px !important;
+    }
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step,
+    .health-matrix-detail .boat-health-list > div{
+        height:62px !important;
+        min-height:62px !important;
+    }
+}
+
+/* Target Gap must stay on one readable line; only the direction marker is colored. */
+#voyageGap{
+    display:flex !important;
+    justify-content:flex-end;
+    align-items:center;
+    gap:4px;
+    white-space:nowrap !important;
+    flex-wrap:nowrap !important;
+}
+#voyageGap .target-gap-direction{ flex:0 0 auto; margin-right:0 !important; }
+
+/* Page-detail cards: Stay the Course / Engine Power / Voyage Journey share 72px. */
+@media(max-width:900px){
+    .mission-kpis > div,
+    .engine-power-detail > div,
+    #logbookPage .logbook-kpis > div{
+        height:var(--rw-detail-kpi-height-mobile) !important;
+        min-height:var(--rw-detail-kpi-height-mobile) !important;
+        box-sizing:border-box;
+    }
+    .mission-kpis > div{ padding:14px 16px !important; }
+    .engine-power-detail > div,
+    #logbookPage .logbook-kpis > div{ padding:12px 14px !important; }
+}
+@media(max-width:640px){
+    .mission-kpis > div{
+        height:var(--rw-detail-kpi-height-mobile) !important;
+        min-height:var(--rw-detail-kpi-height-mobile) !important;
+        padding:14px 16px !important;
+    }
+}
+
+/* Current Status is deliberately compact but remains a single-line K-unit snapshot. */
+#logbookPage .current-status-kpi b{
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums;
+    font-feature-settings:"tnum" 1;
+}
+@media(max-width:900px){
+    #logbookPage .current-status-kpi b{
+        font-size:15px !important;
+        letter-spacing:-0.01em;
+    }
+}
