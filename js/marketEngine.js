@@ -60,6 +60,18 @@ const RiverWatchMarketEngine = (() => {
         return Number.isNaN(number) ? fallback : number;
     }
 
+    function parsePercentPoints(value, fallback = null) {
+        if (value === null || value === undefined || value === "") return fallback;
+        const raw = String(value).trim();
+        const hasPercentSign = raw.includes("%");
+        const cleaned = raw.replace(/,/g, "").replace(/%/g, "");
+        const number = Number(cleaned);
+        if (!Number.isFinite(number)) return fallback;
+        // CSV may expose a percentage-formatted cell as either "10.2%" or 0.102.
+        if (hasPercentSign) return number;
+        return Math.abs(number) <= 1 ? number * 100 : number;
+    }
+
     function parseKeyValueCsv(text) {
         const rows = parseRows(text);
         const result = {};
@@ -75,6 +87,43 @@ const RiverWatchMarketEngine = (() => {
         });
 
         return result;
+    }
+
+    function parseRiverCalibrationCsv(text) {
+        const rows = parseRows(text);
+        const blocks = {};
+        let current = null;
+
+        rows.forEach(cols => {
+            const a = String(cols[0] ?? "").trim();
+            const b = String(cols[1] ?? "").trim();
+            const c = String(cols[2] ?? "").trim();
+            const mode = b.toUpperCase();
+
+            if (a && ["UPPERBOUND", "LOWERBOUND", "STATE"].includes(mode) && c.toUpperCase() === "SCORE") {
+                current = {
+                    name: a.toUpperCase(),
+                    mode: mode === "UPPERBOUND" ? "upper" : mode === "LOWERBOUND" ? "lower" : "state",
+                    rows: []
+                };
+                blocks[current.name] = current;
+                return;
+            }
+
+            if (!current || !a) return;
+            const score = parseNumber(c, null);
+            if (!Number.isFinite(score)) return;
+
+            if (current.mode === "state") {
+                const state = b.toUpperCase();
+                if (state) current.rows.push({ state, score });
+            } else {
+                const threshold = parseNumber(b, null);
+                if (Number.isFinite(threshold)) current.rows.push({ threshold, score });
+            }
+        });
+
+        return blocks;
     }
 
     function headerIndex(headers, ...names) {
@@ -200,6 +249,7 @@ const RiverWatchMarketEngine = (() => {
 
         const dateIdx = idx("Date");
         const eventIdx = idx("EventType");
+        const refuelTypeIdx = idx("RefuelType");
         const principalIdx = idx("PrincipalKRW");
         const marketIdx = idx("MarketValueKRW");
         const targetIdx = idx("TargetValueKRW");
@@ -239,6 +289,9 @@ const RiverWatchMarketEngine = (() => {
             const eventType = eventIdx >= 0
                 ? String(cols[eventIdx] || "").trim().toUpperCase()
                 : (markerIdx >= 0 ? String(cols[markerIdx] || "").trim().toUpperCase() : "");
+            const refuelType = refuelTypeIdx >= 0
+                ? String(cols[refuelTypeIdx] || "").trim().toUpperCase()
+                : "";
             const voyageState = voyageStateIdx >= 0
                 ? String(cols[voyageStateIdx] || "").trim().toUpperCase()
                 : "";
@@ -261,6 +314,7 @@ const RiverWatchMarketEngine = (() => {
             return {
                 date,
                 eventType,
+                refuelType,
                 principalKRW: principal,
                 marketValueKRW: market,
                 targetValueKRW: target,
@@ -307,10 +361,12 @@ const RiverWatchMarketEngine = (() => {
 
     function normalizeTrend(value) {
         const v = String(value || "").trim().toUpperCase();
-        if (["STR_INC", "INC", "INCREASING", "STRONGLY_INCREASING"].includes(v)) return "increasing";
+        if (["STR_INC", "STRONGLY_INCREASING", "STRONG_INCREASING"].includes(v)) return "strongIncreasing";
+        if (["INC", "INCREASING"].includes(v)) return "increasing";
         if (["STABLE", "S"].includes(v)) return "stable";
-        if (["STR_DEC", "DEC", "DECREASING", "STRONGLY_DECREASING"].includes(v)) return "decreasing";
-        return String(value || "").trim().toLowerCase();
+        if (["DEC", "DECREASING"].includes(v)) return "decreasing";
+        if (["STR_DEC", "STRONGLY_DECREASING", "STRONG_DECREASING"].includes(v)) return "strongDecreasing";
+        return String(value || "").trim();
     }
 
     function normalizeFedState(value) {
@@ -405,6 +461,7 @@ const RiverWatchMarketEngine = (() => {
 
         [
             "BrentPrice",
+            "fedRate",
             "nvdaDcRevenueGrowth",
             "cashKRW",
             "openSeaTargetKRW",
@@ -510,6 +567,48 @@ const RiverWatchMarketEngine = (() => {
         return true;
     }
 
+    async function loadRiverCalibration() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.riverCalibrationCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("RIVER_CALIBRATION CSV URL missing. Calibrated River sensors remain unavailable.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        const blocks = parseRiverCalibrationCsv(csvText);
+        const requiredBlocks = ["FED_RATE_LEVEL", "FED_DIRECTION", "VIX_LEVEL", "BRENT_LEVEL", "USD_KRW", "NVDA_DC_REVENUE_GROWTH"];
+        const missing = requiredBlocks.filter(name => !blocks[name] || !Array.isArray(blocks[name].rows) || blocks[name].rows.length === 0);
+        if (missing.length) throw new Error(`RIVER_CALIBRATION missing blocks: ${missing.join(", ")}`);
+
+        riverwatch.riverCalibration = blocks;
+        console.log("RiverWatch RIVER_CALIBRATION AUTO", blocks);
+        return true;
+    }
+
+    async function loadVoyagePlan() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.voyagePlanCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("VOYAGE_PLAN CSV URL missing. Required CAGR remains unavailable.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        const rows = parseRows(csvText);
+        const rawB11 = rows?.[10]?.[1];
+        const requiredCAGR = parsePercentPoints(rawB11, null);
+        if (!Number.isFinite(requiredCAGR) || requiredCAGR <= 0 || requiredCAGR > 100) {
+            throw new Error(`VOYAGE_PLAN!B11 Required CAGR invalid: ${rawB11 ?? "(empty)"}`);
+        }
+
+        riverwatch.manualConfig.requiredCAGR = requiredCAGR;
+        console.log("RiverWatch VOYAGE_PLAN AUTO", { requiredCAGR, source: "VOYAGE_PLAN!B11" });
+        return true;
+    }
+
     async function loadOpenSeaLogbook() {
         const hub = riverwatch.policy.marketDataHub;
         const url = hub?.openSeaLogbookCsvUrl;
@@ -524,7 +623,7 @@ const RiverWatchMarketEngine = (() => {
     }
 
     async function loadCoreData() {
-        const labels = ["MarketData", "PortfolioConfig", "ControlRules", "Portfolio", "ManualConfig"];
+        const labels = ["MarketData", "PortfolioConfig", "ControlRules", "Portfolio", "ManualConfig", "RiverCalibration", "VoyagePlan"];
 
         try {
             const results = await Promise.allSettled([
@@ -532,7 +631,9 @@ const RiverWatchMarketEngine = (() => {
                 loadPortfolioConfig(),
                 loadControlRules(),
                 loadPortfolio(),
-                loadManualConfig()
+                loadManualConfig(),
+                loadRiverCalibration(),
+                loadVoyagePlan()
             ]);
 
             const syncStatus = {};
@@ -553,11 +654,11 @@ const RiverWatchMarketEngine = (() => {
             const okCount = Object.values(syncStatus).filter(Boolean).length;
             riverwatch.auto.syncStatus = syncStatus;
             riverwatch.auto.syncErrors = syncErrors;
-            riverwatch.auto.dataSource = okCount === 5 ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
+            riverwatch.auto.dataSource = okCount === labels.length ? "ONLINE" : (okCount > 0 ? "PARTIAL" : "FALLBACK");
 
-            if (okCount === 5) riverwatch.auto.lastSync = nowString();
+            if (okCount === labels.length) riverwatch.auto.lastSync = nowString();
             console.table(syncStatus);
-            return okCount === 5;
+            return okCount === labels.length;
         } catch (error) {
             riverwatch.auto.dataSource = "FALLBACK";
             riverwatch.auto.syncErrors = { General: String(error?.message || error) };
@@ -586,8 +687,11 @@ const RiverWatchMarketEngine = (() => {
         loadControlRules,
         loadPortfolio,
         loadManualConfig,
+        loadRiverCalibration,
+        loadVoyagePlan,
         loadOpenSeaLogbook,
         parseKeyValueCsv,
+        parseRiverCalibrationCsv,
         parsePortfolioConfigCsv,
         parseControlRulesCsv,
         parsePortfolioCsv,

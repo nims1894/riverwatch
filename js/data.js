@@ -47,22 +47,42 @@ const riverwatch = {
             marketCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0",
             portfolioCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1022059028",
             manualConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=956102677",
+            riverCalibrationCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=39917011",
             portfolioConfigCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=283502072",
             controlRulesCsvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=1223105705",
             openSeaLogbookCsvUrl: "https://docs.google.com/spreadsheets/d/1xmJxkPDPyVWjlMJwbvIEA7gtxrhJyXXE8tYVeqhmlRM/export?format=csv&gid=0", // RiverWatch_Voyage_Log / VOYAGE_LOG
+            voyagePlanCsvUrl: "https://docs.google.com/spreadsheets/d/1xmJxkPDPyVWjlMJwbvIEA7gtxrhJyXXE8tYVeqhmlRM/export?format=csv&gid=345167648", // RiverWatch_Voyage_Log / VOYAGE_PLAN
             csvUrl: "https://docs.google.com/spreadsheets/d/1OQHGJJ4A6oiXYlyNRSfyyC_6lA_s3Het58K_M20j8G8/export?format=csv&gid=0", // legacy
             timeoutMs: 12000
+        },
+
+        // STEP 1C · Captain Order history writer.
+        // Paste the deployed RiverWatch Apps Script Web App URL here after deployment.
+        // Empty URL keeps RiverWatch read-only and stores the last observed order locally.
+        doctrineAudit: {
+            enabled: false,
+            webAppUrl: "",
+            baselineDate: "2026-08-14",
+            sellToleranceKRW: 500000
+        },
+
+        fuelSupply: {
+            baselineDate: "2026-08-14",
+            firstEvaluationMonth: "2026-09"
         },
 
         riverMetricWeights: {
             fedRate: 25,
             vix: 20,
-            oil: 15,
+            m2: 15,
+            oil: 10,
             usdkrw: 10,
-            aiCapex: 15,
-            nvdaDcRevenue: 10,
-            m2: 5
+            aiCapex: 10,
+            nvdaDcRevenue: 10
         },
+
+        riverHealthMinimumValidWeight: 70,
+        manualSensorStaleDays: 120,
 
         riverHealthScoring: {
             // Numeric metric rules are the SSoT for both River Health and Environment.
@@ -100,9 +120,11 @@ const riverwatch = {
                 hiking: { score: 45, growth: -3, defensive: 2, label: "Hiking cycle" }
             },
             aiCapexTrend: {
-                increasing: { score: 95, growth: 3, defensive: -1, label: "Increasing" },
-                stable: { score: 82, growth: 1, defensive: 0, label: "Stable" },
-                decreasing: { score: 50, growth: -3, defensive: 2, label: "Decreasing" }
+                strongIncreasing: { score: 100, growth: 3, defensive: -1, label: "Strong increasing" },
+                increasing: { score: 90, growth: 2, defensive: -1, label: "Increasing" },
+                stable: { score: 80, growth: 0, defensive: 0, label: "Stable" },
+                decreasing: { score: 60, growth: -2, defensive: 1, label: "Decreasing" },
+                strongDecreasing: { score: 40, growth: -3, defensive: 2, label: "Strong decreasing" }
             },
             nvdaDcRevenueGrowth: [
                 { min: 40, score: 95, growth: 3, defensive: -1, label: "Very strong" },
@@ -111,17 +133,19 @@ const riverwatch = {
                 { min: -Infinity, score: 45, growth: -2, defensive: 1, label: "Weak" }
             ],
             m2Trend: {
-                increasing: { score: 95, growth: 2, defensive: -1, label: "Increasing" },
+                strongIncreasing: { score: 100, growth: 3, defensive: -1, label: "Strong increasing" },
+                increasing: { score: 90, growth: 2, defensive: -1, label: "Increasing" },
                 stable: { score: 80, growth: 0, defensive: 0, label: "Stable" },
-                decreasing: { score: 60, growth: -2, defensive: 1, label: "Decreasing" }
+                decreasing: { score: 60, growth: -2, defensive: 1, label: "Decreasing" },
+                strongDecreasing: { score: 40, growth: -3, defensive: 2, label: "Strong decreasing" }
             }
         },
 
         boatHealthWeights: {
-            allocationAlignment: 35,
-            riverSuitability: 35,
-            structuralIntegrity: 20,
-            captainDiscipline: 10
+            trimBalance: 30,
+            riverFit: 20,
+            enginePower: 30,
+            fuelSupply: 20
         },
 
         structuralIntegrityWeights: {
@@ -246,6 +270,7 @@ const riverwatch = {
         openSeaTargetKRW: 1600000000,
         targetDate: "2040.12.31",
         expectedCAGR: 11.0,
+        requiredCAGR: null, // VOYAGE_PLAN!B11 SSOT; no silent fallback
         monthlyContributionKRW: 1200000,
         boatAdjustment: 0.0,
         voyagePhaseMode: "AUTO"
@@ -313,7 +338,7 @@ const riverwatch = {
         recommendedAction: "NO ACTION",
         daysSinceAction: 36,
         lastRebalance: "2026.05.17",
-        doctrineCompliance: 100,
+        doctrineCompliance: null,
 
         voyageHealth: 96,
         riverHealth: 88,

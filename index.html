@@ -118,19 +118,13 @@
             <section class="card mission-card page-hero mission-hero">
                 <div class="label">Mission</div>
                 <div class="mission-text koru-accent-title" id="mission">Stay the Course</div>
-                <p class="page-subtitle mission-subtitle">Monitor the current mission status and maintain discipline throughout the voyage.</p>
-
                 <div class="mission-kpis">
                     <div>
                         <span>Status</span>
                         <b id="status">--</b>
                     </div>
                     <div>
-                        <span>Days Since Action <small id="lastActionDateMeta">(--)</small></span>
-                        <b id="daysSinceAction">--</b>
-                    </div>
-                    <div>
-                        <span>Doctrine Compliance</span>
+                        <span>Doctrine Compliance <small id="doctrineComplianceDateMeta">(-)</small></span>
                         <b id="doctrineCompliance">--</b>
                     </div>
                 </div>
@@ -167,14 +161,12 @@
                         <div class="status-sub" id="voyageStatus">--</div>
 
                         <div class="voyage-flow">
-                            <div class="voyage-step"><span>Current Position</span><b id="currentPosition">-</b></div>
-                            <div class="voyage-step"><span>Remaining</span><b id="remainingTime">-</b></div>
-                            <div class="voyage-step"><span>Effective CAGR</span><b id="effectiveCAGR">-</b></div>
-                            <div class="voyage-step"><span>Adjusted Arrival</span><b id="adjustedArrival">-</b></div>
-                            <div class="voyage-step"><span>Open Sea Target</span><b id="openSeaTarget">-</b></div>
-                            <div class="voyage-step subtle-step"><span>Target Margin</span><b id="voyageGap">-</b></div>
-                            <div class="voyage-step"><span>Recovery Mode</span><b id="recoveryMode">-</b></div>
-                            <div class="voyage-step subtle-step"><span>ETA Extension</span><b id="etaExtension">-</b></div>
+                            <div class="voyage-step"><span id="currentValueLabel">Current Value</span><b id="currentPosition">-</b></div>
+                            <div class="voyage-step"><span>Expected Value</span><b id="adjustedArrival">-</b></div>
+                            <div class="voyage-step"><span>Target Value</span><b id="openSeaTarget">-</b></div>
+                            <div class="voyage-step subtle-step"><span>Target Gap</span><b id="voyageGap">-</b></div>
+                            <div class="voyage-step"><span>Time to Target</span><b id="remainingTime">-</b></div>
+                            <div class="voyage-step subtle-step"><span id="etaLabel">ETA</span><b id="etaExtension">-</b></div>
                         </div>
                     </section>
 
@@ -190,10 +182,10 @@
                         <div class="health-value"><span id="boatHealth">--</span></div>
                         <div class="status-sub" id="boatStatus">--</div>
                         <div class="metric-list boat-health-list">
-                            <div><span>Trim Alignment</span><b id="allocationAlignment">-</b></div>
-                            <div><span>River Suitability</span><b id="riverSuitability">-</b></div>
-                            <div><span>Role Coverage</span><b id="structuralIntegrity">-</b></div>
-                            <div><span>Captain Discipline</span><b id="captainDiscipline">-</b></div>
+                            <div><span>Engine Power</span><b id="enginePower">-</b></div>
+                            <div><span>Fuel Supply</span><b id="fuelSupply">-</b></div>
+                            <div><span>Trim Balance</span><b id="allocationAlignment">-</b></div>
+                            <div><span>River Fit</span><b id="riverSuitability">-</b></div>
                         </div>
                     </section>
                 </div>

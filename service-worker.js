@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-cab081";
+const CACHE_NAME = "riverwatch-v1.1-pwa-cab084-health-ui-final";
 const APP_SHELL = [
   "./",
   "./index.html",

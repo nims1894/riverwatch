@@ -169,36 +169,54 @@ function runCalculationEngines() {
 }
 
 function calculateRiverHealth() {
-    const policy = riverwatch.policy;
-    const scoring = policy.riverHealthScoring || {};
+    const policy = riverwatch.policy || {};
     const weights = policy.riverMetricWeights || {};
+    const scoring = policy.riverHealthScoring || {};
     const config = riverwatch.manualConfig || {};
+    const calibration = riverwatch.riverCalibration || {};
 
     const brentPrice = toFiniteNumber(config.BrentPrice ?? config.brentPrice ?? riverwatch.auto.BrentPrice);
+    const fedRate = toFiniteNumber(config.fedRate);
     const nvdaGrowth = toFiniteNumber(config.nvdaDcRevenueGrowth);
 
+    const fedLevelScore = scoreCalibrationUpper(calibration.FED_RATE_LEVEL, fedRate);
+    const fedDirectionScore = scoreCalibrationState(calibration.FED_DIRECTION, fedCalibrationState(config.fedRateState));
+    const fedScore = Number.isFinite(fedLevelScore) && Number.isFinite(fedDirectionScore)
+        ? (fedLevelScore * 0.60) + (fedDirectionScore * 0.40)
+        : null;
+
+    const aiFresh = isManualSensorFresh(config.aiCapexUpdated, policy.manualSensorStaleDays ?? 120);
+    const nvdaFresh = isManualSensorFresh(config.nvdaDcRevenueUpdated, policy.manualSensorStaleDays ?? 120);
+
     const metricScores = {
-        fedRate: scoreFromState(scoring.fedRateState, config.fedRateState),
-        vix: scoreFromThresholdInterpolated(scoring.vix, toFiniteNumber(riverwatch.auto.vix)),
-        oil: scoreFromThresholdInterpolated(scoring.oilPressure, brentPrice),
-        usdkrw: scoreFromThresholdInterpolated(scoring.usdkrw, toFiniteNumber(riverwatch.auto.usdkrw)),
-        aiCapex: scoreFromState(scoring.aiCapexTrend, config.aiCapexTrend),
-        nvdaDcRevenue: scoreFromMinThresholdInterpolated(scoring.nvdaDcRevenueGrowth, nvdaGrowth),
+        fedRate: fedScore,
+        vix: scoreCalibrationUpper(calibration.VIX_LEVEL, toFiniteNumber(riverwatch.auto.vix)),
+        oil: scoreCalibrationUpper(calibration.BRENT_LEVEL, brentPrice),
+        usdkrw: scoreCalibrationUpper(calibration.USD_KRW, toFiniteNumber(riverwatch.auto.usdkrw)),
+        aiCapex: aiFresh ? scoreFromState(scoring.aiCapexTrend, config.aiCapexTrend) : null,
+        nvdaDcRevenue: nvdaFresh ? scoreCalibrationLower(calibration.NVDA_DC_REVENUE_GROWTH, nvdaGrowth) : null,
         m2: scoreFromState(scoring.m2Trend, config.m2Trend)
     };
 
+    const validWeight = validScoreWeight(metricScores, weights);
+    const minimumValidWeight = Number(policy.riverHealthMinimumValidWeight ?? 70);
+    const riverHealthRaw = validWeight >= minimumValidWeight ? weightedAverage(metricScores, weights) : null;
+
     riverwatch.calc.riverMetricScores = metricScores;
+    riverwatch.calc.riverMetricFreshness = { aiCapex: aiFresh, nvdaDcRevenue: nvdaFresh };
+    riverwatch.calc.riverHealthValidWeight = validWeight;
+    riverwatch.calc.fedRateLevelScore = fedLevelScore;
+    riverwatch.calc.fedRateDirectionScore = fedDirectionScore;
     riverwatch.calc.brentPrice = brentPrice;
-    const riverHealthRaw = weightedAverage(metricScores, weights);
     riverwatch.calc.riverHealth = Number.isFinite(riverHealthRaw) ? Math.round(riverHealthRaw) : null;
 
+    // Legacy interpretation-only outputs remain separate from River Health scoring.
     const favorability = calculateRiverFavorability(brentPrice);
     riverwatch.calc.growthFavorability = favorability.growth;
     riverwatch.calc.defensiveFavorability = favorability.defensive;
 
     riverwatch.calc.actionReason = buildActionReason();
 }
-
 
 
 function getEnabledPortfolioConfig() {
@@ -327,25 +345,36 @@ function getMarketPriceUSD(ticker, fallback = 0) {
 function calculateBoatHealth() {
     const holdings = riverwatch.calc.allocationHoldings || [];
 
-    const alignment = calculateAllocationAlignment(holdings);
+    const trimBalance = calculateAllocationAlignment(holdings);
     const exposure = calculateBoatExposure(holdings);
-    const suitability = calculateRiverSuitability(exposure.growth);
-    const integrity = calculateStructuralIntegrity(holdings);
-    const discipline = calculateCaptainDiscipline();
+    const riverFit = calculateRiverSuitability();
+    const expectedCAGR = toFiniteNumber((riverwatch.manualConfig || {}).expectedCAGR);
+    const requiredCAGR = toFiniteNumber((riverwatch.manualConfig || {}).requiredCAGR);
+    const enginePowerRatio = Number.isFinite(expectedCAGR) && expectedCAGR >= 0
+        && Number.isFinite(requiredCAGR) && requiredCAGR > 0
+        ? (expectedCAGR / requiredCAGR) * 100
+        : null;
+    const enginePowerScore = scoreEnginePower(enginePowerRatio);
+    riverwatch.calc.requiredCAGR = Number.isFinite(requiredCAGR) && requiredCAGR > 0 ? requiredCAGR : null;
+    riverwatch.calc.enginePower = enginePowerRatio;
+    const fuelSupply = calculateFuelSupply();
 
-    riverwatch.calc.allocationAlignment = alignment;
-    riverwatch.calc.riverSuitability = suitability;
-    riverwatch.calc.structuralIntegrity = integrity;
-    riverwatch.calc.captainDiscipline = discipline;
+    // New Boat Health SSOT names. Legacy aliases are retained only so older UI/helpers do not break.
+    riverwatch.calc.trimBalance = trimBalance;
+    riverwatch.calc.riverFit = riverFit;
+    riverwatch.calc.enginePowerScore = enginePowerScore;
+    riverwatch.calc.fuelSupply = fuelSupply;
+    riverwatch.calc.allocationAlignment = trimBalance;
+    riverwatch.calc.riverSuitability = riverFit;
     riverwatch.calc.growthExposure = exposure.growth;
     riverwatch.calc.defensiveExposure = exposure.defensive;
     riverwatch.calc.boatArchetype = getBoatArchetype(exposure.growth);
 
     riverwatch.calc.boatHealth = Math.round(weightedAverage({
-        allocationAlignment: alignment,
-        riverSuitability: suitability,
-        structuralIntegrity: integrity,
-        captainDiscipline: discipline
+        trimBalance,
+        riverFit,
+        enginePower: enginePowerScore,
+        fuelSupply
     }, riverwatch.policy.boatHealthWeights || {}));
 }
 
@@ -363,8 +392,8 @@ function calculateAllocationAlignment(holdings) {
         }
 
         if (controlType === "TARGET" || controlType === "BAND") {
-            const gap = Math.abs(currentValue - limit);
-            return Math.round(Math.max(0, Math.min(100, 100 - gap * 10)));
+            const correctedGap = Math.abs(Math.trunc(currentValue - limit));
+            return Math.round(Math.max(0, Math.min(100, 100 - correctedGap * 10)));
         }
 
         // Default MIN: core groups should be maintained at or above target weight.
@@ -391,20 +420,15 @@ function calculateBoatExposure(holdings) {
     };
 }
 
-function calculateRiverSuitability(growthExposure) {
-    const growthEnv = Number(riverwatch.calc.growthFavorability ?? 50);
-    const defensiveEnv = Number(riverwatch.calc.defensiveFavorability ?? 50);
+function calculateRiverSuitability() {
+    const river = toFiniteNumber(riverwatch.calc.riverHealth);
+    if (!Number.isFinite(river)) return null;
 
-    // River bias를 성장자산 적정 중심값으로 변환.
-    // 50%를 기준으로 Growth Environment와 Defensive Environment의 차이가 클수록 적정 성장 노출이 이동한다.
-    const idealGrowth = Math.max(35, Math.min(65, 50 + (growthEnv - defensiveEnv) / 4));
-    const diff = Math.abs(growthExposure - idealGrowth);
-
-    if (diff <= 5) return 100;
-    if (diff <= 10) return 90;
-    if (diff <= 15) return 80;
-    if (diff <= 20) return 65;
-    return 50;
+    // Koru design-range fit, not tactical market-timing fit.
+    // TAILWIND / CALM / HEADWIND are within the normal design range.
+    if (river >= 70) return 100;
+    if (river >= 55) return 90;   // ROUGH: reduced design margin.
+    return 60;                    // STORM: outside normal design range.
 }
 
 function calculateStructuralIntegrity(holdings) {
@@ -461,7 +485,81 @@ function scoreSpeculation(bitq) {
     return 60;
 }
 
+function getLogbookDateKey(dateText) {
+    const text = String(dateText || "").trim().replace(/\./g, "-").replace(/\//g, "-");
+    const match = text.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (!match) return null;
+    return `${match[1]}-${String(match[2]).padStart(2, "0")}-${String(match[3]).padStart(2, "0")}`;
+}
+
+function calculateFuelSupplySnapshot(referenceDate = new Date()) {
+    const rows = normalizeLogbookRows(riverwatch.logbook || riverwatch.openSeaLogbook || [])
+        .map((row, index) => ({ ...row, _index: index, _dateKey: getLogbookDateKey(row.date) }))
+        .filter(row => row._dateKey && Number.isFinite(Number(row.principalKRW)))
+        .sort((a, b) => a._dateKey.localeCompare(b._dateKey) || a._index - b._index);
+
+    const cfg = (riverwatch.policy || {}).fuelSupply || {};
+    const baselineDate = String(cfg.baselineDate || '2026-08-14');
+    const firstEvaluationMonth = String(cfg.firstEvaluationMonth || '2026-09');
+
+    // Fuel Supply is a closed-month metric: evaluate the previous calendar month only.
+    const ref = new Date(referenceDate.getFullYear(), referenceDate.getMonth() - 1, 1);
+    const monthKey = `${ref.getFullYear()}-${String(ref.getMonth() + 1).padStart(2, '0')}`;
+    const planned = Math.max(0, Number((riverwatch.manualConfig || {}).monthlyContributionKRW ?? 0));
+
+    if (monthKey < firstEvaluationMonth) {
+        return {
+            month: monthKey,
+            baselineDate,
+            status: 'PENDING',
+            plannedRefuelKRW: planned,
+            regularRefuelKRW: 0,
+            extraRefuelKRW: 0,
+            complianceRatio: null,
+            score: null
+        };
+    }
+
+    let regularRefuelKRW = 0;
+    let extraRefuelKRW = 0;
+    let previousPrincipal = null;
+
+    rows.forEach(row => {
+        const principal = Number(row.principalKRW);
+        const delta = previousPrincipal === null ? 0 : principal - previousPrincipal;
+        const refuelType = String(row.refuelType || '').trim().toUpperCase();
+
+        if (row._dateKey >= baselineDate && row._dateKey.startsWith(monthKey) && delta > 0) {
+            if (refuelType === 'REFUEL') regularRefuelKRW += delta;
+            if (refuelType === 'EXTRA_REFUEL') extraRefuelKRW += delta;
+        }
+        previousPrincipal = principal;
+    });
+
+    const complianceRatio = planned > 0 ? regularRefuelKRW / planned : null;
+    const score = scoreFuelSupply(complianceRatio);
+
+    return {
+        month: monthKey,
+        baselineDate,
+        status: Number.isFinite(score) ? 'FINAL' : 'PENDING',
+        plannedRefuelKRW: planned,
+        regularRefuelKRW,
+        extraRefuelKRW,
+        complianceRatio,
+        score
+    };
+}
+
+function calculateFuelSupply() {
+    const fuel = calculateFuelSupplySnapshot();
+    riverwatch.calc.fuelSupply = fuel.score;
+    riverwatch.calc.fuelSupplyDetail = fuel;
+    return fuel.score;
+}
+
 function calculateCaptainDiscipline() {
+    // Legacy metric retained until STEP 2 Boat Health rewiring.
     return Number((riverwatch.manualConfig || {}).monthlyContributionKRW ?? 0) > 0 ? 100 : 60;
 }
 
@@ -471,6 +569,102 @@ function getBoatArchetype(growthExposure) {
     if (growthExposure >= (thresholds.balancedGrowth ?? 45)) return "Balanced Growth Boat";
     if (growthExposure >= (thresholds.coreIndex ?? 35)) return "Core Index Boat";
     return "Defensive Boat";
+}
+
+function scoreEnginePower(ratio) {
+    if (!Number.isFinite(Number(ratio))) return null;
+    const value = Number(ratio);
+    if (value >= 100) return 100;
+    if (value >= 95) return 95;
+    if (value >= 90) return 85;
+    if (value >= 80) return 70;
+    return 50;
+}
+
+function scoreFuelSupply(complianceRatio) {
+    if (!Number.isFinite(Number(complianceRatio))) return null;
+    const value = Number(complianceRatio);
+    if (value >= 0.98) return 100;
+    if (value >= 0.95) return 95;
+    if (value >= 0.90) return 85;
+    if (value >= 0.80) return 70;
+    return 50;
+}
+
+function scoreCalibrationUpper(block, value) {
+    if (!block || block.mode !== 'upper' || !Array.isArray(block.rows) || !Number.isFinite(value)) return null;
+    const rows = block.rows
+        .filter(row => Number.isFinite(row.threshold) && Number.isFinite(row.score))
+        .sort((a, b) => a.threshold - b.threshold);
+    const matched = rows.find(row => value <= row.threshold);
+    return matched ? matched.score : (rows.length ? rows[rows.length - 1].score : null);
+}
+
+function scoreCalibrationLower(block, value) {
+    if (!block || block.mode !== 'lower' || !Array.isArray(block.rows) || !Number.isFinite(value)) return null;
+    const rows = block.rows
+        .filter(row => Number.isFinite(row.threshold) && Number.isFinite(row.score))
+        .sort((a, b) => b.threshold - a.threshold);
+    const matched = rows.find(row => value >= row.threshold);
+    return matched ? matched.score : (rows.length ? rows[rows.length - 1].score : null);
+}
+
+function scoreCalibrationState(block, state) {
+    if (!block || block.mode !== 'state' || !Array.isArray(block.rows) || !state) return null;
+    const key = String(state).trim().toUpperCase();
+    const matched = block.rows.find(row => String(row.state || '').trim().toUpperCase() === key);
+    return matched && Number.isFinite(matched.score) ? matched.score : null;
+}
+
+function fedCalibrationState(state) {
+    const key = String(state || '').trim();
+    const map = {
+        cutting: 'CUT',
+        cutExpected: 'CUT_EXPECTED',
+        pause: 'PAUSE',
+        hikingEnded: 'HIKE_ENDED',
+        hiking: 'HIKE'
+    };
+    return map[key] || key.toUpperCase();
+}
+
+function parseConfigDate(value) {
+    if (value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    const raw = String(value ?? '').trim();
+    if (!raw) return null;
+    const normalized = raw.replace(/[.\/]/g, '-').replace(/\s+/g, '');
+    const match = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+    if (!match) return null;
+    const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function isManualSensorFresh(updatedValue, maxAgeDays = 120, referenceDate = new Date()) {
+    const updated = parseConfigDate(updatedValue);
+    if (!updated) return false;
+    const today = new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate());
+    const stamp = new Date(updated.getFullYear(), updated.getMonth(), updated.getDate());
+    const ageDays = Math.floor((today - stamp) / 86400000);
+    return ageDays >= 0 && ageDays <= Number(maxAgeDays);
+}
+
+function validScoreWeight(scores, weights) {
+    return Object.keys(scores || {}).reduce((sum, key) => {
+        const score = scores[key];
+        const weight = Number((weights || {})[key] ?? 0);
+        return sum + (Number.isFinite(score) && weight > 0 ? weight : 0);
+    }, 0);
+}
+
+function formatTrendState(state) {
+    const labels = {
+        strongIncreasing: 'STRONG INCREASING',
+        increasing: 'INCREASING',
+        stable: 'STABLE',
+        decreasing: 'DECREASING',
+        strongDecreasing: 'STRONG DECREASING'
+    };
+    return labels[String(state || '').trim()] || String(state || '-').toUpperCase();
 }
 
 function toFiniteNumber(value) {
@@ -689,6 +883,116 @@ function buildCaptainNote() {
     return [riverLine, boatLine, voyageLine, actionLine].join(" ");
 }
 
+function daysBetween(start, end) {
+    const a = startOfDay(start);
+    const b = startOfDay(end);
+    if (!a || !b) return null;
+    return Math.max(0, Math.round((b - a) / 86400000));
+}
+
+function addCalendarDays(date, days) {
+    const out = startOfDay(date);
+    if (!out) return null;
+    out.setDate(out.getDate() + Math.max(0, Math.round(days)));
+    return out;
+}
+
+function formatCalendarDuration(startDate, endDate) {
+    const start = startOfDay(startDate);
+    const end = startOfDay(endDate);
+    if (!start || !end || end < start) return '-';
+
+    let cursor = new Date(start);
+    let years = 0;
+    let months = 0;
+
+    while (true) {
+        const next = new Date(cursor);
+        next.setFullYear(next.getFullYear() + 1);
+        if (next <= end) {
+            cursor = next;
+            years += 1;
+        } else break;
+    }
+
+    while (true) {
+        const next = new Date(cursor);
+        next.setMonth(next.getMonth() + 1);
+        if (next <= end) {
+            cursor = next;
+            months += 1;
+        } else break;
+    }
+
+    const days = Math.max(0, Math.round((end - cursor) / 86400000));
+    return `${years}y ${months}m ${days}d`;
+}
+
+function formatSignedCalendarDifference(baseDate, comparisonDate) {
+    const base = startOfDay(baseDate);
+    const compare = startOfDay(comparisonDate);
+    if (!base || !compare) return '-';
+    if (base.getTime() === compare.getTime()) return '±0d';
+
+    const positive = compare > base;
+    const earlier = positive ? base : compare;
+    const later = positive ? compare : base;
+    const parts = [];
+
+    let cursor = new Date(earlier);
+    let years = 0;
+    let months = 0;
+    while (true) {
+        const next = new Date(cursor);
+        next.setFullYear(next.getFullYear() + 1);
+        if (next <= later) { cursor = next; years += 1; } else break;
+    }
+    while (true) {
+        const next = new Date(cursor);
+        next.setMonth(next.getMonth() + 1);
+        if (next <= later) { cursor = next; months += 1; } else break;
+    }
+    const days = Math.max(0, Math.round((later - cursor) / 86400000));
+
+    if (years) parts.push(`${years}y`);
+    if (months) parts.push(`${months}m`);
+    if (days || parts.length === 0) parts.push(`${days}d`);
+    return `${positive ? '+' : '-'}${parts.join(' ')}`;
+}
+
+function estimateDaysToTarget(currentAssets, monthlyContribution, annualRate, target) {
+    if (![currentAssets, monthlyContribution, annualRate, target].every(Number.isFinite) || target <= 0) return null;
+    if (currentAssets >= target) return 0;
+    if (monthlyContribution <= 0 && annualRate <= 0) return null;
+
+    const maxDays = Math.round(50 * 365.2425);
+    if (projectFutureValue(currentAssets, monthlyContribution, annualRate, 50) < target) return null;
+
+    let low = 0;
+    let high = maxDays;
+    while (low < high) {
+        const mid = Math.floor((low + high) / 2);
+        const value = projectFutureValue(currentAssets, monthlyContribution, annualRate, mid / 365.2425);
+        if (value >= target) high = mid;
+        else low = mid + 1;
+    }
+    return low;
+}
+
+function scoreTargetGapRatio(ratio) {
+    if (!Number.isFinite(ratio)) return null;
+    if (ratio >= 0) return 100;
+    return Math.round(Math.max(0, Math.min(100, 100 + ratio * 100)));
+}
+
+function scoreEtaDeviation(deviationDays, remainingDays) {
+    if (!Number.isFinite(deviationDays) || !Number.isFinite(remainingDays)) return null;
+    if (deviationDays <= 0) return 100;
+    if (remainingDays <= 0) return 0;
+    const ratio = deviationDays / remainingDays;
+    return Math.round(Math.max(0, Math.min(100, 100 - ratio * 100)));
+}
+
 function calculateVoyageHealth() {
     const config = riverwatch.manualConfig || {};
     const target = toFiniteNumber(config.openSeaTargetKRW);
@@ -696,6 +1000,7 @@ function calculateVoyageHealth() {
     const monthlyContribution = toFiniteNumber(config.monthlyContributionKRW);
     const baseCAGRInput = toFiniteNumber(config.expectedCAGR);
     const targetDate = parseDate(config.targetDate);
+    const today = startOfDay(new Date());
 
     const validCAGR = Number.isFinite(baseCAGRInput) && baseCAGRInput >= 0 && baseCAGRInput <= 30;
     const validInputs = Number.isFinite(target) && target > 0
@@ -713,39 +1018,56 @@ function calculateVoyageHealth() {
         riverwatch.calc.boatAdjustment = 0;
         riverwatch.calc.effectiveCAGR = validCAGR ? baseCAGRInput / 100 : null;
         riverwatch.calc.remainingYears = targetDate ? calculateRemainingYears(config.targetDate) : null;
-        riverwatch.calc.remainingTime = targetDate ? formatRemainingTime(riverwatch.calc.remainingYears) : "-";
-        riverwatch.calc.eta = config.targetDate;
+        riverwatch.calc.remainingTime = targetDate ? formatCalendarDuration(today, targetDate) : '-';
+        riverwatch.calc.etaDuration = '-';
+        riverwatch.calc.etaDeviationLabel = '-';
         riverwatch.calc.voyageHealth = null;
         riverwatch.calc.voyageDataValid = false;
         return;
     }
 
-    // Sheet contract: expectedCAGR is entered as percent (10.441 = 10.441%).
     const baseCAGR = baseCAGRInput / 100;
     const remainingYears = calculateRemainingYears(config.targetDate);
+    const remainingDays = daysBetween(today, targetDate);
+    const adjustedArrival = projectFutureValue(currentAssets, monthlyContribution, baseCAGR, remainingYears);
+    const targetGapKRW = adjustedArrival - target;
+    const targetGapRatio = targetGapKRW / target;
 
-    // Google Sheet ManualConfig.expectedCAGR is the single source of truth.
-    const riverAdjustment = 0;
-    const boatAdjustment = 0;
-    const effectiveCAGR = baseCAGR;
+    const etaDays = estimateDaysToTarget(currentAssets, monthlyContribution, baseCAGR, target);
+    const etaDate = Number.isFinite(etaDays) ? addCalendarDays(today, etaDays) : null;
+    const etaDeviationDays = Number.isFinite(etaDays) && Number.isFinite(remainingDays)
+        ? etaDays - remainingDays
+        : null;
 
-    const baseArrival = projectFutureValue(currentAssets, monthlyContribution, baseCAGR, remainingYears);
-    const adjustedArrival = projectFutureValue(currentAssets, monthlyContribution, effectiveCAGR, remainingYears);
-    const drift = ((adjustedArrival / target) - 1) * 100;
-    const health = scoreVoyageDrift(drift);
+    const targetGapScore = scoreTargetGapRatio(targetGapRatio);
+    const etaScore = scoreEtaDeviation(etaDeviationDays, remainingDays);
+    const health = Math.round(weightedAverage(
+        { targetGap: targetGapScore, eta: etaScore },
+        { targetGap: 60, eta: 40 }
+    ));
 
     riverwatch.calc.currentPosition = currentAssets;
     riverwatch.calc.openSeaTarget = target;
-    riverwatch.calc.baseArrival = baseArrival;
+    riverwatch.calc.baseArrival = adjustedArrival;
     riverwatch.calc.adjustedArrival = adjustedArrival;
-    riverwatch.calc.voyageDrift = drift;
+    riverwatch.calc.voyageDrift = targetGapRatio * 100;
+    riverwatch.calc.targetGapKRW = targetGapKRW;
+    riverwatch.calc.targetGapRatio = targetGapRatio;
+    riverwatch.calc.targetGapScore = targetGapScore;
     riverwatch.calc.baseCAGR = baseCAGR;
-    riverwatch.calc.riverAdjustment = riverAdjustment;
-    riverwatch.calc.boatAdjustment = boatAdjustment;
-    riverwatch.calc.effectiveCAGR = effectiveCAGR;
+    riverwatch.calc.riverAdjustment = 0;
+    riverwatch.calc.boatAdjustment = 0;
+    riverwatch.calc.effectiveCAGR = baseCAGR;
     riverwatch.calc.remainingYears = remainingYears;
-    riverwatch.calc.remainingTime = formatRemainingTime(remainingYears);
-    riverwatch.calc.eta = config.targetDate;
+    riverwatch.calc.remainingDays = remainingDays;
+    riverwatch.calc.remainingTime = formatCalendarDuration(today, targetDate);
+    riverwatch.calc.etaDays = etaDays;
+    riverwatch.calc.etaDate = etaDate;
+    riverwatch.calc.etaDeviationDays = etaDeviationDays;
+    riverwatch.calc.etaDeviationLabel = etaDate ? formatSignedCalendarDifference(targetDate, etaDate) : '-';
+    riverwatch.calc.etaDuration = etaDate ? formatCalendarDuration(today, etaDate) : 'Not estimable';
+    riverwatch.calc.etaScore = etaScore;
+    riverwatch.calc.eta = etaDate;
     riverwatch.calc.voyageHealth = health;
     riverwatch.calc.voyageDataValid = true;
 }
@@ -754,7 +1076,13 @@ function calculateVoyagePhase() {
     riverwatch.calc.voyagePhase = phase;
     riverwatch.calc.extraTimeRequired = calculateExtraTimeRequired();
     riverwatch.calc.requiredMonthlyContribution = calculateRequiredMonthlyContribution();
-    riverwatch.calc.requiredCAGR = calculateRequiredCAGR();
+    const requiredCAGR = toFiniteNumber((riverwatch.manualConfig || {}).requiredCAGR);
+    const expectedCAGR = toFiniteNumber((riverwatch.manualConfig || {}).expectedCAGR);
+    riverwatch.calc.requiredCAGR = Number.isFinite(requiredCAGR) && requiredCAGR > 0 ? requiredCAGR : null;
+    riverwatch.calc.enginePower = Number.isFinite(expectedCAGR) && expectedCAGR >= 0
+        && Number.isFinite(requiredCAGR) && requiredCAGR > 0
+        ? (expectedCAGR / requiredCAGR) * 100
+        : null;
 }
 
 function getVoyagePhase() {
@@ -873,6 +1201,7 @@ function calculateRequiredMonthlyContribution() {
     return gap / annuityFactor;
 }
 
+// Legacy internal solver retained for reference; ENGINE POWER uses VOYAGE_PLAN!B11.
 function calculateRequiredCAGR() {
     const config = riverwatch.manualConfig || {};
     const target = Number(config.openSeaTargetKRW ?? riverwatch.calc.openSeaTarget ?? 0);
@@ -1030,6 +1359,79 @@ function updateDecisionEngine() {
     riverwatch.calc.status = status;
     riverwatch.calc.recommendedAction = action;
     riverwatch.calc.actionReason = buildDecisionReason(river, boat, voyage, status, action);
+
+    // STEP 1C: record only Captain Order transitions.
+    // Fire-and-forget by design: audit persistence must never block dashboard rendering.
+    recordCaptainOrderTransition(action);
+}
+
+function getCaptainOrderStorageKey() {
+    return "riverwatch.captainOrder.lastKnown.v1";
+}
+
+function getStoredCaptainOrder() {
+    try {
+        const raw = localStorage.getItem(getCaptainOrderStorageKey());
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && parsed.order ? parsed : null;
+    } catch (_) {
+        return null;
+    }
+}
+
+function storeCaptainOrder(order, observedAt = new Date().toISOString()) {
+    try {
+        localStorage.setItem(getCaptainOrderStorageKey(), JSON.stringify({ order, observedAt }));
+    } catch (_) {
+        // Local persistence failure must not affect navigation.
+    }
+}
+
+function recordCaptainOrderTransition(order) {
+    const currentOrder = String(order || "").trim().toUpperCase();
+    if (!currentOrder) return;
+
+    const previous = getStoredCaptainOrder();
+    if (!previous) {
+        // First observation is the local Last Known Order baseline, not a transition.
+        storeCaptainOrder(currentOrder);
+        riverwatch.calc.captainOrderHistoryState = "BASELINED";
+        return;
+    }
+
+    if (String(previous.order || "").trim().toUpperCase() === currentOrder) {
+        riverwatch.calc.captainOrderHistoryState = "UNCHANGED";
+        return;
+    }
+
+    const observedAt = new Date().toISOString();
+    storeCaptainOrder(currentOrder, observedAt);
+    riverwatch.calc.captainOrderHistoryState = "CHANGED";
+
+    const cfg = (riverwatch.policy || {}).doctrineAudit || {};
+    if (cfg.enabled !== true || !cfg.webAppUrl) return;
+
+    const payload = {
+        type: "CAPTAIN_ORDER_CHANGE",
+        observedAt,
+        previousOrder: previous.order,
+        currentOrder,
+        status: riverwatch.calc.status || "",
+        riverHealth: Number.isFinite(Number(riverwatch.calc.riverHealth)) ? Number(riverwatch.calc.riverHealth) : null,
+        boatHealth: Number.isFinite(Number(riverwatch.calc.boatHealth)) ? Number(riverwatch.calc.boatHealth) : null,
+        voyageHealth: Number.isFinite(Number(riverwatch.calc.voyageHealth)) ? Number(riverwatch.calc.voyageHealth) : null
+    };
+
+    fetch(cfg.webAppUrl, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+        keepalive: true
+    }).catch(error => {
+        console.warn("Captain Order history write failed; dashboard operation continues.", error);
+    });
 }
 
 function buildDecisionReason(river, boat, voyage, status, action) {
@@ -1224,26 +1626,28 @@ function formatSyncDetail() {
     }).join(" · ");
 }
 
-function getDoctrineCompliance(boatHealth) {
-    const score = Number(boatHealth);
-    if (!Number.isFinite(score)) return { label: "--", className: "unknown" };
-    if (score >= 85) return { label: "ALIGNED", className: "aligned" };
-    if (score >= 70) return { label: "DRIFTING", className: "drifting" };
-    return { label: "BREACHED", className: "breached" };
+function getDoctrineCompliance() {
+    const value = String(riverwatch.calc.doctrineCompliance || '').trim().toUpperCase();
+    if (value === 'ALIGNED') return { label: 'ALIGNED', className: 'aligned' };
+    if (value === 'VIOLATION') return { label: 'VIOLATION', className: 'breached' };
+    // STEP 1C deliberately does not infer compliance from Boat Health.
+    // Until the monthly audit source is connected, show an explicit pending state.
+    return { label: 'PENDING', className: 'unknown' };
 }
 
 function renderMission() {
     setText("mission", riverwatch.const.mission);
     setText("status", riverwatch.calc.status);
 
-    const lastActionDate = (riverwatch.manualConfig || {}).lastActionDate || riverwatch.calc.lastRebalance || "--";
-    const days = riverwatch.calc.daysSinceAction ?? "--";
-    setText("daysSinceAction", `${days} Days`);
-    setText("lastActionDateMeta", `(${formatDisplayDate(lastActionDate) || lastActionDate})`);
-
-    const doctrine = getDoctrineCompliance(riverwatch.calc.boatHealth);
+    const doctrine = getDoctrineCompliance();
     riverwatch.calc.doctrineCompliance = doctrine.label;
     setText("doctrineCompliance", doctrine.label);
+    const doctrineDate = (riverwatch.manualConfig || {}).doctrineComplianceUpdated
+        ?? (riverwatch.manualConfig || {}).doctrineComplianceDate
+        ?? riverwatch.calc.doctrineComplianceUpdated
+        ?? riverwatch.calc.doctrineComplianceDate;
+    const doctrineDateLabel = formatDisplayDate(doctrineDate);
+    setText("doctrineComplianceDateMeta", doctrineDateLabel ? `(${doctrineDateLabel})` : "(-)");
     const doctrineEl = document.getElementById("doctrineCompliance");
     if (doctrineEl) doctrineEl.className = "mission-kpi-value doctrine-status " + doctrine.className;
 
@@ -1261,27 +1665,39 @@ function getMissionStatusClass(status) {
 }
 
 function renderVoyageHealth() {
-    const voyageMargin = Number.isFinite(riverwatch.calc.adjustedArrival) && Number.isFinite(riverwatch.calc.openSeaTarget)
-        ? riverwatch.calc.adjustedArrival - riverwatch.calc.openSeaTarget
+    const current = Number(riverwatch.calc.currentPosition);
+    const target = Number(riverwatch.calc.openSeaTarget);
+    const progressPct = Number.isFinite(current) && Number.isFinite(target) && target > 0
+        ? (current / target) * 100
         : null;
-    const recovery = getRecoveryDisplay();
 
     setText("voyageHealth", scoreText(riverwatch.calc.voyageHealth));
     setText("voyageStatus", getVoyageStatus(riverwatch.calc.voyageHealth));
     applyHealthSemanticClass("voyageStatus", riverwatch.calc.voyageHealth);
-    setText("currentPosition", formatKRWM(riverwatch.calc.currentPosition));
-    setText("remainingTime", riverwatch.calc.remainingTime);
-    setText("effectiveCAGR", formatEffectiveCAGR(riverwatch.calc.effectiveCAGR));
-    setText("adjustedArrival", formatKRWM(riverwatch.calc.adjustedArrival));
-    setText("openSeaTarget", formatKRWM(riverwatch.calc.openSeaTarget));
-    setText("voyageGap", formatSignedKRWM(voyageMargin));
-    setText("recoveryMode", recovery.mode);
-    setText("etaExtension", recovery.eta);
+
+    const currentValueLabel = document.getElementById('currentValueLabel');
+    if (currentValueLabel) {
+        currentValueLabel.textContent = Number.isFinite(progressPct)
+            ? `Current Value (${progressPct.toFixed(1)}%)`
+            : 'Current Value';
+    }
+
+    setText("currentPosition", formatKRWValueM(current));
+    setText("remainingTime", riverwatch.calc.remainingTime || '-');
+    setText("adjustedArrival", formatKRWValueM(riverwatch.calc.adjustedArrival));
+    setText("openSeaTarget", formatKRWValueM(target));
+    setText("voyageGap", formatTargetGapKRWM(riverwatch.calc.targetGapKRW));
+
+    const etaLabel = document.getElementById('etaLabel');
+    if (etaLabel) etaLabel.textContent = `ETA (${riverwatch.calc.etaDeviationLabel || '-'})`;
+    setText("etaExtension", riverwatch.calc.etaDuration || '-');
 }
 
 function renderRiverHealth() {
-    setText("riverHealth", riverwatch.calc.riverHealth);
-    setText("riverStatus", getRiverStatus(riverwatch.calc.riverHealth));
+    setText("riverHealth", scoreText(riverwatch.calc.riverHealth));
+    const riverState = getRiverStatus(riverwatch.calc.riverHealth);
+    const environment = getRiverEnvironmentLabel(riverwatch.calc.riverHealth);
+    setText("riverStatus", environment ? `${riverState} · ${environment}` : riverState);
     applyHealthSemanticClass("riverStatus", riverwatch.calc.riverHealth);
 
     const list = document.getElementById("riverMetricList");
@@ -1293,16 +1709,25 @@ function renderRiverHealth() {
     const config = riverwatch.manualConfig || {};
     const fxAsOf = formatDisplayDate(riverwatch.auto.fxAsOf);
     const brentAsOf = formatDisplayDate(config.BrentPriceAsOf ?? config.brentPriceAsOf);
+    const freshness = riverwatch.calc.riverMetricFreshness || {};
+    const aiDate = formatDisplayDate(config.aiCapexUpdated);
+    const nvdaDate = formatDisplayDate(config.nvdaDcRevenueUpdated);
+    const aiLabel = freshness.aiCapex === false
+        ? "AI CAPEX <small>(STALE)</small>"
+        : `AI CAPEX${aiDate ? ` <small>(${aiDate})</small>` : ""}`;
+    const nvdaLabel = freshness.nvdaDcRevenue === false
+        ? "NVDA DC Rev <small>(STALE)</small>"
+        : `NVDA DC Rev${nvdaDate ? ` <small>(${nvdaDate})</small>` : ""}`;
+
+    // Display order: External Market Environment → Financial Environment → AI Growth Drivers.
     const metrics = [
-        [`USDKRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
+        [`USD/KRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, `${formatFixedNumber(riverwatch.auto.usdkrw, 2)} (${scoreText(scores.usdkrw)})`],
+        [`BRENT${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, `${formatBrentPrice(riverwatch.calc.brentPrice)} (${scoreText(scores.oil)})`],
+        ["FED", `${String(config.fedRateState || "-").toUpperCase()} (${scoreText(scores.fedRate)})`],
+        ["M2", `${formatTrendState(config.m2Trend)} (${scoreText(scores.m2)})`],
         ["VIX", `${formatInteger(riverwatch.auto.vix)} (${scoreText(scores.vix)})`],
-        [`Brent${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, `${formatBrentPrice(riverwatch.calc.brentPrice)} (${scoreText(scores.oil)})`],
-        ["Fed Policy", `${String(config.fedRateState || "-").toUpperCase()} (${scoreText(scores.fedRate)})`],
-        ["AI CAPEX", `${String(config.aiCapexTrend || "-").toUpperCase()} (${scoreText(scores.aiCapex)})`],
-        ["NVDA DC Rev", `${formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth))} (${scoreText(scores.nvdaDcRevenue)})`],
-        ["M2", `${String(config.m2Trend || "-").toUpperCase()} (${scoreText(scores.m2)})`],
-        ["Growth Environment", `${getEnvironmentLabel(riverwatch.calc.growthFavorability)} (${riverwatch.calc.growthFavorability})`],
-        ["River Bias", getRiverBiasLabel(riverwatch.calc.growthFavorability, riverwatch.calc.defensiveFavorability)]
+        [aiLabel, `${formatTrendState(config.aiCapexTrend)} (${freshness.aiCapex === false ? '-' : scoreText(scores.aiCapex)})`],
+        [nvdaLabel, `${formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth))} (${freshness.nvdaDcRevenue === false ? '-' : scoreText(scores.nvdaDcRevenue)})`]
     ];
 
     metrics.forEach(([label, value]) => {
@@ -1312,14 +1737,54 @@ function renderRiverHealth() {
     });
 }
 
+function getEnginePowerLabel(score) {
+    if (!Number.isFinite(Number(score))) return 'PENDING';
+    const value = Number(score);
+    if (value >= 100) return 'SUFFICIENT';
+    if (value >= 95) return 'NEAR REQUIRED';
+    if (value >= 85) return 'BELOW REQUIRED';
+    if (value >= 70) return 'LOW POWER';
+    return 'CRITICAL';
+}
+
+function getFuelSupplyLabel(score) {
+    if (!Number.isFinite(Number(score))) return 'PENDING';
+    const value = Number(score);
+    if (value >= 100) return 'ON PLAN';
+    if (value >= 95) return 'NEAR PLAN';
+    if (value >= 85) return 'BELOW PLAN';
+    if (value >= 70) return 'SHORTFALL';
+    return 'CRITICAL';
+}
+
 function renderBoatHealth() {
     setText("boatHealth", riverwatch.calc.boatHealth);
     setText("boatStatus", getBoatStatus(riverwatch.calc.boatHealth));
     applyHealthSemanticClass("boatStatus", riverwatch.calc.boatHealth);
-    setText("allocationAlignment", `${getAlignmentLabel(riverwatch.calc.allocationAlignment)} (${riverwatch.calc.allocationAlignment})`);
-    setText("riverSuitability", `${getSuitabilityLabel(riverwatch.calc.riverSuitability)} (${riverwatch.calc.riverSuitability})`);
-    setText("structuralIntegrity", `${getIntegrityLabel(riverwatch.calc.structuralIntegrity)} (${riverwatch.calc.structuralIntegrity})`);
-    setText("captainDiscipline", `${getDisciplineLabel(riverwatch.calc.captainDiscipline)} (${riverwatch.calc.captainDiscipline})`);
+
+    const engineRaw = riverwatch.calc.enginePowerScore;
+    const engineScore = (engineRaw === null || engineRaw === undefined || engineRaw === '') ? null : Number(engineRaw);
+    setText("enginePower", Number.isFinite(engineScore)
+        ? `${getEnginePowerLabel(engineScore)} (${Math.round(engineScore)})`
+        : 'PENDING (-)');
+
+    const fuelRaw = riverwatch.calc.fuelSupply;
+    const fuelScore = (fuelRaw === null || fuelRaw === undefined || fuelRaw === '') ? null : Number(fuelRaw);
+    setText("fuelSupply", Number.isFinite(fuelScore)
+        ? `${getFuelSupplyLabel(fuelScore)} (${Math.round(fuelScore)})`
+        : 'PENDING (-)');
+
+    const trimRaw = riverwatch.calc.trimBalance;
+    const trim = (trimRaw === null || trimRaw === undefined || trimRaw === '') ? null : Number(trimRaw);
+    setText("allocationAlignment", Number.isFinite(trim)
+        ? `${getAlignmentLabel(trim)} (${Math.round(trim)})`
+        : 'PENDING (-)');
+
+    const fitRaw = riverwatch.calc.riverFit;
+    const fit = (fitRaw === null || fitRaw === undefined || fitRaw === '') ? null : Number(fitRaw);
+    setText("riverSuitability", Number.isFinite(fit)
+        ? `${getSuitabilityLabel(fit)} (${Math.round(fit)})`
+        : 'PENDING (-)');
 }
 
 function renderAllocation() {
@@ -1520,20 +1985,18 @@ function getRiverBiasLabel(growth, defensive) {
 
 function getAlignmentLabel(score) {
     const value = Number(score ?? 0);
-    if (value >= 90) return "DOCTRINE FIT";
-    if (value >= 75) return "MOSTLY BUILT";
-    if (value >= 60) return "BUILDING";
-    if (value >= 45) return "EARLY BUILD";
-    return "NOT ALIGNED";
+    if (value >= 95) return "ON TARGET";
+    if (value >= 85) return "NEAR TARGET";
+    if (value >= 70) return "OFF TARGET";
+    return "OUT OF BALANCE";
 }
 
 function getSuitabilityLabel(score) {
-    const value = Number(score ?? 0);
-    if (value >= 90) return "EXCELLENT MATCH";
-    if (value >= 80) return "GOOD MATCH";
-    if (value >= 65) return "ACCEPTABLE MATCH";
-    if (value >= 50) return "POOR MATCH";
-    return "MISMATCH";
+    if (!Number.isFinite(Number(score))) return "PENDING";
+    const value = Number(score);
+    if (value >= 100) return "WITHIN RANGE";
+    if (value >= 90) return "REDUCED MARGIN";
+    return "OUTSIDE RANGE";
 }
 
 function getIntegrityLabel(score) {
@@ -2025,11 +2488,11 @@ const HEALTH_STATUS_TABLES = {
         { min: 0,  label: "LOST COURSE" }
     ],
     river: [
-        { min: 90, label: "STRONG CURRENT" },
-        { min: 75, label: "FAVORABLE CURRENT" },
-        { min: 60, label: "MIXED CURRENT" },
-        { min: 40, label: "HEAD CURRENT" },
-        { min: 0,  label: "STORM WARNING" }
+        { min: 90, label: "TAILWIND" },
+        { min: 80, label: "CALM" },
+        { min: 70, label: "HEADWIND" },
+        { min: 55, label: "ROUGH" },
+        { min: 0,  label: "STORM" }
     ],
     boat: [
         { min: 90, label: "OPTIMALLY TRIMMED" },
@@ -2053,7 +2516,17 @@ function getHealthStatus(score) {
 }
 
 function getRiverStatus(score) {
+    if (!Number.isFinite(score)) return "PENDING";
     return getStatusFromTable(score, "river");
+}
+
+function getRiverEnvironmentLabel(score) {
+    if (!Number.isFinite(score)) return "";
+    if (score >= 90) return "HIGHLY FAVORABLE";
+    if (score >= 80) return "FAVORABLE";
+    if (score >= 70) return "CHALLENGING";
+    if (score >= 55) return "UNFAVORABLE";
+    return "HIGHLY UNFAVORABLE";
 }
 
 function getBoatStatus(score) {
@@ -2138,6 +2611,19 @@ function formatRemainingTime(years) {
 function formatKRWM(value) {
     if (typeof value !== "number" || Number.isNaN(value)) return "-";
     return formatInteger(value / 1000000) + "M";
+}
+
+function formatKRWValueM(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    return `KRW ${formatInteger(value / 1000000)}M`;
+}
+
+function formatTargetGapKRWM(value) {
+    if (typeof value !== "number" || Number.isNaN(value)) return "-";
+    const roundedM = Math.round(Math.abs(value) / 1000000);
+    if (roundedM === 0) return "KRW 0M";
+    const direction = value > 0 ? "▲" : "▼";
+    return `${direction} KRW ${roundedM.toLocaleString("ko-KR")}M`;
 }
 
 function formatKRWB(value) {

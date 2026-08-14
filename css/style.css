@@ -3246,7 +3246,7 @@ body{
 
 .health-matrix-detail .boat-health-list{
     grid-template-columns:1fr !important;
-    grid-template-rows:repeat(8, minmax(58px, 1fr)) !important;
+    grid-template-rows:repeat(4, minmax(58px, 1fr)) !important;
 }
 
 .health-matrix-detail .metric-list > div,
@@ -6634,3 +6634,53 @@ body{
         font-size:12px;
     }
 }
+
+
+/* CAB082 STEP2 FINAL: preserve lowercase y/m/d inside dynamic ETA label. */
+#etaLabel {
+    text-transform: none !important;
+}
+
+/* CAB-083 STEP3: Boat Health mobile readability */
+@media(max-width:900px){
+  .health-matrix-detail .boat-health-list{
+    grid-template-columns:1fr !important;
+    grid-template-rows:none !important;
+    grid-auto-rows:minmax(54px, auto) !important;
+  }
+}
+
+
+/* CAB-084 · Health content-fit + mobile single-row metric contract */
+.health-matrix-detail{ align-items:start !important; }
+.health-matrix-detail .health-card{ height:auto !important; align-self:start !important; }
+.health-matrix-detail .metric-list,
+.health-matrix-detail .voyage-flow,
+.health-matrix-detail .boat-health-list{
+    flex:none !important;
+    grid-template-rows:none !important;
+    grid-auto-rows:var(--rw-metric-box-min-height-desktop) !important;
+    align-content:start !important;
+}
+.health-matrix-detail .metric-list > div,
+.health-matrix-detail .voyage-step{
+    height:var(--rw-metric-box-min-height-desktop) !important;
+    min-height:var(--rw-metric-box-min-height-desktop) !important;
+}
+.mission-kpis{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+.mission-kpis span small,
+.health-matrix-detail .metric-list span small{ color:var(--rw-meta-white) !important; opacity:.92; font-size:.88em; }
+@media(max-width:900px){
+    .health-matrix-detail .metric-list,
+    .health-matrix-detail .voyage-flow,
+    .health-matrix-detail .boat-health-list{
+        grid-template-columns:1fr !important;
+        grid-auto-rows:var(--rw-metric-box-min-height-mobile) !important;
+    }
+    .health-matrix-detail .metric-list > div,
+    .health-matrix-detail .voyage-step{
+        height:var(--rw-metric-box-min-height-mobile) !important;
+        min-height:var(--rw-metric-box-min-height-mobile) !important;
+    }
+}
+@media(max-width:640px){ .mission-kpis{ grid-template-columns:1fr !important; } }

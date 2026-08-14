@@ -349,3 +349,15 @@ Status: Eye Comfort patch ready for review.
 ## CAB-081
 - Fixed the standalone Voyage Log CSV source URL and bumped the PWA cache key.
 
+
+## CAB082 STEP 1B — Fuel Supply calculation core
+- Added monthly REFUEL / EXTRA_REFUEL classification from VOYAGE_LOG RefuelType column.
+- Fuel Supply regular-refuel compliance uses planned `monthlyContributionKRW` as denominator.
+- EXTRA_REFUEL is tracked separately and does not inflate regular-refuel compliance.
+- Principal delta is derived only at RefuelType-tagged REFUEL / EXTRA_REFUEL rows; EventType remains independent and no Inflow/Outflow schema is added.
+- Boat Health weighting/UI remains unchanged until STEP 2.
+
+## CAB082 STEP 1C — Doctrine Compliance core
+- Added Captain Order transition tracking with local Last Known Order state and optional Apps Script persistence.
+- Added Apps Script audit setup/history skeleton with 2026-08-14 baseline and configurable KRW 500,000 sell tolerance.
+- Doctrine monthly SELL evaluation intentionally remains NOT_EVALUATED until a valid sell evidence source is wired; Principal changes are not misused as sell evidence.
