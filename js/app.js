@@ -2128,12 +2128,12 @@ function renderBoatyard() {
 
         deck.innerHTML = `
             <div class="portfolio-summary" aria-label="Portfolio all assets summary">
-                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS) · ₩K</div>
+                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS) · KRW</div>
                 <div class="portfolio-summary-grid">
-                    <div class="portfolio-summary-item"><span>COST</span><b class="is-reference">${formatKRWThousands(totalCost)}</b></div>
-                    <div class="portfolio-summary-item"><span>CURRENT</span><b class="is-neutral">${formatKRWThousands(totalCurrent)}</b></div>
-                    <div class="portfolio-summary-item"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWThousands(totalPnL, true)}</b></div>
-                    <div class="portfolio-summary-item"><span>RETURN</span><b class="${totalToneClass}">${formatSignedPercent1(totalReturn)}</b></div>
+                    <div class="portfolio-summary-item portfolio-summary-cost"><span>COST</span><b class="is-reference">${formatKRWFull(totalCost)}</b></div>
+                    <div class="portfolio-summary-item portfolio-summary-current"><span>CURRENT</span><b class="is-neutral">${formatKRWFull(totalCurrent)}</b></div>
+                    <div class="portfolio-summary-item portfolio-summary-pnl"><span>PROFIT/LOSS</span><b class="${totalToneClass}">${formatKRWFull(totalPnL, true)}</b></div>
+                    <div class="portfolio-summary-item portfolio-summary-return"><span>RETURN</span><b class="${totalToneClass}">${formatSignedPercent2(totalReturn)}</b></div>
                 </div>
             </div>
             <div class="trim-deck-detail trim-deck-detail-only" id="trimDeckDetail"></div>

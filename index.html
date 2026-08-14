@@ -115,21 +115,6 @@
 
         <main id="dashboardPage" class="app-page dashboard-grid">
 
-            <section class="card mission-card page-hero mission-hero">
-                <div class="label">Mission</div>
-                <div class="mission-text koru-accent-title" id="mission">Stay the Course</div>
-                <div class="mission-kpis">
-                    <div>
-                        <span>Status</span>
-                        <b id="status">--</b>
-                    </div>
-                    <div>
-                        <span>Doctrine Compliance <small id="doctrineComplianceDateMeta">(-)</small></span>
-                        <b id="doctrineCompliance">--</b>
-                    </div>
-                </div>
-            </section>
-
             <section class="card health-matrix-card" id="healthMatrixCard">
                 <button class="section-toggle health-matrix-toggle" type="button" id="healthMatrixToggle" onclick="toggleHealthMatrix()" aria-expanded="false">
                     <span class="section-toggle-title">▾ Health Matrix</span>
@@ -210,10 +195,9 @@
 
 
         <main id="boatyardPage" class="app-page hidden">
-            <section class="card page-hero boatyard-hero engine-power-hero">
-                <div class="label">Boatyard</div>
-                <div class="page-title koru-accent-title">Engine Power</div>
-                <div class="engine-power-detail">
+            <section class="card boatyard-hero engine-power-hero">
+                <div class="label engine-power-section-title">Engine Power</div>
+                <div class="engine-power-detail metric-list">
                     <div><span>Expected CAGR</span><b id="boatyardExpectedCagr">-</b></div>
                     <div><span>Required CAGR</span><b id="boatyardRequiredCagr">-</b></div>
                     <div><span>CAGR Gap</span><b id="boatyardCagrGap">-</b></div>
@@ -223,19 +207,12 @@
 
             <section class="card allocation-card premium-allocation-card trim-deck-card">
                 <div class="label">Trim Deck</div>
-                <div class="section-caption">Compare current trim with target allocation and keep the boat properly balanced.</div>
                 <div id="trimDeckList" class="trim-deck-list"></div>
             </section>
 
         </main>
 
         <main id="logbookPage" class="app-page hidden">
-            <section class="card page-hero">
-                <div class="label">Open Sea Logbook</div>
-                <div class="page-title koru-accent-title">Voyage Journey</div>
-                <div class="logbook-kpis" id="logbookKpis"></div>
-            </section>
-
             <section class="card logbook-chart-card">
                 <div class="label">Voyage Track</div>
                 <div id="logbookChart" class="logbook-chart"></div>

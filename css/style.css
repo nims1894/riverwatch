@@ -6881,3 +6881,150 @@ body{
         letter-spacing:-0.01em;
     }
 }
+
+/* ========================================================================== 
+   CAB-087 · Boatyard compact hierarchy pass
+   - Engine Power: remove cyan hero treatment; reuse Health metric-card grammar
+   - Trim Deck: remove explanatory caption and reclaim vertical space
+   - Portfolio Summary: mobile 2x2 (Cost/P&L, Current/Return); desktop unchanged
+   ========================================================================== */
+
+/* Engine Power is a section instrument, not a hero statement. */
+.engine-power-hero .engine-power-section-title{
+    margin-top:18px;
+    margin-bottom:14px;
+    color:var(--text-soft) !important;
+}
+.engine-power-hero .engine-power-detail{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:var(--rw-metric-box-gap, 8px);
+}
+.engine-power-hero .engine-power-detail > div{
+    height:var(--rw-metric-box-min-height-desktop) !important;
+    min-height:var(--rw-metric-box-min-height-desktop) !important;
+    padding:var(--rw-metric-box-padding-y-desktop, 14px) var(--rw-metric-box-padding-x-desktop, 16px) !important;
+    border:1px solid var(--border) !important;
+    background:rgba(255,255,255,.025) !important;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:6px;
+}
+.engine-power-hero .engine-power-detail span{
+    color:var(--text-soft) !important;
+    font-size:13px !important;
+    line-height:1.2;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+}
+.engine-power-hero .engine-power-detail b{
+    color:var(--text-strong) !important;
+    text-align:right;
+    font-size:20px !important;
+    line-height:1.15;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+}
+.engine-power-hero .engine-power-detail .target-gap-direction.gap-down{ color:var(--rw-negative) !important; }
+.engine-power-hero .engine-power-detail .target-gap-direction.gap-up{ color:var(--red) !important; }
+
+/* Caption removed: keep only a compact, intentional gap below the section label. */
+.trim-deck-card > .label{ margin-bottom:10px; }
+.trim-deck-card .trim-deck-list{ margin-top:0 !important; }
+
+@media(max-width:900px){
+    /* Four engine diagnostics become a compact 2x2 instrument matrix. */
+    .engine-power-hero .engine-power-detail{
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        grid-auto-rows:62px !important;
+    }
+    .engine-power-hero .engine-power-detail > div{
+        height:62px !important;
+        min-height:62px !important;
+        padding:9px 12px !important;
+    }
+    .engine-power-hero .engine-power-detail span{ font-size:11.5px !important; }
+    .engine-power-hero .engine-power-detail b{ font-size:16px !important; }
+}
+
+@media(max-width:640px){
+    /* Mobile summary is semantic 2x2: amount column / performance column. */
+    .portfolio-summary{ padding:12px 14px !important; }
+    .portfolio-summary-grid{
+        grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+        grid-template-areas:
+            "cost pnl"
+            "current return";
+        row-gap:10px;
+        column-gap:0;
+    }
+    .portfolio-summary-cost{ grid-area:cost; }
+    .portfolio-summary-current{ grid-area:current; }
+    .portfolio-summary-pnl{ grid-area:pnl; }
+    .portfolio-summary-return{ grid-area:return; }
+    .portfolio-summary-item{
+        padding:0 12px !important;
+        border-left:1px solid #34485f !important;
+    }
+    .portfolio-summary-cost,
+    .portfolio-summary-current{
+        padding-left:0 !important;
+        border-left:0 !important;
+    }
+    .portfolio-summary-pnl,
+    .portfolio-summary-return{ padding-right:0 !important; }
+    .portfolio-summary-current,
+    .portfolio-summary-return{
+        padding-top:9px !important;
+        border-top:1px solid rgba(52,72,95,.62);
+    }
+    .portfolio-summary-item span{
+        font-size:10px !important;
+        letter-spacing:0 !important;
+        margin-bottom:5px !important;
+    }
+    .portfolio-summary-item b{
+        font-size:15px !important;
+        line-height:1.15;
+        letter-spacing:-.02em !important;
+        text-align:right;
+    }
+}
+
+
+/* CAB-088: focused UI cleanup */
+/* Engine Power becomes the single Boatyard section label. */
+.engine-power-hero .engine-power-section-title{
+    margin-top:0 !important;
+    margin-bottom:14px !important;
+}
+
+/* CAGR gap direction and value are one atomic readout. */
+#boatyardCagrGap{
+    display:inline-flex !important;
+    flex-direction:row !important;
+    justify-content:flex-end !important;
+    align-items:center !important;
+    gap:5px !important;
+    white-space:nowrap !important;
+    flex-wrap:nowrap !important;
+}
+#boatyardCagrGap .target-gap-direction{
+    flex:0 0 auto !important;
+    margin-right:0 !important;
+}
+
+/* Voyage Target Gap uses the same semantic direction colors as CAGR Gap. */
+#voyageGap .target-gap-direction.gap-down{ color:var(--rw-negative) !important; }
+#voyageGap .target-gap-direction.gap-up{ color:var(--red) !important; }
+
+/* Full KRW amounts need more horizontal room on compact summary cards. */
+@media(max-width:640px){
+    .portfolio-summary-item b{
+        font-size:13px !important;
+        letter-spacing:-.035em !important;
+        white-space:nowrap !important;
+    }
+}
