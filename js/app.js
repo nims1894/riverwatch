@@ -148,7 +148,10 @@ async function initializeCoreData(preserveLkg = true) {
 async function initializeLogbookData() {
     try {
         if (typeof RiverWatchMarketEngine === "undefined" || typeof RiverWatchMarketEngine.loadOpenSeaLogbook !== "function") return false;
-        return await RiverWatchMarketEngine.loadOpenSeaLogbook() === true;
+        const loaders = [RiverWatchMarketEngine.loadOpenSeaLogbook()];
+        if (typeof RiverWatchMarketEngine.loadMarketPeak === "function") loaders.push(RiverWatchMarketEngine.loadMarketPeak());
+        const results = await Promise.allSettled(loaders);
+        return results[0].status === "fulfilled" && results[0].value === true;
     } catch (error) {
         console.warn("RiverWatch Logbook sync failed.", error);
         return false;
@@ -1031,6 +1034,7 @@ function calculateVoyageHealth() {
         riverwatch.calc.boatAdjustment = 0;
         riverwatch.calc.effectiveCAGR = validCAGR ? baseCAGRInput / 100 : null;
         riverwatch.calc.remainingYears = targetDate ? calculateRemainingYears(config.targetDate) : null;
+        riverwatch.calc.remainingDays = targetDate ? daysBetween(today, targetDate) : null;
         riverwatch.calc.remainingTime = targetDate ? formatCalendarDuration(today, targetDate) : '-';
         riverwatch.calc.etaDuration = '-';
         riverwatch.calc.etaDeviationLabel = '-';
@@ -1690,20 +1694,27 @@ function renderVoyageHealth() {
 
     const currentValueLabel = document.getElementById('currentValueLabel');
     if (currentValueLabel) {
-        currentValueLabel.textContent = Number.isFinite(progressPct)
-            ? `Current Value (${progressPct.toFixed(1)}%)`
-            : 'Current Value';
+        currentValueLabel.innerHTML = Number.isFinite(progressPct)
+            ? `<span class="label-primary">Current Value</span> <small class="label-meta">(${progressPct.toFixed(1)}%)</small>`
+            : '<span class="label-primary">Current Value</span>';
     }
 
     setText("currentPosition", formatKRWValueM(current));
-    setText("remainingTime", riverwatch.calc.remainingTime || '-');
+
+    const targetDateLabel = formatDisplayDate((riverwatch.manualConfig || {}).targetDate) || '-';
+    const remainingDaysLabel = formatDayCount(riverwatch.calc.remainingDays);
+    setText("targetDateStatus", `(${targetDateLabel})`);
+    setText("remainingTime", remainingDaysLabel);
+
     setText("adjustedArrival", formatKRWValueM(riverwatch.calc.adjustedArrival));
     setText("openSeaTarget", formatKRWValueM(target));
     setHTML("voyageGap", formatTargetGapKRWHTML(riverwatch.calc.targetGapKRW));
 
-    const etaLabel = document.getElementById('etaLabel');
-    if (etaLabel) etaLabel.textContent = `ETA (${riverwatch.calc.etaDeviationLabel || '-'})`;
-    setText("etaExtension", riverwatch.calc.etaDuration || '-');
+    const etaDaysLabel = formatDayCount(riverwatch.calc.etaDays, 'Not estimable');
+    const etaDateLabel = riverwatch.calc.etaDate ? formatDisplayDate(riverwatch.calc.etaDate) : '-';
+    const etaDeviationLabel = formatSignedDayDelta(riverwatch.calc.etaDeviationDays);
+    setText("etaMetaStatus", etaDateLabel !== '-' ? `(${etaDateLabel}, ${etaDeviationLabel.replace(/^\(|\)$/g, '')})` : '-');
+    setText("etaExtension", etaDaysLabel);
 }
 
 function renderRiverHealth() {
@@ -1726,19 +1737,19 @@ function renderRiverHealth() {
     const nvdaDate = formatDisplayDate(config.nvdaDcRevenueUpdated);
 
     const metrics = [
-        { label: `USD/KRW${fxAsOf ? ` <small>(${fxAsOf})</small>` : ""}`, value: formatFixedNumber(riverwatch.auto.usdkrw, 2), score: scores.usdkrw },
-        { label: `BRENT${brentAsOf ? ` <small>(${brentAsOf})</small>` : ""}`, value: formatBrentPrice(riverwatch.calc.brentPrice), score: scores.oil },
+        { label: `USD/KRW${fxAsOf ? ` <small class="label-meta">(${fxAsOf})</small>` : ""}`, value: formatFixedNumber(riverwatch.auto.usdkrw, 2), score: scores.usdkrw },
+        { label: `BRENT${brentAsOf ? ` <small class="label-meta">(${brentAsOf})</small>` : ""}`, value: formatBrentPrice(riverwatch.calc.brentPrice), score: scores.oil },
         { label: "FED", value: String(config.fedRateState || "-").toUpperCase(), score: scores.fedRate },
         { label: "M2", value: formatTrendState(config.m2Trend), score: scores.m2 },
         { label: "VIX", value: formatInteger(riverwatch.auto.vix), score: scores.vix },
         {
-            label: freshness.aiCapex === false ? "AI CAPEX <small class=\"stale-meta\">(STALE)</small>" : `AI CAPEX${aiDate ? ` <small>(${aiDate})</small>` : ""}`,
+            label: freshness.aiCapex === false ? "AI CAPEX <small class=\"label-meta stale-meta\">(STALE)</small>" : `AI CAPEX${aiDate ? ` <small class="label-meta">(${aiDate})</small>` : ""}`,
             value: formatTrendState(config.aiCapexTrend),
             score: freshness.aiCapex === false ? null : scores.aiCapex,
             stale: freshness.aiCapex === false
         },
         {
-            label: freshness.nvdaDcRevenue === false ? "NVDA DC Rev <small class=\"stale-meta\">(STALE)</small>" : `NVDA DC Rev${nvdaDate ? ` <small>(${nvdaDate})</small>` : ""}`,
+            label: freshness.nvdaDcRevenue === false ? "NVDA DC Rev <small class=\"label-meta stale-meta\">(STALE)</small>" : `NVDA DC Rev${nvdaDate ? ` <small class="label-meta">(${nvdaDate})</small>` : ""}`,
             value: formatPercentValue(toFiniteNumber(config.nvdaDcRevenueGrowth)),
             score: freshness.nvdaDcRevenue === false ? null : scores.nvdaDcRevenue,
             stale: freshness.nvdaDcRevenue === false
@@ -1748,7 +1759,7 @@ function renderRiverHealth() {
     metrics.forEach(metric => {
         const row = document.createElement("div");
         if (metric.stale) row.classList.add("metric-stale");
-        row.innerHTML = `<span>${metric.label}</span><b>${metric.value} ${metricScoreHTML(metric.score)}</b>`;
+        row.innerHTML = `<span class="label-with-meta">${metric.label}</span><b>${metric.value} ${metricScoreHTML(metric.score)}</b>`;
         list.appendChild(row);
     });
 }
@@ -1784,7 +1795,7 @@ function renderBoatHealth() {
 
     const latestRefuelDate = formatDisplayDate(getLatestRefuelDate());
     const fuelLabel = document.getElementById("fuelSupplyLabel");
-    if (fuelLabel) fuelLabel.textContent = `Fuel Supply (${latestRefuelDate || '-'})`;
+    if (fuelLabel) fuelLabel.innerHTML = `<span class="label-primary">Fuel Supply</span> <small class="label-meta">(${latestRefuelDate || '-'})</small>`;
 
     const fuelRaw = riverwatch.calc.fuelSupply;
     const fuelScore = (fuelRaw === null || fuelRaw === undefined || fuelRaw === '') ? null : Number(fuelRaw);
@@ -2128,7 +2139,7 @@ function renderBoatyard() {
 
         deck.innerHTML = `
             <div class="portfolio-summary" aria-label="Portfolio all assets summary">
-                <div class="portfolio-summary-title">PORTFOLIO (ALL ASSETS) · KRW</div>
+                <div class="portfolio-summary-title">PORTFOLIO · ALL ASSETS · KRW</div>
                 <div class="portfolio-summary-grid">
                     <div class="portfolio-summary-item portfolio-summary-cost"><span>COST</span><b class="is-reference">${formatKRWFull(totalCost)}</b></div>
                     <div class="portfolio-summary-item portfolio-summary-current"><span>CURRENT</span><b class="is-neutral">${formatKRWFull(totalCurrent)}</b></div>
@@ -2249,7 +2260,6 @@ function normalizeLogbookRows(rows) {
         const principal = Number(row.principalKRW || 0);
         const market = Number(row.marketValueKRW || 0);
         const target = Number(row.targetValueKRW || 0);
-        const computedPlanGap = target > 0 ? ((market / target) - 1) * 100 : 0;
         const logbook = typeof row.logbook === "boolean"
             ? row.logbook
             : String(row.logbook ?? row.milestone ?? "FALSE").toUpperCase() === "TRUE";
@@ -2266,7 +2276,7 @@ function normalizeLogbookRows(rows) {
             principalKRW: principal,
             marketValueKRW: market,
             targetValueKRW: target,
-            planGap: Number.isFinite(Number(row.planGap)) ? Number(row.planGap) : computedPlanGap,
+            planGap: Number.isFinite(Number(row.planGap)) ? Number(row.planGap) : null,
             dailyTrend: Number(row.dailyTrend || 0),
             returnPct: principal > 0 ? ((market / principal) - 1) * 100 : Number(row.returnPct || 0)
         };
@@ -2277,7 +2287,9 @@ function renderOpenSeaLogbook() {
     const rows = (riverwatch.logbook || riverwatch.openSeaLogbook || []).slice();
 
     renderLogbookKpis(rows);
+    renderVoyageTrackLatest(rows);
     renderLogbookChart(rows);
+    renderVoyageTrackPeak();
     renderLogbookTimeline(rows);
 }
 
@@ -2304,7 +2316,7 @@ function renderLogbookKpis(rows) {
 
     el.innerHTML = `
         <div><span>Voyage Phase</span><b>${phase}</b></div>
-        <div class="current-status-kpi"><span>Current Status <small>(${latestDate})</small></span><b>${currentStatus}</b></div>
+        <div class="current-status-kpi"><span class="label-with-meta">Current Status <small class="label-meta">(${latestDate})</small></span><b>${currentStatus}</b></div>
         <div><span>Voyage Start</span><b>${voyageStart}</b></div>
         <div><span>Target Arrival</span><b>${targetArrival}</b></div>
     `;
@@ -2319,11 +2331,100 @@ function formatDisplayDate(value) {
     return `${y}.${m}.${d}`;
 }
 
+function formatDayCount(value, fallback = '-') {
+    const days = Number(value);
+    if (!Number.isFinite(days)) return fallback;
+    return `${Math.max(0, Math.round(days)).toLocaleString("en-US")} days`;
+}
+
+function formatSignedDayDelta(value) {
+    const days = Number(value);
+    if (!Number.isFinite(days)) return '-';
+    const rounded = Math.round(days);
+    if (rounded === 0) return '(0d)';
+    return `(${rounded > 0 ? '+' : '-'}${Math.abs(rounded).toLocaleString("en-US")}d)`;
+}
+
+function formatVoyageTimeReadout(primary, secondary) {
+    const safePrimary = primary || '-';
+    const safeSecondary = secondary || '-';
+    return `<i class="voyage-time-primary">${safePrimary}</i><i class="voyage-time-secondary">(${safeSecondary})</i>`;
+}
+
 function formatSignedPercent2(value) {
     const amount = Number(value);
     if (!Number.isFinite(amount)) return "-";
     const sign = amount > 0 ? "+" : "";
     return `${sign}${amount.toFixed(2)}%`;
+}
+
+function gapToneClass(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount === 0) return "gap-neutral";
+    return amount > 0 ? "gap-positive" : "gap-negative";
+}
+
+function snapshotMetricsHTML(market, plan, gap) {
+    return `
+        <span class="snapshot-metric snapshot-market"><i>Market</i><b>${formatKRWM(market)}</b></span>
+        <span class="snapshot-metric snapshot-plan"><i>Plan</i><b>${formatKRWM(plan)}</b></span>
+        <span class="snapshot-metric snapshot-gap"><i>Gap</i><b class="${gapToneClass(gap)}">${formatSignedPercent2(gap)}</b></span>
+    `;
+}
+
+function renderVoyageTrackLatest(rows) {
+    const el = document.getElementById("voyageTrackLatest");
+    if (!el) return;
+    const datedRows = normalizeLogbookRows(rows)
+        .filter(row => row && row.date)
+        .sort((a, b) => (parseDateSafe(a.date) || 0) - (parseDateSafe(b.date) || 0));
+    const latest = datedRows[datedRows.length - 1];
+    if (!latest) {
+        el.innerHTML = `<div class="empty-state">Latest snapshot unavailable.</div>`;
+        return;
+    }
+    const stateClass = latest.voyageState ? ` state-${latest.voyageState.toLowerCase()}` : "";
+    const trendClass = latest.trend ? ` trend-${latest.trend.toLowerCase().replace(/_/g, "-")}` : "";
+    el.innerHTML = `
+        <div class="voyage-track-latest-head">
+            <span class="voyage-track-latest-label label-with-meta">LATEST <small class="label-meta">(${formatDisplayDate(latest.date) || latest.date})</small></span>
+            <span class="voyage-track-status-group">
+                ${latest.voyageState ? `<span class="timeline-voyage-state${stateClass}">${latest.voyageState}</span>` : ""}
+                ${latest.trend ? `<span class="timeline-trend${trendClass}">${latest.trend.replace(/_/g, " ")}</span>` : ""}
+            </span>
+        </div>
+        <div class="snapshot-metrics voyage-track-latest-metrics">
+            ${snapshotMetricsHTML(latest.marketValueKRW, latest.targetValueKRW, latest.planGap)}
+        </div>
+    `;
+}
+
+function renderVoyageTrackPeak() {
+    const el = document.getElementById("voyageTrackPeak");
+    if (!el) return;
+    const peak = riverwatch.marketPeak || {};
+    const market = Number(peak.marketValueKRW);
+    const gap = Number(peak.planGap);
+    const date = formatDisplayDate(peak.date) || String(peak.date || "-");
+    if (!Number.isFinite(market) && !peak.date && !Number.isFinite(gap)) {
+        el.innerHTML = `<div class="voyage-peak-unavailable">MARKET PEAK unavailable</div>`;
+        return;
+    }
+    el.innerHTML = `
+        <div class="voyage-peak-cell voyage-peak-brand">
+            <span class="voyage-peak-icon" aria-hidden="true">
+                <svg viewBox="0 0 32 32" focusable="false">
+                    <circle cx="16" cy="16" r="14"></circle>
+                    <path d="M7.5 22.5 13 10.5l4.2 7.2 2.4-4.1 4.9 8.9Z"></path>
+                    <path d="m11.5 17.5 2.7-2.3 2.4 1.9"></path>
+                </svg>
+            </span>
+            <span class="voyage-peak-title"><strong><span>MARKET</span><span>PEAK</span></strong></span>
+        </div>
+        <span class="voyage-peak-cell voyage-peak-field peak-market"><i>Peak</i><b>${formatKRWM(market)}</b></span>
+        <span class="voyage-peak-cell voyage-peak-field peak-date"><i>Date</i><b>${date}</b></span>
+        <span class="voyage-peak-cell voyage-peak-field peak-gap"><i>Gap</i><b class="${gapToneClass(gap)}">${formatSignedPercent2(gap)}</b></span>
+    `;
 }
 
 function renderLogbookChart(rows) {
@@ -2357,8 +2458,8 @@ function renderLogbookChart(rows) {
     const chartHeight = 250;
     const isMobileJourney = chartWidth <= 520;
     const pad = isMobileJourney
-        ? { left: 28, right: 16, top: 26, bottom: 42 }
-        : { left: 72, right: 34, top: 28, bottom: 44 };
+        ? { left: 28, right: 16, top: 18, bottom: 32 }
+        : { left: 72, right: 34, top: 20, bottom: 34 };
     const plotW = chartWidth - pad.left - pad.right;
     const plotH = chartHeight - pad.top - pad.bottom;
 
@@ -2382,9 +2483,9 @@ function renderLogbookChart(rows) {
 
     el.innerHTML = `
         <div class="journey-legend">
+            <span><i class="legend-line market"></i>Market</span>
+            <span><i class="legend-line course"></i>Plan</span>
             <span><i class="legend-line principal"></i>Principal</span>
-            <span><i class="legend-line market"></i>Market Value</span>
-            <span><i class="legend-line course"></i>Planned Course</span>
         </div>
         <div class="journey-scroll-x">
             <svg class="journey-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Portfolio journey line chart">
@@ -2392,8 +2493,8 @@ function renderLogbookChart(rows) {
                 <line class="journey-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + plotH}"></line>
                 ${yearDividers.map(t => `<line class="journey-year-divider" x1="${t.x}" y1="${pad.top}" x2="${t.x}" y2="${pad.top + plotH}"></line>`).join("")}
                 <path class="journey-line principal" d="${linePath("principalKRW")}"></path>
-                <path class="journey-line market" d="${linePath("marketValueKRW")}"></path>
                 <path class="journey-line course" d="${linePath("targetValueKRW")}"></path>
+                <path class="journey-line market" d="${linePath("marketValueKRW")}"></path>
                 <text class="journey-edge-label start" x="${pad.left}" y="${chartHeight - 18}" text-anchor="start">${startLabel}</text>
                 <text class="journey-edge-label end" x="${chartWidth - pad.right}" y="${chartHeight - 18}" text-anchor="end">${endLabel}</text>
             </svg>
@@ -2469,7 +2570,7 @@ function renderLogbookTimeline(rows) {
     el.innerHTML = timelineRows.map(row => {
         const market = Number(row.marketValueKRW || 0);
         const planned = Number(row.targetValueKRW || 0);
-        const planGap = planned > 0 ? ((market / planned) - 1) * 100 : Number(row.planGap || 0);
+        const planGap = Number(row.planGap);
         const stateClass = row.voyageState ? ` state-${row.voyageState.toLowerCase()}` : "";
         const trendClass = row.trend ? ` trend-${row.trend.toLowerCase().replace(/_/g, "-")}` : "";
 
@@ -2486,10 +2587,8 @@ function renderLogbookTimeline(rows) {
                     </div>
                     <div class="timeline-date">${row.date || "-"}</div>
                     <div class="timeline-title">${row.title || "Log Entry"}</div>
-                    <div class="timeline-metric-line">
-                        <span>Market <b>${formatKRWM(market)}</b></span>
-                        <span>Plan <b>${formatKRWM(planned)}</b></span>
-                        <span>Gap <b>${formatSignedPercent2(planGap)}</b></span>
+                    <div class="timeline-metric-line snapshot-metrics">
+                        ${snapshotMetricsHTML(market, planned, planGap)}
                     </div>
                     <div class="timeline-note">${row.message || row.memo || "-"}</div>
                 </div>

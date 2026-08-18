@@ -348,6 +348,31 @@ const RiverWatchMarketEngine = (() => {
         return true;
     }
 
+    function parseMarketPeakCsv(text) {
+        const rows = parseRows(text);
+        const row = rows?.[1] || [];
+        const date = String(row?.[0] || "").trim();       // A2
+        const marketValueKRW = parseNumber(row?.[2], NaN); // C2
+        const planGap = parsePercentPoints(row?.[4], null); // E2
+
+        if (!date && !Number.isFinite(marketValueKRW) && !Number.isFinite(planGap)) return null;
+        return {
+            date,
+            marketValueKRW: Number.isFinite(marketValueKRW) ? marketValueKRW : null,
+            planGap: Number.isFinite(planGap) ? planGap : null
+        };
+    }
+
+    function applyMarketPeak(record) {
+        if (!record) {
+            console.warn("MARKET_PEAK CSV parsed but A2/C2/E2 are unavailable.");
+            return false;
+        }
+        riverwatch.marketPeak = record;
+        console.log("RiverWatch MARKET_PEAK AUTO", record);
+        return true;
+    }
+
     function normalizeManualConfig(rawConfig) {
         const config = {};
 
@@ -622,6 +647,19 @@ const RiverWatchMarketEngine = (() => {
         return applyLogbook(parseLogbookCsv(csvText));
     }
 
+    async function loadMarketPeak() {
+        const hub = riverwatch.policy.marketDataHub;
+        const url = hub?.marketPeakCsvUrl;
+
+        if (!hub || hub.enabled !== true || !url) {
+            console.warn("MARKET_PEAK CSV URL missing. Peak record remains unavailable.");
+            return false;
+        }
+
+        const csvText = await fetchWithTimeout(url, hub.timeoutMs || 5000);
+        return applyMarketPeak(parseMarketPeakCsv(csvText));
+    }
+
     async function loadCoreData() {
         const labels = ["MarketData", "PortfolioConfig", "ControlRules", "Portfolio", "ManualConfig", "RiverCalibration", "VoyagePlan"];
 
@@ -670,13 +708,12 @@ const RiverWatchMarketEngine = (() => {
     async function loadAllData() {
         const coreOk = await loadCoreData();
         if (!coreOk) return false;
-        try {
-            const logbookOk = await loadOpenSeaLogbook();
-            return logbookOk === true;
-        } catch (logError) {
-            console.warn("RiverWatch OpenSeaLogbook load failed", logError);
-            return false;
-        }
+        const results = await Promise.allSettled([loadOpenSeaLogbook(), loadMarketPeak()]);
+        const logbookOk = results[0].status === "fulfilled" && results[0].value === true;
+        const peakOk = results[1].status === "fulfilled" && results[1].value === true;
+        if (!logbookOk) console.warn("RiverWatch OpenSeaLogbook load failed", results[0].reason || "Loader returned false");
+        if (!peakOk) console.warn("RiverWatch MARKET_PEAK load failed", results[1].reason || "Loader returned false");
+        return logbookOk;
     }
 
     return {
@@ -690,12 +727,14 @@ const RiverWatchMarketEngine = (() => {
         loadRiverCalibration,
         loadVoyagePlan,
         loadOpenSeaLogbook,
+        loadMarketPeak,
         parseKeyValueCsv,
         parseRiverCalibrationCsv,
         parsePortfolioConfigCsv,
         parseControlRulesCsv,
         parsePortfolioCsv,
-        parseLogbookCsv
+        parseLogbookCsv,
+        parseMarketPeakCsv
     };
 
 })();

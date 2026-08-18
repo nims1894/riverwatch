@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-cab088-focused-ui-cleanup";
+const CACHE_NAME = "riverwatch-v1.1-pwa-cab092-ui-grammar";
 const APP_SHELL = [
   "./",
   "./index.html",
