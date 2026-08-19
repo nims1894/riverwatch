@@ -8066,3 +8066,60 @@ body{
         flex-basis:25px !important;
     }
 }
+
+
+/* ==========================================================================
+   CAB-096 · UI density / label consistency / Engine Power review date
+   ========================================================================== */
+
+/* Engine Power review date is sourced from ManualConfig.ENGINE_POWER_REVIEW_DATE. */
+.engine-power-hero .engine-power-section-title{
+    display:flex !important;
+    align-items:baseline !important;
+    gap:7px !important;
+}
+.engine-power-hero .engine-power-section-title .label-meta{
+    font-size:.62em !important;
+    line-height:1 !important;
+    font-weight:550 !important;
+    letter-spacing:0 !important;
+    color:var(--muted) !important;
+    text-transform:none !important;
+    opacity:.92 !important;
+}
+
+/* CAGR GAP: direction marker + value form one right-aligned readout. */
+#boatyardCagrGap{
+    display:flex !important;
+    width:100% !important;
+    justify-content:flex-end !important;
+    align-items:baseline !important;
+    gap:7px !important;
+}
+#boatyardCagrGap .target-gap-direction{
+    display:inline-block !important;
+    margin:0 !important;
+    font-size:.76em !important;
+    line-height:1 !important;
+    transform:translateY(-1px);
+}
+
+/* Voyage Track -> Voyage Log: retain separation while reducing excess vertical gap to ~60%. */
+#logbookPage .logbook-chart-card + .logbook-timeline-card{
+    margin-top:11px !important;
+}
+
+/* Market Peak: reduce only vertical breathing room; keep typography/grid/plot geometry unchanged. */
+.voyage-track-peak{
+    min-height:42px !important;
+    padding-top:4px !important;
+    padding-bottom:2px !important;
+}
+
+@media(max-width:520px){
+    .voyage-track-peak{
+        min-height:40px !important;
+        padding-top:3.5px !important;
+        padding-bottom:1.5px !important;
+    }
+}

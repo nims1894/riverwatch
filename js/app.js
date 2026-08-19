@@ -1795,7 +1795,7 @@ function renderBoatHealth() {
 
     const latestRefuelDate = formatDisplayDate(getLatestRefuelDate());
     const fuelLabel = document.getElementById("fuelSupplyLabel");
-    if (fuelLabel) fuelLabel.innerHTML = `<span class="label-primary">Fuel Supply</span> <small class="label-meta">(${latestRefuelDate || '-'})</small>`;
+    if (fuelLabel) fuelLabel.innerHTML = `<span class="label-primary">FUEL SUPPLY</span> <small class="label-meta">(${latestRefuelDate || '-'})</small>`;
 
     const fuelRaw = riverwatch.calc.fuelSupply;
     const fuelScore = (fuelRaw === null || fuelRaw === undefined || fuelRaw === '') ? null : Number(fuelRaw);
@@ -2107,8 +2107,12 @@ function getPnLToneClass(value) {
 }
 
 function renderBoatyard() {
-    const expectedCagr = toFiniteNumber((riverwatch.manualConfig || {}).expectedCAGR);
-    const requiredCagr = toFiniteNumber((riverwatch.manualConfig || {}).requiredCAGR);
+    const manualConfig = riverwatch.manualConfig || {};
+    const enginePowerReviewDate = formatDisplayDate(manualConfig.ENGINE_POWER_REVIEW_DATE);
+    setText("enginePowerReviewDate", enginePowerReviewDate ? `(${enginePowerReviewDate})` : "");
+
+    const expectedCagr = toFiniteNumber(manualConfig.expectedCAGR);
+    const requiredCagr = toFiniteNumber(manualConfig.requiredCAGR);
     const powerRatio = Number.isFinite(expectedCagr) && Number.isFinite(requiredCagr) && requiredCagr > 0
         ? (expectedCagr / requiredCagr) * 100
         : null;
