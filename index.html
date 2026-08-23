@@ -93,8 +93,13 @@
                             <div class="rw-mobile-header-brand">RiverWatch</div>
                         </div>
                     </div>
-                    <div class="rw-mobile-header-sync">Last Sync <span id="rwMobileLastSync"></span> · <span id="rwMobileDataSource" class="rw-mobile-online">ONLINE</span></div>
-                    <button class="rw-mobile-header-retry" type="button" title="Refresh dashboard" onclick="refreshDashboard()"><span>↻</span></button>
+                    <div class="rw-mobile-header-sync">
+                        <span class="rw-mobile-sync-label">Last Sync</span>
+                        <span id="rwMobileLastSync"></span>
+                        <span class="rw-mobile-sync-sep">·</span>
+                        <span id="rwMobileDataSource" class="rw-mobile-online">ONLINE</span>
+                        <button class="rw-mobile-header-retry" type="button" title="Refresh dashboard" onclick="refreshDashboard()"><span>↻</span></button>
+                    </div>
                 </div>
             </div>
             <div class="brand-wrap koru-header-wrap">

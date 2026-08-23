@@ -1693,7 +1693,9 @@ function applyMobileHeaderConfig() {
         const symbol=commonUi.querySelector('.rw-mobile-header-symbol'); if(symbol&&ui.symbol){symbol.style.width=`${ui.symbol.size}px`;symbol.style.height=`${ui.symbol.size}px`;symbol.style.transform=`translate(${ui.symbol.x}px,${ui.symbol.y}px)`;}
         const brand=commonUi.querySelector('.rw-mobile-header-brand-copy'); if(brand&&ui.brand)brand.style.transform=`translateX(${ui.brand.x}px)`;
         const sync=commonUi.querySelector('.rw-mobile-header-sync'); if(sync&&ui.sync){sync.style.left=`${ui.sync.x}px`;sync.style.top=`${ui.sync.y}px`;}
-        const retry=commonUi.querySelector('.rw-mobile-header-retry'); if(retry&&ui.retry){retry.style.left=`${ui.retry.x}px`;retry.style.top=`${ui.retry.y}px`;retry.style.margin='0';}
+        // Retry is intentionally flow-attached to the Sync row. Independent X/Y is ignored in production
+        // so font metrics and viewport width cannot separate or overlap the status action.
+        const retry=commonUi.querySelector('.rw-mobile-header-retry'); if(retry){retry.style.left='auto';retry.style.top='auto';}
     }
 
     const layerMap={darkCloud:'.rw-mobile-darkcloud-layer',rain:'.rw-mobile-rain-layer',lightning:'.rw-mobile-lightning-layer',cloud:'.rw-mobile-cloud-layer',birds:'.rw-mobile-birds-layer'};

@@ -8274,19 +8274,22 @@ body{
         top:48px;
         display:flex;
         align-items:center;
+        gap:3px;
         white-space:nowrap;
         color:#7f93aa;
         font-size:9px;
         line-height:1;
     }
-    .rw-mobile-online{font-weight:800;color:#3dd58a;margin-left:3px}
+    .rw-mobile-sync-label,.rw-mobile-sync-sep{flex:none}
+    .rw-mobile-online{font-weight:800;color:#3dd58a;margin-left:0}
     .rw-mobile-header-retry{
-        position:absolute;
-        left:172px;
-        top:46px;
-        margin:0 !important; /* neutralize legacy global button margin-top */
+        position:relative;
+        left:auto !important;
+        top:auto !important;
+        margin:0 0 0 2px !important; /* stay attached to sync row on every viewport */
         width:20px;
         height:20px;
+        flex:0 0 20px;
         display:grid;
         place-items:center;
         border:1px solid #42536a;

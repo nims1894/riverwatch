@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-mobile-header-config-20260823";
+const CACHE_NAME = "riverwatch-v1.1-pwa-retry-sync-row-20260823";
 const APP_SHELL = [
   "./",
   "./index.html",
