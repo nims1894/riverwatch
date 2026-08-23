@@ -85,7 +85,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
         <div class="stage-shell">
           <div class="stage-label"><span>MOBILE HEADER · SCENE + COMMON UI</span><span id="stageSize"></span></div>
           <div id="stage" class="stage">
-            <div id="rearWaveLayer" class="rear-wave-layer"><div id="rearWavePlacement" class="rear-wave-placement"><div id="rearWaveMotion" class="rear-wave-motion"><img id="rearWaveImg" src="assets/rear-waves/Rear_Wave_Common.png" alt="RiverWatch common rear wave asset"></div></div></div>
+            <div id="rearWaveLayer" class="rear-wave-layer"><div id="rearWavePlacement" class="rear-wave-placement"><div id="rearWaveMotion" class="rear-wave-motion"><img id="rearWaveImg" src="assets/scene-header/rear-waves/Rear_Wave_Common.png" alt="RiverWatch common rear wave asset"></div></div></div>
             <div id="waveLayer" class="wave-layer"><div id="wavePlacement" class="wave-placement"><div id="waveMotion" class="wave-motion"><img id="waveImg" alt="RiverWatch front wave state asset"></div></div></div>
             <div id="boatLayer" class="boat-layer">
               <div id="boatPlacement" class="boat-placement">
@@ -94,11 +94,11 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
                 </div>
               </div>
             </div>
-            <div id="trendDarkCloudLayer" class="common-ui-layer"><div id="trendDarkCloudPlacement" class="common-ui-placement"><div id="trendDarkCloudMotion"><img id="trendDarkCloudImg" src="assets/trends/Trend_DarkCloud.png" alt="Dark cloud trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
-            <div id="trendRainLayer" class="common-ui-layer"><div id="trendRainPlacement" class="common-ui-placement"><div id="trendRainMotion"><img id="trendRainImg" src="assets/trends/Trend_Rain.png" alt="Rain trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
-            <div id="trendLightningLayer" class="common-ui-layer"><div id="trendLightningPlacement" class="common-ui-placement"><div id="trendLightningMotion"><img id="trendLightningImg" src="assets/trends/Trend_Lightning.png" alt="Lightning trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
-            <div id="trendCloudLayer" class="common-ui-layer"><div id="trendCloudPlacement" class="common-ui-placement"><div id="trendCloudMotion"><img id="trendCloudImg" src="assets/trends/Trend_Cloud.png" alt="Cloud trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
-            <div id="trendBirdsLayer" class="common-ui-layer"><div id="trendBirdsPlacement" class="common-ui-placement"><div id="trendBirdsMotion"><img id="trendBirdsImg" src="assets/trends/Trend_Birds.png" alt="Birds trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
+            <div id="trendDarkCloudLayer" class="common-ui-layer"><div id="trendDarkCloudPlacement" class="common-ui-placement"><div id="trendDarkCloudMotion"><img id="trendDarkCloudImg" src="assets/scene-header/trends/Trend_DarkCloud.png" alt="Dark cloud trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
+            <div id="trendRainLayer" class="common-ui-layer"><div id="trendRainPlacement" class="common-ui-placement"><div id="trendRainMotion"><img id="trendRainImg" src="assets/scene-header/trends/Trend_Rain.png" alt="Rain trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
+            <div id="trendLightningLayer" class="common-ui-layer"><div id="trendLightningPlacement" class="common-ui-placement"><div id="trendLightningMotion"><img id="trendLightningImg" src="assets/scene-header/trends/Trend_Lightning.png" alt="Lightning trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
+            <div id="trendCloudLayer" class="common-ui-layer"><div id="trendCloudPlacement" class="common-ui-placement"><div id="trendCloudMotion"><img id="trendCloudImg" src="assets/scene-header/trends/Trend_Cloud.png" alt="Cloud trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
+            <div id="trendBirdsLayer" class="common-ui-layer"><div id="trendBirdsPlacement" class="common-ui-placement"><div id="trendBirdsMotion"><img id="trendBirdsImg" src="assets/scene-header/trends/Trend_Birds.png" alt="Birds trend asset" style="display:block;width:390px;height:auto;pointer-events:none"></div></div></div>
             <div id="commonUiLayer" class="common-ui-layer">
               <div id="commonUiPlacement" class="common-ui-placement">
                 <div class="header-id">
@@ -263,18 +263,18 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
 <script>
 const STATES=['TAILWIND','CALM','HEADWIND','ROUGH','STORM'];
 const ASSETS={
- TAILWIND:'assets/boats/Boat_tailwind_1254_1254_Cyan.png',
- CALM:'assets/boats/Boat_calm_1254_1254_Cyan.png',
- HEADWIND:'assets/boats/Boat_headwind_1254_1254_Cyan.png',
- ROUGH:'assets/boats/Boat_rough_1254_1254_Cyan.png',
- STORM:'assets/boats/Boat_storm_1254_1254_Cyan.png'
+ TAILWIND:'assets/scene-header/boats/Boat_tailwind_1254_1254_Cyan.png',
+ CALM:'assets/scene-header/boats/Boat_calm_1254_1254_Cyan.png',
+ HEADWIND:'assets/scene-header/boats/Boat_headwind_1254_1254_Cyan.png',
+ ROUGH:'assets/scene-header/boats/Boat_rough_1254_1254_Cyan.png',
+ STORM:'assets/scene-header/boats/Boat_storm_1254_1254_Cyan.png'
 };
 const INTERNAL={originX:50,originY:82,easing:'ease-in-out',baseWidthRatio:0.37,baseRot:0,waveBaseWidthRatio:1.0,rearWaveBaseWidthRatio:1.0};
 const DEFAULT_COMMON={x:80,y:12,scale:0.55,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:80,waveY:35,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:3,rearWaveScale:1.6,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7,uiX:0,uiY:6,uiScale:1,uiZIndex:60,symbolX:9,symbolY:4,symbolSize:38,brandX:7,syncX:13,syncY:48,retryX:172,retryY:46};
 const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v5_4';
 const TREND_STORAGE_KEY='riverwatch.sceneLab.trendLayers.v6_0';
 const TRENDS=['STRONG_DOWN','DOWN','STABLE','UP','STRONG_UP'];
-const TREND_LAYER_ASSETS={darkCloud:'assets/trends/Trend_DarkCloud.png',rain:'assets/trends/Trend_Rain.png',lightning:'assets/trends/Trend_Lightning.png',cloud:'assets/trends/Trend_Cloud.png',birds:'assets/trends/Trend_Birds.png'};
+const TREND_LAYER_ASSETS={darkCloud:'assets/scene-header/trends/Trend_DarkCloud.png',rain:'assets/scene-header/trends/Trend_Rain.png',lightning:'assets/scene-header/trends/Trend_Lightning.png',cloud:'assets/scene-header/trends/Trend_Cloud.png',birds:'assets/scene-header/trends/Trend_Birds.png'};
 const TREND_COMPOSITION={STRONG_DOWN:['darkCloud','rain','lightning'],DOWN:['darkCloud','rain'],STABLE:['darkCloud'],UP:['cloud'],STRONG_UP:['cloud','birds']};
 const TREND_LAYER_LABELS={darkCloud:'DARK CLOUD',rain:'RAIN',lightning:'LIGHTNING',cloud:'CLOUD',birds:'BIRDS'};
 const TREND_LAYER_DEFAULTS={
@@ -292,7 +292,7 @@ function makeButtons(el,items,type){el.innerHTML=items.map(v=>`<button class="bt
 makeButtons($('#stateBtns'),STATES,'state');
 makeButtons($('#trendBtns'),TRENDS,'trend');
 makeButtons($('#widthBtns'),['360','375','390','412','DEVICE'],'width');
-const WAVE_ASSETS={HEADWIND:'assets/front-waves/Front_Wave_Headwind.png',ROUGH:'assets/front-waves/Front_Wave_Rough.png',STORM:'assets/front-waves/Front_Wave_Storm.png',TAILWIND:'assets/front-waves/Front_Wave_Tailwind.png',CALM:'assets/front-waves/Front_Wave_Calm.png'};
+const WAVE_ASSETS={HEADWIND:'assets/scene-header/front-waves/Front_Wave_Headwind.png',ROUGH:'assets/scene-header/front-waves/Front_Wave_Rough.png',STORM:'assets/scene-header/front-waves/Front_Wave_Storm.png',TAILWIND:'assets/scene-header/front-waves/Front_Wave_Tailwind.png',CALM:'assets/scene-header/front-waves/Front_Wave_Calm.png'};
 const fields=['x','y','scale','zIndex','floatY','driftX','pitch','duration','waveX','waveY','waveScale','waveZIndex','waveDriftX','waveFloatY','wavePulse','waveDuration','rearWaveX','rearWaveY','rearWaveScale','rearWaveZIndex','rearWaveDriftX','rearWaveFloatY','rearWavePulse','rearWaveDuration','uiX','uiY','uiScale','uiZIndex','symbolX','symbolY','symbolSize','brandX','syncX','syncY','retryX','retryY'];
 function clampNum(v,min,max,fallback){v=Number(v);if(!Number.isFinite(v))return fallback;return Math.min(max,Math.max(min,v))}
 function active(){document.querySelectorAll('[data-state]').forEach(b=>b.classList.toggle('active',b.dataset.state===app.state));document.querySelectorAll('[data-trend]').forEach(b=>b.classList.toggle('active',b.dataset.trend===app.trend));document.querySelectorAll('[data-width]').forEach(b=>b.classList.toggle('active',b.dataset.width===String(app.width)||(b.dataset.width==='DEVICE'&&app.width==='DEVICE')))}
