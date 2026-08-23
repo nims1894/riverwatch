@@ -55,7 +55,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
 .tab-panel{display:none}.tab-panel.active{display:block}
 .tab-panel>.section:first-child{border-top:0;margin-top:0;padding-top:0}
 .ui-preview-note{color:#6f8296;font-size:10px;margin-top:6px}
-@media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:sticky;top:0;z-index:5}.grid{grid-template-columns:repeat(2,1fr)}.stage{height:140px}}
+@media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:static;top:auto;z-index:auto}.grid{grid-template-columns:repeat(2,1fr)}.stage{height:140px}.controls{padding-bottom:calc(18px + env(safe-area-inset-bottom))}html{scroll-padding-bottom:42vh}body{overflow-y:auto;-webkit-overflow-scrolling:touch}}
 @media(prefers-reduced-motion:reduce){.boat-layer img.swap,.wave-layer img.swap{animation:none!important}}
 </style>
 </head>
