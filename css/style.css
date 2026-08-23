@@ -8284,6 +8284,7 @@ body{
         position:absolute;
         left:172px;
         top:46px;
+        margin:0 !important; /* neutralize legacy global button margin-top */
         width:20px;
         height:20px;
         display:grid;
