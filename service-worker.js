@@ -1,10 +1,11 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-mobile-scene-header-20260823";
+const CACHE_NAME = "riverwatch-v1.1-pwa-mobile-header-config-20260823";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/data.js",
   "./js/marketEngine.js",
+  "./js/mobile-header-config.js",
   "./js/app.js",
   "./manifest.webmanifest",
   "./icons/riverwatch-192.png",

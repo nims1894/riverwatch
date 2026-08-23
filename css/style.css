@@ -8301,19 +8301,19 @@ body{
     .rw-mobile-header-retry span{display:block;line-height:1}
 
     @keyframes rwSceneBoatFloat{
-        0%{transform:translate(-5px,0) rotate(-2deg)}
-        50%{transform:translate(0,-10px) rotate(0deg)}
-        100%{transform:translate(5px,0) rotate(2deg)}
+        0%{transform:translate(calc(-1 * var(--rw-drift-x,5px)),0) rotate(calc(-1 * var(--rw-pitch,2deg)))}
+        50%{transform:translate(0,calc(-1 * var(--rw-float-y,10px))) rotate(0deg)}
+        100%{transform:translate(var(--rw-drift-x,5px),0) rotate(var(--rw-pitch,2deg))}
     }
     @keyframes rwSceneFrontMove{
-        0%{transform:translate(-15px,0) scale(1)}
-        50%{transform:translate(0,-2px) scale(1.01)}
-        100%{transform:translate(15px,0) scale(1)}
+        0%{transform:translate(calc(-1 * var(--rw-drift-x,15px)),0) scale(1)}
+        50%{transform:translate(0,calc(-1 * var(--rw-float-y,2px))) scale(calc(1 + var(--rw-scale-pulse,.01)))}
+        100%{transform:translate(var(--rw-drift-x,15px),0) scale(1)}
     }
     @keyframes rwSceneRearMove{
-        0%{transform:translate(-8px,0) scale(1)}
-        50%{transform:translate(0,-1px) scale(1.005)}
-        100%{transform:translate(8px,0) scale(1)}
+        0%{transform:translate(calc(-1 * var(--rw-drift-x,8px)),0) scale(1)}
+        50%{transform:translate(0,calc(-1 * var(--rw-float-y,1px))) scale(calc(1 + var(--rw-scale-pulse,.005)))}
+        100%{transform:translate(var(--rw-drift-x,8px),0) scale(1)}
     }
     @keyframes rwSceneLightningPulse{
         0%,100%{opacity:.70;filter:brightness(.92)}
@@ -8323,23 +8323,23 @@ body{
         58%{opacity:.82;filter:brightness(1)}
     }
     @keyframes rwSceneRainFall{
-        0%{transform:translate3d(-2px,-10px,0)}
-        100%{transform:translate3d(2px,10px,0)}
+        0%{transform:translate3d(calc(-1 * var(--rw-drift-x,2px)),calc(-1 * var(--rw-float-y,10px)),0)}
+        100%{transform:translate3d(var(--rw-drift-x,2px),var(--rw-float-y,10px),0)}
     }
     @keyframes rwSceneDarkCloudDrift{
-        0%{transform:translate3d(-4px,0,0)}
-        50%{transform:translate3d(0,-1px,0)}
-        100%{transform:translate3d(4px,0,0)}
+        0%{transform:translate3d(calc(-1 * var(--rw-drift-x,4px)),0,0)}
+        50%{transform:translate3d(0,calc(-1 * var(--rw-float-y,1px)),0)}
+        100%{transform:translate3d(var(--rw-drift-x,4px),0,0)}
     }
     @keyframes rwSceneCloudDrift{
-        0%{transform:translate3d(-5px,0,0)}
-        50%{transform:translate3d(0,-1px,0)}
-        100%{transform:translate3d(5px,0,0)}
+        0%{transform:translate3d(calc(-1 * var(--rw-drift-x,5px)),0,0)}
+        50%{transform:translate3d(0,calc(-1 * var(--rw-float-y,1px)),0)}
+        100%{transform:translate3d(var(--rw-drift-x,5px),0,0)}
     }
     @keyframes rwSceneBirdsFly{
-        0%{transform:translate3d(-20px,0,0)}
-        50%{transform:translate3d(0,-5px,0)}
-        100%{transform:translate3d(20px,0,0)}
+        0%{transform:translate3d(calc(-1 * var(--rw-drift-x,20px)),0,0)}
+        50%{transform:translate3d(0,calc(-1 * var(--rw-float-y,5px)),0)}
+        100%{transform:translate3d(var(--rw-drift-x,20px),0,0)}
     }
 
     .rw-mobile-boat-motion{animation:rwSceneBoatFloat 3s ease-in-out infinite alternate}

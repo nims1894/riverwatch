@@ -1643,7 +1643,71 @@ function getLatestHeaderStateTrend() {
     };
 }
 
+
+function getMobileHeaderConfig() {
+    return window.RIVERWATCH_MOBILE_HEADER_CONFIG || null;
+}
+
+function applyMobileHeaderConfig() {
+    const cfg = getMobileHeaderConfig();
+    if (!cfg || window.innerWidth > 640) return;
+
+    const topbar = document.querySelector('.topbar');
+    if (topbar && cfg.header?.height) {
+        topbar.style.setProperty('height', `${cfg.header.height}px`, 'important');
+        topbar.style.setProperty('min-height', `${cfg.header.height}px`, 'important');
+    }
+    const scene = document.querySelector('.rw-mobile-header-scene');
+    const commonUi = document.querySelector('.rw-mobile-common-ui');
+    if (scene && cfg.header?.height) scene.style.height = `${cfg.header.height}px`;
+    if (commonUi && cfg.header?.height) commonUi.style.height = `${cfg.header.height}px`;
+
+    const setPlace=(sel,c,baseWidthRatio)=>{
+        const el=document.querySelector(sel); if(!el||!c)return;
+        el.style.width=`${baseWidthRatio*100}%`;
+        el.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale})`;
+        if(el.parentElement) el.parentElement.style.zIndex=String(c.zIndex);
+    };
+    setPlace('.rw-mobile-boat-place',cfg.boat,cfg.boat?.baseWidthRatio ?? .37);
+    setPlace('.rw-mobile-front-place',cfg.frontWave,cfg.frontWave?.baseWidthRatio ?? 1);
+    setPlace('.rw-mobile-rear-place',cfg.rearWave,cfg.rearWave?.baseWidthRatio ?? 1);
+
+    const boatMotion=document.querySelector('.rw-mobile-boat-motion');
+    if(boatMotion&&cfg.boat){
+        boatMotion.style.transformOrigin=`${cfg.boat.originX ?? 50}% ${cfg.boat.originY ?? 82}%`;
+        const a=cfg.boat.animation||{};
+        boatMotion.style.setProperty('--rw-drift-x',`${a.driftX ?? 5}px`);
+        boatMotion.style.setProperty('--rw-float-y',`${a.floatY ?? 10}px`);
+        boatMotion.style.setProperty('--rw-pitch',`${a.pitch ?? 2}deg`);
+        boatMotion.style.animationDuration=`${a.duration ?? 3}s`;
+        boatMotion.style.animationTimingFunction=a.easing||'ease-in-out';
+    }
+    const applyWaveMotion=(sel,c)=>{const el=document.querySelector(sel);if(!el||!c)return;const a=c.animation||{};el.style.setProperty('--rw-drift-x',`${a.driftX ?? 0}px`);el.style.setProperty('--rw-float-y',`${a.floatY ?? 0}px`);el.style.setProperty('--rw-scale-pulse',String(a.scalePulse ?? 0));el.style.animationDuration=`${a.duration ?? 5}s`;el.style.animationTimingFunction=a.easing||'ease-in-out';};
+    applyWaveMotion('.rw-mobile-front-motion',cfg.frontWave);
+    applyWaveMotion('.rw-mobile-rear-motion',cfg.rearWave);
+
+    const ui=cfg.commonUI;
+    if(commonUi&&ui){
+        commonUi.style.zIndex=String(ui.zIndex);
+        const p=commonUi.querySelector('.rw-mobile-common-ui-place'); if(p)p.style.transform=`translate(${ui.x}px,${ui.y}px) scale(${ui.scale})`;
+        const symbol=commonUi.querySelector('.rw-mobile-header-symbol'); if(symbol&&ui.symbol){symbol.style.width=`${ui.symbol.size}px`;symbol.style.height=`${ui.symbol.size}px`;symbol.style.transform=`translate(${ui.symbol.x}px,${ui.symbol.y}px)`;}
+        const brand=commonUi.querySelector('.rw-mobile-header-brand-copy'); if(brand&&ui.brand)brand.style.transform=`translateX(${ui.brand.x}px)`;
+        const sync=commonUi.querySelector('.rw-mobile-header-sync'); if(sync&&ui.sync){sync.style.left=`${ui.sync.x}px`;sync.style.top=`${ui.sync.y}px`;}
+        const retry=commonUi.querySelector('.rw-mobile-header-retry'); if(retry&&ui.retry){retry.style.left=`${ui.retry.x}px`;retry.style.top=`${ui.retry.y}px`;retry.style.margin='0';}
+    }
+
+    const layerMap={darkCloud:'.rw-mobile-darkcloud-layer',rain:'.rw-mobile-rain-layer',lightning:'.rw-mobile-lightning-layer',cloud:'.rw-mobile-cloud-layer',birds:'.rw-mobile-birds-layer'};
+    Object.entries(cfg.trend?.layers||{}).forEach(([key,c])=>{
+        const layer=document.querySelector(layerMap[key]); if(!layer)return;
+        layer.style.zIndex=String(c.zIndex);
+        const place=layer.querySelector('.rw-mobile-trend-place'); if(place){place.style.right='0';place.style.left='auto';place.style.top='0';place.style.transformOrigin='100% 0';place.style.transform=`translate3d(${-c.x}px,${c.y}px,0) scale(${c.scale})`;}
+        const img=layer.querySelector('img'); if(img)img.style.opacity=String(c.opacity);
+        const motion=layer.querySelector('[class$="-motion"]'); if(motion){motion.style.setProperty('--rw-drift-x',`${c.driftX ?? 0}px`);motion.style.setProperty('--rw-float-y',`${c.floatY ?? 0}px`);motion.style.animationDuration=`${c.duration ?? 5}s`;}
+    });
+}
+
 function renderMobileSceneHeader() {
+    applyMobileHeaderConfig();
     const boat = document.getElementById('rwMobileBoat');
     const front = document.getElementById('rwMobileFrontWave');
     if (!boat || !front) return;
@@ -1666,7 +1730,7 @@ function renderMobileSceneHeader() {
     boat.src = boatAssets[state];
     front.src = frontAssets[state];
 
-    const composition = {
+    const composition = getMobileHeaderConfig()?.trend?.composition || {
         STRONG_DOWN:['darkCloud','rain','lightning'],
         DOWN:['darkCloud','rain'],
         STABLE:['darkCloud'],
