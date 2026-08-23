@@ -68,7 +68,7 @@ window.RIVERWATCH_MOBILE_HEADER_CONFIG = {
     },
     "retry": {
       "x": 178,
-      "y": 44
+      "y": 42
     }
   },
   "trend": {
