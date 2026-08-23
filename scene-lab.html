@@ -224,6 +224,16 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
   </div>
 </div>
 <script>
+const STATES=['TAILWIND','CALM','HEADWIND','ROUGH','STORM'];
+const ASSETS={
+ TAILWIND:'assets/boats/Boat_tailwind_1254_1254_Cyan.png',
+ CALM:'assets/boats/Boat_calm_1254_1254_Cyan.png',
+ HEADWIND:'assets/boats/Boat_headwind_1254_1254_Cyan.png',
+ ROUGH:'assets/boats/Boat_rough_1254_1254_Cyan.png',
+ STORM:'assets/boats/Boat_storm_1254_1254_Cyan.png'
+};
+const INTERNAL={originX:50,originY:82,easing:'ease-in-out',baseWidthRatio:0.37,baseRot:0,waveBaseWidthRatio:1.0,rearWaveBaseWidthRatio:1.0};
+const DEFAULT_COMMON={x:80,y:12,scale:0.55,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:80,waveY:35,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:3,rearWaveScale:1.6,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7,uiX:0,uiY:6,uiScale:1,uiZIndex:60,symbolX:9,symbolY:4,symbolSize:38,brandX:7,syncX:13,syncY:48,retryX:172,retryY:42};
 const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v5_4';
 const TREND_STORAGE_KEY='riverwatch.sceneLab.trendLayers.v6_0';
 const TRENDS=['STRONG_DOWN','DOWN','STABLE','UP','STRONG_UP'];
