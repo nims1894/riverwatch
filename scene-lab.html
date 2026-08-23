@@ -34,17 +34,34 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
 .boat-motion{position:relative;pointer-events:none;will-change:transform}
 .boat-layer img{position:relative;display:block;max-width:none;user-select:none;pointer-events:none;will-change:opacity}
 .boat-layer img.swap{animation:assetFade .22s ease-out}
+.common-ui-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.common-ui-placement{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none}
+.header-id{display:flex;align-items:flex-start;gap:7px;white-space:nowrap}
+.header-symbol{display:block;width:36px;height:36px;flex:none;filter:drop-shadow(0 0 4px rgba(80,220,226,.12))}
+.header-brand-copy{position:relative;line-height:1}
+.header-vessel{font-size:10px;font-weight:700;letter-spacing:.05em;color:#8faac5;margin:1px 0 2px}
+.header-brand{font-size:25px;font-weight:800;letter-spacing:-.04em;color:#edf5ff}
+.header-sync-row{position:absolute;display:flex;align-items:center;white-space:nowrap;color:#7f93aa;font-size:9px;line-height:1}
+.header-online{font-weight:800;color:#3dd58a;margin-left:3px}
+.header-retry{position:absolute;display:grid;place-items:center;border:1px solid #42536a;border-radius:50%;background:rgba(9,20,34,.78);color:#7f93aa;padding:0;font:700 11px/1 system-ui;pointer-events:auto;cursor:pointer}
+.header-retry:active{transform:scale(.92)}
 @keyframes assetFade{from{opacity:.2}to{opacity:1}}
 .guide{position:absolute;z-index:999;pointer-events:none;display:none}.guide.center{left:50%;top:0;bottom:0;border-left:1px dashed #ffdd66}.guide.water{left:0;right:0;top:74%;border-top:1px dashed #65e0a3}.guide.safe{inset:8px;border:1px dashed #d778ff}.guides-on .guide{display:block}
 .section{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.section:first-child{border:0;margin-top:0;padding-top:0}.section h2{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 0 9px}.grid{display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:8px}.field label{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.field input{width:100%;background:#081522;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:7px;min-height:36px}.readout{white-space:pre-wrap;background:#06101a;border:1px solid var(--line);border-radius:8px;padding:9px;color:#bcd1e2;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:220px;overflow:auto}.hint{color:var(--muted);font-size:11px;margin-top:8px}.statusline{margin-top:8px;color:#9fc8e5;font-size:11px}.scope{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#081522;color:#b7c8d8;font-size:11px}.saved{color:#72e0aa}
+.control-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:3px;margin-bottom:12px;scrollbar-width:thin}
+.tab-btn{flex:0 0 auto;border:1px solid var(--line);background:#0a1725;color:#8fa2b5;border-radius:8px;padding:8px 10px;min-height:36px;cursor:pointer;font-size:11px;font-weight:700;letter-spacing:.04em}
+.tab-btn.active{color:#dff4ff;border-color:#4ca4d2;background:#10263a;box-shadow:inset 0 0 0 1px rgba(119,201,255,.08)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+.tab-panel>.section:first-child{border-top:0;margin-top:0;padding-top:0}
+.ui-preview-note{color:#6f8296;font-size:10px;margin-top:6px}
 @media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:sticky;top:0;z-index:5}.grid{grid-template-columns:repeat(2,1fr)}.stage{height:140px}}
-@media(prefers-reduced-motion:reduce){.boat-layer img.swap{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.boat-layer img.swap,.wave-layer img.swap{animation:none!important}}
 </style>
 </head>
 <body>
 <div class="lab">
   <div class="lab-head">
-    <div><h1>RiverWatch · Boat Scene Lab</h1><div class="meta">Boat Asset + Position + Scale + Z + Base Animation</div></div>
+    <div><h1>RiverWatch · Boat Scene Lab</h1><div class="meta">Tabbed Scene Controls · Boat / Waves / Common UI</div></div>
     <div id="deviceMeta" class="meta"></div>
   </div>
 
@@ -59,7 +76,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
     <section class="preview-panel">
       <div class="device-wrap">
         <div class="stage-shell">
-          <div class="stage-label"><span>MOBILE HEADER · BOAT ONLY</span><span id="stageSize"></span></div>
+          <div class="stage-label"><span>MOBILE HEADER · SCENE + COMMON UI</span><span id="stageSize"></span></div>
           <div id="stage" class="stage">
             <div id="rearWaveLayer" class="rear-wave-layer"><div id="rearWavePlacement" class="rear-wave-placement"><div id="rearWaveMotion" class="rear-wave-motion"><img id="rearWaveImg" src="assets/rear-waves/Rear_Wave_Common.png" alt="RiverWatch common rear wave asset"></div></div></div>
             <div id="waveLayer" class="wave-layer"><div id="wavePlacement" class="wave-placement"><div id="waveMotion" class="wave-motion"><img id="waveImg" alt="RiverWatch front wave state asset"></div></div></div>
@@ -68,6 +85,19 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
                 <div id="boatMotion" class="boat-motion">
                   <img id="boatImg" alt="RiverWatch boat state asset">
                 </div>
+              </div>
+            </div>
+            <div id="commonUiLayer" class="common-ui-layer">
+              <div id="commonUiPlacement" class="common-ui-placement">
+                <div class="header-id">
+                  <img id="headerSymbol" class="header-symbol" src="icons/koru-mark.svg" alt="Koru symbol">
+                  <div id="headerBrandCopy" class="header-brand-copy">
+                    <div class="header-vessel">RV Koru</div>
+                    <div class="header-brand">RiverWatch</div>
+                  </div>
+                </div>
+                <div id="headerSyncRow" class="header-sync-row">Last Sync 2026.08.23 15:19 · <span class="header-online">ONLINE</span></div>
+                <button id="headerRetry" class="header-retry" type="button" title="Retry / Refresh">↻</button>
               </div>
             </div>
             <i class="guide center"></i><i class="guide water"></i><i class="guide safe"></i>
@@ -82,74 +112,103 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
       </div>
 
       <div class="section">
-        <div class="scope">Brand / Status / Sky / Weather / Birds / Trend effects are disabled. State changes Boat PNG + Front Wave PNG. Rear Wave is one COMMON asset for all states.</div>
+        <div class="scope">Trend / Sky / Weather / Birds are disabled. Boat + Front Wave change by STATE. Rear Wave and Header Common UI are shared across all states.</div>
       </div>
     </section>
 
     <section class="controls">
-      <div class="section"><h2>STAGE</h2><div class="row" id="widthBtns"></div><div class="hint">DEVICE는 현재 브라우저 CSS width를 사용합니다.</div></div>
-
-      <div class="section"><h2>COMMON · PLACEMENT</h2><div class="grid">
-        <div class="field"><label>X px</label><input id="x" type="number" step="1"></div>
-        <div class="field"><label>Y px</label><input id="y" type="number" step="1"></div>
-        <div class="field"><label>SCALE</label><input id="scale" type="number" step="0.01" min="0.05" max="3"></div>
-        <div class="field"><label>Z-INDEX</label><input id="zIndex" type="number" step="1" min="-100" max="1000"></div>
-      </div></div>
-
-      <div class="section"><h2>COMMON · BASE ANIMATION</h2><div class="grid">
-        <div class="field"><label>FLOAT ΔY px</label><input id="floatY" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>DRIFT ΔX px</label><input id="driftX" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>PITCH ±deg</label><input id="pitch" type="number" step="0.1" min="0" max="10"></div>
-        <div class="field"><label>DURATION s</label><input id="duration" type="number" step="0.1" min="0.5" max="30"></div>
-      </div><div class="hint">모든 값은 5개 STATE 공통입니다. Origin / Easing은 내부 고정값입니다. Boat Base Width는 Stage 폭의 37%로 계산되어 PC/모바일에서 동일한 Stage 기준을 사용합니다.</div></div>
-
-
-      <div class="section"><h2>COMMON · FRONT WAVE PLACEMENT</h2><div class="grid">
-        <div class="field"><label>WAVE X px</label><input id="waveX" type="number" step="1"></div>
-        <div class="field"><label>WAVE Y px</label><input id="waveY" type="number" step="1"></div>
-        <div class="field"><label>WAVE SCALE</label><input id="waveScale" type="number" step="0.01" min="0.05" max="3"></div>
-        <div class="field"><label>WAVE Z-INDEX</label><input id="waveZIndex" type="number" step="1" min="-100" max="1000"></div>
-      </div><div class="hint">Front Wave는 5개 STATE 공통 위치/크기입니다. 기본 Z는 Boat(30)보다 앞인 40입니다.</div></div>
-
-      <div class="section"><h2>COMMON · FRONT WAVE ANIMATION</h2><div class="grid">
-        <div class="field"><label>WAVE DRIFT ΔX px</label><input id="waveDriftX" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>WAVE FLOAT ΔY px</label><input id="waveFloatY" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>SCALE PULSE</label><input id="wavePulse" type="number" step="0.001" min="0" max="0.2"></div>
-        <div class="field"><label>DURATION s</label><input id="waveDuration" type="number" step="0.1" min="0.5" max="30"></div>
-      </div><div class="hint">Front Wave 전용 테스트 애니메이션입니다. Boat 애니메이션 값과 독립적으로 조절됩니다.</div></div>
-
-
-      <div class="section"><h2>COMMON · REAR WAVE PLACEMENT</h2><div class="grid">
-        <div class="field"><label>REAR X px</label><input id="rearWaveX" type="number" step="1"></div>
-        <div class="field"><label>REAR Y px</label><input id="rearWaveY" type="number" step="1"></div>
-        <div class="field"><label>REAR SCALE</label><input id="rearWaveScale" type="number" step="0.01" min="0.05" max="3"></div>
-        <div class="field"><label>REAR Z-INDEX</label><input id="rearWaveZIndex" type="number" step="1" min="-100" max="1000"></div>
-      </div><div class="hint">Rear Wave는 5개 STATE 공통 단일 에셋입니다. 기본 Z는 Boat(30) 뒤인 20입니다.</div></div>
-
-      <div class="section"><h2>COMMON · REAR WAVE ANIMATION</h2><div class="grid">
-        <div class="field"><label>REAR DRIFT ΔX px</label><input id="rearWaveDriftX" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>REAR FLOAT ΔY px</label><input id="rearWaveFloatY" type="number" step="0.5" min="0" max="40"></div>
-        <div class="field"><label>SCALE PULSE</label><input id="rearWavePulse" type="number" step="0.001" min="0" max="0.2"></div>
-        <div class="field"><label>DURATION s</label><input id="rearWaveDuration" type="number" step="0.1" min="0.5" max="30"></div>
-      </div><div class="hint">Rear Wave 전용 테스트 애니메이션입니다. Boat / Front Wave와 독립적으로 조절됩니다.</div></div>
-
-      <div class="section"><h2>CONFIG MEMORY</h2>
-        <div id="saveStatus" class="statusline"></div>
-        <div class="row" style="margin-top:8px">
-          <button class="btn" id="saveBtn" type="button">SAVE</button>
-          <button class="btn" id="copyBtn" type="button">COPY CONFIG</button>
-          <button class="btn" id="resetBtn" type="button">RESET</button>
-        </div>
-        <div class="hint">값 변경 시 이 브라우저에 자동 저장됩니다. PC와 모바일의 저장값은 서로 독립적입니다.</div>
+      <div class="control-tabs" id="controlTabs">
+        <button class="tab-btn active" type="button" data-tab="boat">BOAT</button>
+        <button class="tab-btn" type="button" data-tab="front">FRONT WAVE</button>
+        <button class="tab-btn" type="button" data-tab="rear">REAR WAVE</button>
+        <button class="tab-btn" type="button" data-tab="ui">COMMON UI</button>
+        <button class="tab-btn" type="button" data-tab="config">CONFIG</button>
       </div>
 
-      <div class="section"><h2>CURRENT CONFIG</h2><div id="readout" class="readout"></div></div>
+      <div class="tab-panel active" data-panel="boat">
+        <div class="section"><h2>BOAT · PLACEMENT</h2><div class="grid">
+          <div class="field"><label>X px</label><input id="x" type="number" step="1"></div>
+          <div class="field"><label>Y px</label><input id="y" type="number" step="1"></div>
+          <div class="field"><label>SCALE</label><input id="scale" type="number" step="0.01" min="0.05" max="3"></div>
+          <div class="field"><label>Z-INDEX</label><input id="zIndex" type="number" step="1" min="-100" max="1000"></div>
+        </div></div>
+        <div class="section"><h2>BOAT · BASE ANIMATION</h2><div class="grid">
+          <div class="field"><label>FLOAT ΔY px</label><input id="floatY" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>DRIFT ΔX px</label><input id="driftX" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>PITCH ±deg</label><input id="pitch" type="number" step="0.1" min="0" max="10"></div>
+          <div class="field"><label>DURATION s</label><input id="duration" type="number" step="0.1" min="0.5" max="30"></div>
+        </div><div class="hint">5개 STATE 공통값. Origin / Easing은 내부 고정값입니다.</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="front">
+        <div class="section"><h2>FRONT WAVE · PLACEMENT</h2><div class="grid">
+          <div class="field"><label>WAVE X px</label><input id="waveX" type="number" step="1"></div>
+          <div class="field"><label>WAVE Y px</label><input id="waveY" type="number" step="1"></div>
+          <div class="field"><label>WAVE SCALE</label><input id="waveScale" type="number" step="0.01" min="0.05" max="3"></div>
+          <div class="field"><label>WAVE Z-INDEX</label><input id="waveZIndex" type="number" step="1" min="-100" max="1000"></div>
+        </div></div>
+        <div class="section"><h2>FRONT WAVE · ANIMATION</h2><div class="grid">
+          <div class="field"><label>DRIFT ΔX px</label><input id="waveDriftX" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>FLOAT ΔY px</label><input id="waveFloatY" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>SCALE PULSE</label><input id="wavePulse" type="number" step="0.001" min="0" max="0.2"></div>
+          <div class="field"><label>DURATION s</label><input id="waveDuration" type="number" step="0.1" min="0.5" max="30"></div>
+        </div><div class="hint">Boat와 독립된 Front Wave 전용 애니메이션.</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="rear">
+        <div class="section"><h2>REAR WAVE · PLACEMENT</h2><div class="grid">
+          <div class="field"><label>REAR X px</label><input id="rearWaveX" type="number" step="1"></div>
+          <div class="field"><label>REAR Y px</label><input id="rearWaveY" type="number" step="1"></div>
+          <div class="field"><label>REAR SCALE</label><input id="rearWaveScale" type="number" step="0.01" min="0.05" max="3"></div>
+          <div class="field"><label>REAR Z-INDEX</label><input id="rearWaveZIndex" type="number" step="1" min="-100" max="1000"></div>
+        </div></div>
+        <div class="section"><h2>REAR WAVE · ANIMATION</h2><div class="grid">
+          <div class="field"><label>DRIFT ΔX px</label><input id="rearWaveDriftX" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>FLOAT ΔY px</label><input id="rearWaveFloatY" type="number" step="0.5" min="0" max="40"></div>
+          <div class="field"><label>SCALE PULSE</label><input id="rearWavePulse" type="number" step="0.001" min="0" max="0.2"></div>
+          <div class="field"><label>DURATION s</label><input id="rearWaveDuration" type="number" step="0.1" min="0.5" max="30"></div>
+        </div><div class="hint">5개 STATE 공통 Rear Wave. Boat / Front Wave와 독립적으로 조절.</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="ui">
+        <div class="section"><h2>HEADER COMMON UI · GROUP</h2><div class="grid">
+          <div class="field"><label>UI X px</label><input id="uiX" type="number" step="1"></div>
+          <div class="field"><label>UI Y px</label><input id="uiY" type="number" step="1"></div>
+          <div class="field"><label>UI SCALE</label><input id="uiScale" type="number" step="0.01" min="0.5" max="2"></div>
+          <div class="field"><label>UI Z-INDEX</label><input id="uiZIndex" type="number" step="1" min="-100" max="1000"></div>
+        </div><div class="hint">Koru Symbol + RV Koru/RiverWatch + Last Sync/ONLINE + Retry를 하나의 공통 UI Layer로 관리합니다.</div></div>
+        <div class="section"><h2>SYMBOL / BRAND</h2><div class="grid">
+          <div class="field"><label>SYMBOL X px</label><input id="symbolX" type="number" step="1"></div>
+          <div class="field"><label>SYMBOL Y px</label><input id="symbolY" type="number" step="1"></div>
+          <div class="field"><label>SYMBOL SIZE px</label><input id="symbolSize" type="number" step="1" min="10" max="100"></div>
+          <div class="field"><label>BRAND X px</label><input id="brandX" type="number" step="1"></div>
+        </div></div>
+        <div class="section"><h2>SYNC / ONLINE / RETRY</h2><div class="grid">
+          <div class="field"><label>SYNC X px</label><input id="syncX" type="number" step="1"></div>
+          <div class="field"><label>SYNC Y px</label><input id="syncY" type="number" step="1"></div>
+          <div class="field"><label>RETRY X px</label><input id="retryX" type="number" step="1"></div>
+          <div class="field"><label>RETRY Y px</label><input id="retryY" type="number" step="1"></div>
+        </div><div class="ui-preview-note">현재 Scene-Lab에서는 Last Sync와 ONLINE을 Mock 값으로 표시합니다. 실제 데이터 연동은 하지 않습니다.</div></div>
+      </div>
+
+      <div class="tab-panel" data-panel="config">
+        <div class="section"><h2>STAGE</h2><div class="row" id="widthBtns"></div><div class="hint">DEVICE는 현재 브라우저 CSS width를 사용합니다.</div></div>
+        <div class="section"><h2>CONFIG MEMORY</h2>
+          <div id="saveStatus" class="statusline"></div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn" id="saveBtn" type="button">SAVE</button>
+            <button class="btn" id="copyBtn" type="button">COPY CONFIG</button>
+            <button class="btn" id="resetBtn" type="button">RESET</button>
+          </div>
+          <div class="hint">값 변경 시 이 브라우저에 자동 저장됩니다. PC와 모바일 저장값은 서로 독립적입니다.</div>
+        </div>
+        <div class="section"><h2>CURRENT CONFIG</h2><div id="readout" class="readout"></div></div>
+      </div>
     </section>
   </div>
 </div>
 <script>
-const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v4_6';
-const LEGACY_STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v4_5';
+const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v4_7';
 const STATES=['TAILWIND','CALM','HEADWIND','ROUGH','STORM'];
 const ASSETS={
   HEADWIND:'assets/boats/Boat_headwind_1254_1254_Cyan.png',
@@ -159,25 +218,27 @@ const ASSETS={
   CALM:'assets/boats/Boat_calm_1254_1254_Cyan.png'
 };
 const INTERNAL={originX:50,originY:82,easing:'ease-in-out',baseWidthRatio:0.37,baseRot:0,waveBaseWidthRatio:1.0,rearWaveBaseWidthRatio:1.0};
-const DEFAULT_COMMON={x:65,y:10,scale:0.5,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:70,waveY:33,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:38,rearWaveScale:1,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7};
+const DEFAULT_COMMON={x:70,y:15,scale:0.5,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:70,waveY:30,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:3,rearWaveScale:1.4,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7,uiX:18,uiY:12,uiScale:1,uiZIndex:60,symbolX:0,symbolY:0,symbolSize:38,brandX:7,syncX:45,syncY:55,retryX:191,retryY:49};
 const app={state:'CALM',width:390,paused:false,forceMotion:true,common:{...DEFAULT_COMMON}};
 const $=s=>document.querySelector(s);
 function makeButtons(el,items,type){el.innerHTML=items.map(v=>`<button class="btn" type="button" data-${type}="${v}">${v}</button>`).join('')}
 makeButtons($('#stateBtns'),STATES,'state');
 makeButtons($('#widthBtns'),['360','375','390','412','DEVICE'],'width');
 const WAVE_ASSETS={HEADWIND:'assets/front-waves/Front_Wave_Headwind.png',ROUGH:'assets/front-waves/Front_Wave_Rough.png',STORM:'assets/front-waves/Front_Wave_Storm.png',TAILWIND:'assets/front-waves/Front_Wave_Tailwind.png',CALM:'assets/front-waves/Front_Wave_Calm.png'};
-const fields=['x','y','scale','zIndex','floatY','driftX','pitch','duration','waveX','waveY','waveScale','waveZIndex','waveDriftX','waveFloatY','wavePulse','waveDuration','rearWaveX','rearWaveY','rearWaveScale','rearWaveZIndex','rearWaveDriftX','rearWaveFloatY','rearWavePulse','rearWaveDuration'];
+const fields=['x','y','scale','zIndex','floatY','driftX','pitch','duration','waveX','waveY','waveScale','waveZIndex','waveDriftX','waveFloatY','wavePulse','waveDuration','rearWaveX','rearWaveY','rearWaveScale','rearWaveZIndex','rearWaveDriftX','rearWaveFloatY','rearWavePulse','rearWaveDuration','uiX','uiY','uiScale','uiZIndex','symbolX','symbolY','symbolSize','brandX','syncX','syncY','retryX','retryY'];
 function clampNum(v,min,max,fallback){v=Number(v);if(!Number.isFinite(v))return fallback;return Math.min(max,Math.max(min,v))}
 function active(){document.querySelectorAll('[data-state]').forEach(b=>b.classList.toggle('active',b.dataset.state===app.state));document.querySelectorAll('[data-width]').forEach(b=>b.classList.toggle('active',b.dataset.width===String(app.width)||(b.dataset.width==='DEVICE'&&app.width==='DEVICE')))}
 function setBoatAsset(animate=true){const img=$('#boatImg');const src=ASSETS[app.state];if(img.getAttribute('src')===src)return;img.classList.remove('swap');img.src=src;if(animate){void img.offsetWidth;img.classList.add('swap')}$('#assetName').textContent=`${app.state} → ${src.split('/').pop()}`}
 function setWaveAsset(animate=true){const img=$('#waveImg');const src=WAVE_ASSETS[app.state];if(img.getAttribute('src')===src)return;img.classList.remove('swap');img.src=src;if(animate){void img.offsetWidth;img.classList.add('swap')}$('#waveAssetName').textContent=`${app.state} → ${src.split('/').pop()}`}
 function animationCss(){const c=app.common;return `@keyframes boatFloat{0%{transform:translate(${-c.driftX}px,0) rotate(${-c.pitch}deg)}50%{transform:translate(0,${-c.floatY}px) rotate(0deg)}100%{transform:translate(${c.driftX}px,0) rotate(${c.pitch}deg)}} @keyframes waveMove{0%{transform:translate(${-c.waveDriftX}px,0) scale(1)}50%{transform:translate(0,${-c.waveFloatY}px) scale(${1+c.wavePulse})}100%{transform:translate(${c.waveDriftX}px,0) scale(1)}} @keyframes rearWaveMove{0%{transform:translate(${-c.rearWaveDriftX}px,0) scale(1)}50%{transform:translate(0,${-c.rearWaveFloatY}px) scale(${1+c.rearWavePulse})}100%{transform:translate(${c.rearWaveDriftX}px,0) scale(1)}}`}
 function saveCommon(show=true){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(app.common));if(show){$('#saveStatus').textContent='Saved to this browser';$('#saveStatus').classList.add('saved')}}catch(e){$('#saveStatus').textContent='Save unavailable in this browser';$('#saveStatus').classList.remove('saved')}}
-function loadCommon(){try{let raw=localStorage.getItem(STORAGE_KEY);let migrated=false;if(!raw){raw=localStorage.getItem(LEGACY_STORAGE_KEY);migrated=!!raw}if(!raw)return;const data=JSON.parse(raw);for(const k of fields){if(Object.prototype.hasOwnProperty.call(data,k))app.common[k]=data[k]}if(migrated)localStorage.setItem(STORAGE_KEY,JSON.stringify(app.common));$('#saveStatus').textContent=migrated?'Migrated V4.3 config':'Restored saved config';$('#saveStatus').classList.add('saved')}catch(e){}}
+function loadCommon(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;const data=JSON.parse(raw);for(const k of fields){if(Object.prototype.hasOwnProperty.call(data,k))app.common[k]=data[k]}$('#saveStatus').textContent='Restored saved config';$('#saveStatus').classList.add('saved')}catch(e){}}
 function clearCommon(){try{localStorage.removeItem(STORAGE_KEY)}catch(e){}}
-function render(){const c=app.common;const s=$('#stage');const img=$('#boatImg');const layer=$('#boatLayer');const placement=$('#boatPlacement');const motion=$('#boatMotion');const waveImg=$('#waveImg');const waveLayer=$('#waveLayer');const wavePlacement=$('#wavePlacement');const waveMotion=$('#waveMotion');const rearWaveImg=$('#rearWaveImg');const rearWaveLayer=$('#rearWaveLayer');const rearWavePlacement=$('#rearWavePlacement');const rearWaveMotion=$('#rearWaveMotion');const requestedW=app.width==='DEVICE'?Math.min(innerWidth,640):app.width;s.parentElement.style.width=requestedW+'px';const rect=s.getBoundingClientRect();const stageW=rect.width;const stageH=rect.height;const baseBoatW=stageW*INTERNAL.baseWidthRatio;const renderedBoatW=baseBoatW*c.scale;const baseWaveW=stageW*INTERNAL.waveBaseWidthRatio;const renderedWaveW=baseWaveW*c.waveScale;const baseRearWaveW=stageW*INTERNAL.rearWaveBaseWidthRatio;const renderedRearWaveW=baseRearWaveW*c.rearWaveScale;$('#stageSize').textContent=`${Math.round(stageW)} × ${Math.round(stageH)} CSS px · BOAT ${Math.round(renderedBoatW)} px · FRONT ${Math.round(renderedWaveW)} px · REAR ${Math.round(renderedRearWaveW)} px`;img.style.width=baseBoatW+'px';layer.style.zIndex=String(c.zIndex);placement.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale}) rotate(${INTERNAL.baseRot}deg)`;motion.style.transformOrigin=`${INTERNAL.originX}% ${INTERNAL.originY}%`;waveImg.style.width=baseWaveW+'px';waveLayer.style.zIndex=String(c.waveZIndex);wavePlacement.style.transform=`translate(calc(-50% + ${c.waveX}px),calc(-50% + ${c.waveY}px)) scale(${c.waveScale})`;waveMotion.style.transformOrigin='50% 50%';rearWaveImg.style.width=baseRearWaveW+'px';rearWaveLayer.style.zIndex=String(c.rearWaveZIndex);rearWavePlacement.style.transform=`translate(calc(-50% + ${c.rearWaveX}px),calc(-50% + ${c.rearWaveY}px)) scale(${c.rearWaveScale})`;rearWaveMotion.style.transformOrigin='50% 50%';let st=$('#boatMotionStyle');if(!st){st=document.createElement('style');st.id='boatMotionStyle';document.head.appendChild(st)}st.textContent=animationCss();motion.style.animation='none';waveMotion.style.animation='none';rearWaveMotion.style.animation='none';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(!app.paused && (app.forceMotion || !reduced)){void motion.offsetWidth;motion.style.animation=`boatFloat ${c.duration}s ${INTERNAL.easing} infinite alternate`;void waveMotion.offsetWidth;waveMotion.style.animation=`waveMove ${c.waveDuration}s ${INTERNAL.easing} infinite alternate`;void rearWaveMotion.offsetWidth;rearWaveMotion.style.animation=`rearWaveMove ${c.rearWaveDuration}s ${INTERNAL.easing} infinite alternate`}else{motion.style.transform='translate(0,0) rotate(0deg)';waveMotion.style.transform='translate(0,0) scale(1)';rearWaveMotion.style.transform='translate(0,0) scale(1)'}$('#readout').textContent=JSON.stringify({scope:'COMMON',state:app.state,boatAsset:ASSETS[app.state],frontWaveAsset:WAVE_ASSETS[app.state],requestedStageWidth:requestedW,actualStageWidth:Number(stageW.toFixed(2)),boatBaseWidth:Number(baseBoatW.toFixed(2)),boatRenderedWidth:Number(renderedBoatW.toFixed(2)),waveBaseWidth:Number(baseWaveW.toFixed(2)),waveRenderedWidth:Number(renderedWaveW.toFixed(2)),rearWaveAsset:'assets/rear-waves/Rear_Wave_Common.png',rearWaveBaseWidth:Number(baseRearWaveW.toFixed(2)),rearWaveRenderedWidth:Number(renderedRearWaveW.toFixed(2)),...c},null,2);active()}
+function render(){const c=app.common;const s=$('#stage');const img=$('#boatImg');const layer=$('#boatLayer');const placement=$('#boatPlacement');const motion=$('#boatMotion');const waveImg=$('#waveImg');const waveLayer=$('#waveLayer');const wavePlacement=$('#wavePlacement');const waveMotion=$('#waveMotion');const rearWaveImg=$('#rearWaveImg');const rearWaveLayer=$('#rearWaveLayer');const rearWavePlacement=$('#rearWavePlacement');const rearWaveMotion=$('#rearWaveMotion');const commonUiLayer=$('#commonUiLayer');const commonUiPlacement=$('#commonUiPlacement');const headerSymbol=$('#headerSymbol');const headerBrandCopy=$('#headerBrandCopy');const headerSyncRow=$('#headerSyncRow');const headerRetry=$('#headerRetry');const requestedW=app.width==='DEVICE'?Math.min(innerWidth,640):app.width;s.parentElement.style.width=requestedW+'px';const rect=s.getBoundingClientRect();const stageW=rect.width;const stageH=rect.height;const baseBoatW=stageW*INTERNAL.baseWidthRatio;const renderedBoatW=baseBoatW*c.scale;const baseWaveW=stageW*INTERNAL.waveBaseWidthRatio;const renderedWaveW=baseWaveW*c.waveScale;const baseRearWaveW=stageW*INTERNAL.rearWaveBaseWidthRatio;const renderedRearWaveW=baseRearWaveW*c.rearWaveScale;$('#stageSize').textContent=`${Math.round(stageW)} × ${Math.round(stageH)} CSS px · BOAT ${Math.round(renderedBoatW)} px · FRONT ${Math.round(renderedWaveW)} px · REAR ${Math.round(renderedRearWaveW)} px`;img.style.width=baseBoatW+'px';layer.style.zIndex=String(c.zIndex);placement.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale}) rotate(${INTERNAL.baseRot}deg)`;motion.style.transformOrigin=`${INTERNAL.originX}% ${INTERNAL.originY}%`;waveImg.style.width=baseWaveW+'px';waveLayer.style.zIndex=String(c.waveZIndex);wavePlacement.style.transform=`translate(calc(-50% + ${c.waveX}px),calc(-50% + ${c.waveY}px)) scale(${c.waveScale})`;waveMotion.style.transformOrigin='50% 50%';rearWaveImg.style.width=baseRearWaveW+'px';rearWaveLayer.style.zIndex=String(c.rearWaveZIndex);rearWavePlacement.style.transform=`translate(calc(-50% + ${c.rearWaveX}px),calc(-50% + ${c.rearWaveY}px)) scale(${c.rearWaveScale})`;rearWaveMotion.style.transformOrigin='50% 50%';commonUiLayer.style.zIndex=String(c.uiZIndex);commonUiPlacement.style.transform=`translate(${c.uiX}px,${c.uiY}px) scale(${c.uiScale})`;headerSymbol.style.width=c.symbolSize+'px';headerSymbol.style.height=c.symbolSize+'px';headerSymbol.style.transform=`translate(${c.symbolX}px,${c.symbolY}px)`;headerBrandCopy.style.transform=`translateX(${c.brandX}px)`;headerSyncRow.style.left=c.syncX+'px';headerSyncRow.style.top=c.syncY+'px';headerRetry.style.left=c.retryX+'px';headerRetry.style.top=c.retryY+'px';headerRetry.style.width='20px';headerRetry.style.height='20px';let st=$('#boatMotionStyle');if(!st){st=document.createElement('style');st.id='boatMotionStyle';document.head.appendChild(st)}st.textContent=animationCss();motion.style.animation='none';waveMotion.style.animation='none';rearWaveMotion.style.animation='none';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(!app.paused && (app.forceMotion || !reduced)){void motion.offsetWidth;motion.style.animation=`boatFloat ${c.duration}s ${INTERNAL.easing} infinite alternate`;void waveMotion.offsetWidth;waveMotion.style.animation=`waveMove ${c.waveDuration}s ${INTERNAL.easing} infinite alternate`;void rearWaveMotion.offsetWidth;rearWaveMotion.style.animation=`rearWaveMove ${c.rearWaveDuration}s ${INTERNAL.easing} infinite alternate`}else{motion.style.transform='translate(0,0) rotate(0deg)';waveMotion.style.transform='translate(0,0) scale(1)';rearWaveMotion.style.transform='translate(0,0) scale(1)'}$('#readout').textContent=JSON.stringify({scope:'COMMON',state:app.state,boatAsset:ASSETS[app.state],frontWaveAsset:WAVE_ASSETS[app.state],requestedStageWidth:requestedW,actualStageWidth:Number(stageW.toFixed(2)),boatBaseWidth:Number(baseBoatW.toFixed(2)),boatRenderedWidth:Number(renderedBoatW.toFixed(2)),waveBaseWidth:Number(baseWaveW.toFixed(2)),waveRenderedWidth:Number(renderedWaveW.toFixed(2)),rearWaveAsset:'assets/rear-waves/Rear_Wave_Common.png',rearWaveBaseWidth:Number(baseRearWaveW.toFixed(2)),rearWaveRenderedWidth:Number(renderedRearWaveW.toFixed(2)),...c},null,2);active()}
 function syncFields(){fields.forEach(id=>{$('#'+id).value=app.common[id]});render()}
-function readField(id,val){const c=app.common;const limits={x:[-300,300],y:[-300,300],scale:[.05,3],zIndex:[-100,1000],floatY:[0,40],driftX:[0,40],pitch:[0,10],duration:[.5,30],waveX:[-500,500],waveY:[-300,300],waveScale:[.05,3],waveZIndex:[-100,1000],waveDriftX:[0,40],waveFloatY:[0,40],wavePulse:[0,.2],waveDuration:[.5,30],rearWaveX:[-500,500],rearWaveY:[-300,300],rearWaveScale:[.05,3],rearWaveZIndex:[-100,1000],rearWaveDriftX:[0,40],rearWaveFloatY:[0,40],rearWavePulse:[0,.2],rearWaveDuration:[.5,30]};const [min,max]=limits[id];c[id]=clampNum(val,min,max,c[id])}
+function readField(id,val){const c=app.common;const limits={x:[-300,300],y:[-300,300],scale:[.05,3],zIndex:[-100,1000],floatY:[0,40],driftX:[0,40],pitch:[0,10],duration:[.5,30],waveX:[-500,500],waveY:[-300,300],waveScale:[.05,3],waveZIndex:[-100,1000],waveDriftX:[0,40],waveFloatY:[0,40],wavePulse:[0,.2],waveDuration:[.5,30],rearWaveX:[-500,500],rearWaveY:[-300,300],rearWaveScale:[.05,3],rearWaveZIndex:[-100,1000],rearWaveDriftX:[0,40],rearWaveFloatY:[0,40],rearWavePulse:[0,.2],rearWaveDuration:[.5,30],uiX:[-500,500],uiY:[-300,300],uiScale:[.5,2],uiZIndex:[-100,1000],symbolX:[-200,200],symbolY:[-200,200],symbolSize:[10,100],brandX:[-200,200],syncX:[-300,500],syncY:[-300,300],retryX:[-300,500],retryY:[-300,300]};const [min,max]=limits[id];c[id]=clampNum(val,min,max,c[id])}
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('[data-panel]').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));}));
+$('#headerRetry').addEventListener('click',()=>{const b=$('#headerRetry');b.textContent='↻';b.animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:450,easing:'ease-out'});});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.state){app.state=b.dataset.state;setBoatAsset(true);setWaveAsset(true);render()}if(b.dataset.width){app.width=b.dataset.width==='DEVICE'?'DEVICE':Number(b.dataset.width);render()}});
 fields.forEach(id=>$('#'+id).addEventListener('input',e=>{readField(id,e.target.value);saveCommon(false);render()}));
 $('#guideBtn').addEventListener('click',()=>$('#stage').classList.toggle('guides-on'));
