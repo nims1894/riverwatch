@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-cab096-ui-density-review-date";
+const CACHE_NAME = "riverwatch-v1.1-pwa-mobile-scene-header-20260823";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -24,7 +24,23 @@ const APP_SHELL = [
   "./icons/header-front-wave.png",
   "./icons/voyage-health.svg",
   "./icons/river-health.svg",
-  "./icons/boat-health.svg"
+  "./icons/boat-health.svg",
+  "./assets/scene-header/rear-waves/Rear_Wave_Common.png",
+  "./assets/scene-header/boats/Boat_tailwind_1254_1254_Cyan.png",
+  "./assets/scene-header/boats/Boat_calm_1254_1254_Cyan.png",
+  "./assets/scene-header/boats/Boat_headwind_1254_1254_Cyan.png",
+  "./assets/scene-header/boats/Boat_rough_1254_1254_Cyan.png",
+  "./assets/scene-header/boats/Boat_storm_1254_1254_Cyan.png",
+  "./assets/scene-header/front-waves/Front_Wave_Tailwind.png",
+  "./assets/scene-header/front-waves/Front_Wave_Calm.png",
+  "./assets/scene-header/front-waves/Front_Wave_Headwind.png",
+  "./assets/scene-header/front-waves/Front_Wave_Rough.png",
+  "./assets/scene-header/front-waves/Front_Wave_Storm.png",
+  "./assets/scene-header/trends/Trend_DarkCloud.png",
+  "./assets/scene-header/trends/Trend_Rain.png",
+  "./assets/scene-header/trends/Trend_Lightning.png",
+  "./assets/scene-header/trends/Trend_Cloud.png",
+  "./assets/scene-header/trends/Trend_Birds.png"
 ];
 
 self.addEventListener("install", (event) => {

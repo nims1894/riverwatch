@@ -1626,6 +1626,71 @@ function renderTopbar() {
     if (detailEl) {
         detailEl.innerText = formatSyncDetail();
     }
+
+    renderMobileSceneHeader();
+}
+
+function getLatestHeaderStateTrend() {
+    const rows = normalizeLogbookRows(riverwatch.logbook || riverwatch.openSeaLogbook || [])
+        .filter(row => row && row.date)
+        .sort((a, b) => (parseDateSafe(a.date) || 0) - (parseDateSafe(b.date) || 0));
+    const latest = rows[rows.length - 1] || {};
+    const validStates = new Set(['TAILWIND','CALM','HEADWIND','ROUGH','STORM']);
+    const validTrends = new Set(['STRONG_DOWN','DOWN','STABLE','UP','STRONG_UP']);
+    return {
+        state: validStates.has(latest.voyageState) ? latest.voyageState : 'CALM',
+        trend: validTrends.has(latest.trend) ? latest.trend : 'STABLE'
+    };
+}
+
+function renderMobileSceneHeader() {
+    const boat = document.getElementById('rwMobileBoat');
+    const front = document.getElementById('rwMobileFrontWave');
+    if (!boat || !front) return;
+
+    const { state, trend } = getLatestHeaderStateTrend();
+    const boatAssets = {
+        TAILWIND:'assets/scene-header/boats/Boat_tailwind_1254_1254_Cyan.png',
+        CALM:'assets/scene-header/boats/Boat_calm_1254_1254_Cyan.png',
+        HEADWIND:'assets/scene-header/boats/Boat_headwind_1254_1254_Cyan.png',
+        ROUGH:'assets/scene-header/boats/Boat_rough_1254_1254_Cyan.png',
+        STORM:'assets/scene-header/boats/Boat_storm_1254_1254_Cyan.png'
+    };
+    const frontAssets = {
+        TAILWIND:'assets/scene-header/front-waves/Front_Wave_Tailwind.png',
+        CALM:'assets/scene-header/front-waves/Front_Wave_Calm.png',
+        HEADWIND:'assets/scene-header/front-waves/Front_Wave_Headwind.png',
+        ROUGH:'assets/scene-header/front-waves/Front_Wave_Rough.png',
+        STORM:'assets/scene-header/front-waves/Front_Wave_Storm.png'
+    };
+    boat.src = boatAssets[state];
+    front.src = frontAssets[state];
+
+    const composition = {
+        STRONG_DOWN:['darkCloud','rain','lightning'],
+        DOWN:['darkCloud','rain'],
+        STABLE:['darkCloud'],
+        UP:['cloud'],
+        STRONG_UP:['birds']
+    };
+    const active = new Set(composition[trend] || []);
+    const layers = {
+        darkCloud:document.querySelector('.rw-mobile-darkcloud-layer'),
+        rain:document.querySelector('.rw-mobile-rain-layer'),
+        lightning:document.querySelector('.rw-mobile-lightning-layer'),
+        cloud:document.querySelector('.rw-mobile-cloud-layer'),
+        birds:document.querySelector('.rw-mobile-birds-layer')
+    };
+    Object.entries(layers).forEach(([key, el]) => { if (el) el.style.display = active.has(key) ? 'block' : 'none'; });
+
+    const mobileSync = document.getElementById('rwMobileLastSync');
+    if (mobileSync) mobileSync.textContent = riverwatch.auto.lastSync || '';
+    const mobileSource = document.getElementById('rwMobileDataSource');
+    if (mobileSource) {
+        const src = riverwatch.auto.dataSource || 'FALLBACK';
+        mobileSource.textContent = src;
+        mobileSource.className = 'rw-mobile-online ' + src.toLowerCase();
+    }
 }
 
 function formatSyncDetail() {

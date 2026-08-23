@@ -70,7 +70,33 @@
                 <img class="rw-header-layer rw-header-boat" src="icons/header-boat.png?v=cab079" alt="">
                 <img class="rw-header-layer rw-header-front-wave" src="icons/header-front-wave.png?v=cab079" alt="">
                 <img class="rw-header-layer rw-header-seagulls" src="icons/header-seagulls.png?v=cab079" alt="">
-</div>
+            </div>
+
+            <!-- Scene-Lab locked mobile header. Desktop header above remains unchanged. -->
+            <div class="rw-mobile-header-scene" aria-hidden="true">
+                <div class="rw-mobile-rear-layer"><div class="rw-mobile-rear-place"><div class="rw-mobile-rear-motion"><img id="rwMobileRearWave" src="assets/scene-header/rear-waves/Rear_Wave_Common.png" alt=""></div></div></div>
+                <div class="rw-mobile-trend-layer rw-mobile-darkcloud-layer"><div class="rw-mobile-trend-place"><div class="rw-mobile-darkcloud-motion"><img id="rwMobileDarkCloud" src="assets/scene-header/trends/Trend_DarkCloud.png" alt=""></div></div></div>
+                <div class="rw-mobile-boat-layer"><div class="rw-mobile-boat-place"><div class="rw-mobile-boat-motion"><img id="rwMobileBoat" src="assets/scene-header/boats/Boat_calm_1254_1254_Cyan.png" alt=""></div></div></div>
+                <div class="rw-mobile-front-layer"><div class="rw-mobile-front-place"><div class="rw-mobile-front-motion"><img id="rwMobileFrontWave" src="assets/scene-header/front-waves/Front_Wave_Calm.png" alt=""></div></div></div>
+                <div class="rw-mobile-trend-layer rw-mobile-rain-layer"><div class="rw-mobile-trend-place"><div class="rw-mobile-rain-motion"><img id="rwMobileRain" src="assets/scene-header/trends/Trend_Rain.png" alt=""></div></div></div>
+                <div class="rw-mobile-trend-layer rw-mobile-lightning-layer"><div class="rw-mobile-trend-place"><div class="rw-mobile-lightning-motion"><img id="rwMobileLightning" src="assets/scene-header/trends/Trend_Lightning.png" alt=""></div></div></div>
+                <div class="rw-mobile-trend-layer rw-mobile-cloud-layer"><div class="rw-mobile-trend-place"><div class="rw-mobile-cloud-motion"><img id="rwMobileCloud" src="assets/scene-header/trends/Trend_Cloud.png" alt=""></div></div></div>
+                <div class="rw-mobile-trend-layer rw-mobile-birds-layer"><div class="rw-mobile-trend-place"><div class="rw-mobile-birds-motion"><img id="rwMobileBirds" src="assets/scene-header/trends/Trend_Birds.png" alt=""></div></div></div>
+            </div>
+
+            <div class="rw-mobile-common-ui">
+                <div class="rw-mobile-common-ui-place">
+                    <div class="rw-mobile-header-id">
+                        <img class="rw-mobile-header-symbol" src="icons/koru-mark.svg" alt="" aria-hidden="true">
+                        <div class="rw-mobile-header-brand-copy">
+                            <div class="rw-mobile-header-vessel">RV Koru</div>
+                            <div class="rw-mobile-header-brand">RiverWatch</div>
+                        </div>
+                    </div>
+                    <div class="rw-mobile-header-sync">Last Sync <span id="rwMobileLastSync"></span> · <span id="rwMobileDataSource" class="rw-mobile-online">ONLINE</span></div>
+                    <button class="rw-mobile-header-retry" type="button" title="Refresh dashboard" onclick="refreshDashboard()"><span>↻</span></button>
+                </div>
+            </div>
             <div class="brand-wrap koru-header-wrap">
                 <div class="koru-mark koru-mark-small" aria-label="Koru fern symbol"><img src="icons/koru-mark.svg" alt="" aria-hidden="true"></div>
                 <div>
