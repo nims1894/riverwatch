@@ -23,17 +23,17 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
 .row,.statebar{display:flex;gap:7px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#102033;color:var(--text);border-radius:8px;padding:8px 11px;cursor:pointer;min-height:38px}.btn.active{outline:2px solid var(--accent);border-color:transparent}.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .workspace{display:grid;grid-template-columns:minmax(320px,470px) 1fr;gap:16px;align-items:start}
 .preview-panel,.controls{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
-.device-wrap{display:flex;justify-content:center;padding:12px 0}.stage-shell{width:390px;max-width:100%}.stage-label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}
+.device-wrap{display:flex;justify-content:center;padding:12px 0;overflow-x:auto}.stage-shell{width:390px;max-width:none;flex:0 0 auto}.stage-label{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:6px}
 .stage{position:relative;width:100%;height:140px;overflow:hidden;background:var(--stage);border-radius:18px;border:1px solid #2a4056}
 .boat-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .boat-placement{position:absolute;left:50%;top:50%;pointer-events:none;will-change:transform}
 .boat-motion{position:relative;pointer-events:none;will-change:transform}
-.boat-layer img{position:relative;display:block;max-width:none;user-select:none;pointer-events:none;will-change:opacity;width:37vw;max-width:none}
+.boat-layer img{position:relative;display:block;max-width:none;user-select:none;pointer-events:none;will-change:opacity}
 .boat-layer img.swap{animation:assetFade .22s ease-out}
 @keyframes assetFade{from{opacity:.2}to{opacity:1}}
 .guide{position:absolute;z-index:999;pointer-events:none;display:none}.guide.center{left:50%;top:0;bottom:0;border-left:1px dashed #ffdd66}.guide.water{left:0;right:0;top:74%;border-top:1px dashed #65e0a3}.guide.safe{inset:8px;border:1px dashed #d778ff}.guides-on .guide{display:block}
 .section{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.section:first-child{border:0;margin-top:0;padding-top:0}.section h2{font-size:12px;letter-spacing:.08em;color:var(--muted);margin:0 0 9px}.grid{display:grid;grid-template-columns:repeat(4,minmax(80px,1fr));gap:8px}.field label{display:block;color:var(--muted);font-size:10px;margin-bottom:4px}.field input{width:100%;background:#081522;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:7px;min-height:36px}.readout{white-space:pre-wrap;background:#06101a;border:1px solid var(--line);border-radius:8px;padding:9px;color:#bcd1e2;font:11px/1.45 ui-monospace,SFMono-Regular,Consolas,monospace;max-height:220px;overflow:auto}.hint{color:var(--muted);font-size:11px;margin-top:8px}.statusline{margin-top:8px;color:#9fc8e5;font-size:11px}.scope{padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#081522;color:#b7c8d8;font-size:11px}.saved{color:#72e0aa}
-@media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:sticky;top:0;z-index:5}.grid{grid-template-columns:repeat(2,1fr)}.stage-shell{width:100%}.stage{height:140px}}
+@media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:sticky;top:0;z-index:5}.grid{grid-template-columns:repeat(2,1fr)}.stage{height:140px}}
 @media(prefers-reduced-motion:reduce){.boat-layer img.swap{animation:none!important}}
 </style>
 </head>
@@ -95,7 +95,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
         <div class="field"><label>DRIFT ΔX px</label><input id="driftX" type="number" step="0.5" min="0" max="40"></div>
         <div class="field"><label>PITCH ±deg</label><input id="pitch" type="number" step="0.1" min="0" max="10"></div>
         <div class="field"><label>DURATION s</label><input id="duration" type="number" step="0.1" min="0.5" max="30"></div>
-      </div><div class="hint">모든 값은 5개 STATE 공통입니다. Origin / Easing / Asset Width는 내부 고정값으로 관리합니다.</div></div>
+      </div><div class="hint">모든 값은 5개 STATE 공통입니다. Origin / Easing은 내부 고정값입니다. Boat Base Width는 Stage 폭의 37%로 계산되어 PC/모바일에서 동일한 Stage 기준을 사용합니다.</div></div>
 
       <div class="section"><h2>CONFIG MEMORY</h2>
         <div id="saveStatus" class="statusline"></div>
@@ -112,7 +112,8 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
   </div>
 </div>
 <script>
-const STORAGE_KEY='riverwatch.sceneLab.boatCommon.v4_3';
+const STORAGE_KEY='riverwatch.sceneLab.boatCommon.v4_4';
+const LEGACY_STORAGE_KEY='riverwatch.sceneLab.boatCommon.v4_3';
 const STATES=['TAILWIND','CALM','HEADWIND','ROUGH','STORM'];
 const ASSETS={
   HEADWIND:'assets/boats/Boat_headwind_1254_1254_Cyan.png',
@@ -121,7 +122,7 @@ const ASSETS={
   TAILWIND:'assets/boats/Boat_tailwind_1254_1254_Cyan.png',
   CALM:'assets/boats/Boat_calm_1254_1254_Cyan.png'
 };
-const INTERNAL={originX:50,originY:82,easing:'ease-in-out',assetWidth:37,baseRot:0};
+const INTERNAL={originX:50,originY:82,easing:'ease-in-out',baseWidthRatio:0.37,baseRot:0};
 const DEFAULT_COMMON={x:0,y:4,scale:1,zIndex:30,floatY:2.5,driftX:0.8,pitch:0.7,duration:5.8};
 const app={state:'CALM',width:390,paused:false,forceMotion:true,common:{...DEFAULT_COMMON}};
 const $=s=>document.querySelector(s);
@@ -134,11 +135,11 @@ function active(){document.querySelectorAll('[data-state]').forEach(b=>b.classLi
 function setBoatAsset(animate=true){const img=$('#boatImg');const src=ASSETS[app.state];if(img.getAttribute('src')===src)return;img.classList.remove('swap');img.src=src;if(animate){void img.offsetWidth;img.classList.add('swap')}$('#assetName').textContent=`${app.state} → ${src.split('/').pop()}`}
 function animationCss(){const c=app.common;return `@keyframes boatFloat{0%{transform:translate(${-c.driftX}px,0) rotate(${-c.pitch}deg)}50%{transform:translate(0,${-c.floatY}px) rotate(0deg)}100%{transform:translate(${c.driftX}px,0) rotate(${c.pitch}deg)}}`}
 function saveCommon(show=true){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(app.common));if(show){$('#saveStatus').textContent='Saved to this browser';$('#saveStatus').classList.add('saved')}}catch(e){$('#saveStatus').textContent='Save unavailable in this browser';$('#saveStatus').classList.remove('saved')}}
-function loadCommon(){try{const raw=localStorage.getItem(STORAGE_KEY);if(!raw)return;const data=JSON.parse(raw);for(const k of fields){if(Object.prototype.hasOwnProperty.call(data,k))app.common[k]=data[k]}$('#saveStatus').textContent='Restored saved config';$('#saveStatus').classList.add('saved')}catch(e){}}
+function loadCommon(){try{let raw=localStorage.getItem(STORAGE_KEY);let migrated=false;if(!raw){raw=localStorage.getItem(LEGACY_STORAGE_KEY);migrated=!!raw}if(!raw)return;const data=JSON.parse(raw);for(const k of fields){if(Object.prototype.hasOwnProperty.call(data,k))app.common[k]=data[k]}if(migrated)localStorage.setItem(STORAGE_KEY,JSON.stringify(app.common));$('#saveStatus').textContent=migrated?'Migrated V4.3 config':'Restored saved config';$('#saveStatus').classList.add('saved')}catch(e){}}
 function clearCommon(){try{localStorage.removeItem(STORAGE_KEY)}catch(e){}}
-function render(){const c=app.common;const s=$('#stage');const img=$('#boatImg');const layer=$('#boatLayer');const placement=$('#boatPlacement');const motion=$('#boatMotion');const w=app.width==='DEVICE'?Math.min(innerWidth,640):app.width;s.parentElement.style.width=w+'px';$('#stageSize').textContent=`${Math.round(s.getBoundingClientRect().width)} × ${Math.round(s.getBoundingClientRect().height)} CSS px`;img.style.width=INTERNAL.assetWidth+'vw';layer.style.zIndex=String(c.zIndex);placement.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale}) rotate(${INTERNAL.baseRot}deg)`;motion.style.transformOrigin=`${INTERNAL.originX}% ${INTERNAL.originY}%`;let st=$('#boatMotionStyle');if(!st){st=document.createElement('style');st.id='boatMotionStyle';document.head.appendChild(st)}st.textContent=animationCss();motion.style.animation='none';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function render(){const c=app.common;const s=$('#stage');const img=$('#boatImg');const layer=$('#boatLayer');const placement=$('#boatPlacement');const motion=$('#boatMotion');const requestedW=app.width==='DEVICE'?Math.min(innerWidth,640):app.width;s.parentElement.style.width=requestedW+'px';const rect=s.getBoundingClientRect();const stageW=rect.width;const stageH=rect.height;const baseBoatW=stageW*INTERNAL.baseWidthRatio;const renderedBoatW=baseBoatW*c.scale;$('#stageSize').textContent=`${Math.round(stageW)} × ${Math.round(stageH)} CSS px · BOAT ${Math.round(renderedBoatW)} px`;img.style.width=baseBoatW+'px';layer.style.zIndex=String(c.zIndex);placement.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale}) rotate(${INTERNAL.baseRot}deg)`;motion.style.transformOrigin=`${INTERNAL.originX}% ${INTERNAL.originY}%`;let st=$('#boatMotionStyle');if(!st){st=document.createElement('style');st.id='boatMotionStyle';document.head.appendChild(st)}st.textContent=animationCss();motion.style.animation='none';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
 if(!app.paused && (app.forceMotion || !reduced)){void motion.offsetWidth;motion.style.animation=`boatFloat ${c.duration}s ${INTERNAL.easing} infinite alternate`}else{motion.style.transform='translate(0,0) rotate(0deg)'}
-$('#readout').textContent=JSON.stringify({scope:'COMMON',state:app.state,boatAsset:ASSETS[app.state],stageWidth:w,...c},null,2);active()}
+$('#readout').textContent=JSON.stringify({scope:'COMMON',state:app.state,boatAsset:ASSETS[app.state],requestedStageWidth:requestedW,actualStageWidth:Number(stageW.toFixed(2)),boatBaseWidth:Number(baseBoatW.toFixed(2)),boatRenderedWidth:Number(renderedBoatW.toFixed(2)),...c},null,2);active()}
 function syncFields(){fields.forEach(id=>{$('#'+id).value=app.common[id]});render()}
 function readField(id,val){const c=app.common;const limits={x:[-300,300],y:[-300,300],scale:[.05,3],zIndex:[-100,1000],floatY:[0,40],driftX:[0,40],pitch:[0,10],duration:[.5,30]};const [min,max]=limits[id];c[id]=clampNum(val,min,max,c[id])}
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.state){app.state=b.dataset.state;setBoatAsset(true);render()}if(b.dataset.width){app.width=b.dataset.width==='DEVICE'?'DEVICE':Number(b.dataset.width);render()}});
