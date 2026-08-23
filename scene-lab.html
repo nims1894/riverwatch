@@ -57,12 +57,18 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
 .ui-preview-note{color:#6f8296;font-size:10px;margin-top:6px}
 @media(max-width:760px){.lab{padding:10px}.workspace{grid-template-columns:1fr}.preview-panel{position:static;top:auto;z-index:auto}.grid{grid-template-columns:repeat(2,1fr)}.stage{height:140px}.controls{padding-bottom:calc(18px + env(safe-area-inset-bottom))}html{scroll-padding-bottom:42vh}body{overflow-y:auto;-webkit-overflow-scrolling:touch}}
 @media(prefers-reduced-motion:reduce){.boat-layer img.swap,.wave-layer img.swap{animation:none!important}}
+
+.intro-stage{position:relative;width:100%;height:520px;overflow:hidden;background:#020e22;border-radius:18px;border:1px solid #2a4056;display:none}
+.intro-stage.active{display:block}.stage.hidden{display:none}
+.intro-scene{position:absolute;left:50%;top:36%;width:390px;height:220px;transform:translate(-50%,-50%);transform-origin:center;pointer-events:none}
+.intro-scene img{position:absolute;left:0;top:0;width:100%;height:auto;object-fit:contain;pointer-events:none}.intro-rear{z-index:10}.intro-boat{z-index:20}.intro-front{z-index:30}.intro-birds{z-index:40}
+.intro-copy{position:absolute;left:50%;top:58%;transform:translateX(-50%);width:88%;text-align:center}.intro-lockup{display:flex;justify-content:center;align-items:center;gap:9px}.intro-lockup img{width:42px;height:42px}.intro-title{font-size:34px;font-weight:800;letter-spacing:-.04em}.intro-vessel{font-size:12px;letter-spacing:.14em;color:#9fc8e5;margin-top:4px}.intro-version{font-size:10px;color:#6f8296;margin-top:3px}.intro-motto{margin-top:26px;font-size:16px;line-height:1.65;color:#bcd1e2}.intro-motto p{margin:0}.intro-motto p:first-child{color:#edf5ff}.intro-enter{margin-top:25px;font-size:10px;letter-spacing:.18em;color:#77c9ff}.intro-stage.play .intro-scene{animation:introSceneIn var(--intro-scene-duration,2.2s) ease-out both}.intro-stage.play .intro-copy{animation:introCopyIn var(--intro-copy-duration,1.8s) ease-out var(--intro-copy-delay,.55s) both}@keyframes introSceneIn{from{opacity:0;transform:translate(-50%,-44%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}@keyframes introCopyIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
 </style>
 </head>
 <body>
 <div class="lab">
   <div class="lab-head">
-    <div><h1>RiverWatch · Boat Scene Lab</h1><div class="meta">Tabbed Scene Controls · Boat / Waves / Trend / Common UI · v5.3</div></div>
+    <div><h1>RiverWatch · Boat Scene Lab</h1><div class="meta">Tabbed Scene Controls · Boat / Waves / Trend / Common UI / Intro · v6.2</div></div>
     <div id="deviceMeta" class="meta"></div>
   </div>
 
@@ -108,6 +114,20 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
             </div>
             <i class="guide center"></i><i class="guide water"></i><i class="guide safe"></i>
           </div>
+          <div id="introStage" class="intro-stage">
+            <div id="introScene" class="intro-scene">
+              <img class="intro-rear" src="icons/intro-wave-rear.png" alt="">
+              <img class="intro-boat" src="icons/intro-boat-koru.png" alt="">
+              <img class="intro-front" src="icons/intro-wave-front.png" alt="">
+              <img class="intro-birds" src="icons/intro-seagulls.png" alt="">
+            </div>
+            <div id="introCopy" class="intro-copy">
+              <div class="intro-lockup"><img src="icons/koru-mark.svg" alt=""><span class="intro-title">RiverWatch</span></div>
+              <div class="intro-vessel">RV Koru</div><div class="intro-version">v1.1</div>
+              <div class="intro-motto"><p>Observe the River.</p><p>Adapt the Boat.</p><p>Continue the Voyage.</p></div>
+              <div class="intro-enter">ENTER THE VOYAGE</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -134,6 +154,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
         <button class="tab-btn" type="button" data-tab="rear">REAR WAVE</button>
         <button class="tab-btn" type="button" data-tab="trend">TREND</button>
         <button class="tab-btn" type="button" data-tab="ui">COMMON UI</button>
+        <button class="tab-btn" type="button" data-tab="intro">INTRO</button>
         <button class="tab-btn" type="button" data-tab="config">CONFIG</button>
       </div>
 
@@ -208,6 +229,21 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
         </div><div class="ui-preview-note">RETRY X/Y는 Common UI 그룹 기준 독립 좌표입니다. Retry 회전 애니메이션은 아이콘 내부에만 적용되어 위치값을 덮어쓰지 않습니다. Last Sync와 ONLINE은 Mock 값입니다.</div></div>
       </div>
 
+      <div class="tab-panel" data-panel="intro">
+        <div class="section"><h2>INTRO · SCENE</h2><div class="grid">
+          <div class="field"><label>SCENE Y %</label><input id="introSceneY" type="number" step="1" min="10" max="70"></div>
+          <div class="field"><label>SCENE SCALE</label><input id="introSceneScale" type="number" step="0.01" min="0.3" max="2"></div>
+          <div class="field"><label>SCENE DURATION s</label><input id="introSceneDuration" type="number" step="0.1" min="0.2" max="10"></div>
+          <div class="field"><label>COPY TOP %</label><input id="introCopyTop" type="number" step="1" min="30" max="85"></div>
+        </div></div>
+        <div class="section"><h2>INTRO · COPY / MOTION</h2><div class="grid">
+          <div class="field"><label>COPY SCALE</label><input id="introCopyScale" type="number" step="0.01" min="0.5" max="1.5"></div>
+          <div class="field"><label>COPY DELAY s</label><input id="introCopyDelay" type="number" step="0.05" min="0" max="5"></div>
+          <div class="field"><label>COPY DURATION s</label><input id="introCopyDuration" type="number" step="0.1" min="0.2" max="10"></div>
+          <div class="field"><label>INTRO HEIGHT px</label><input id="introHeight" type="number" step="10" min="360" max="800"></div>
+        </div><div class="hint">기존 Intro 자산/문구를 재사용하는 테스트 탭입니다. INTRO 탭 선택 시 Header Preview 대신 Intro Preview가 표시됩니다. RESTART로 등장 애니메이션을 반복 확인합니다.</div></div>
+      </div>
+
       <div class="tab-panel" data-panel="config">
         <div class="section"><h2>CONFIG MEMORY</h2>
           <div id="saveStatus" class="statusline"></div>
@@ -233,7 +269,7 @@ const ASSETS={
  STORM:'assets/boats/Boat_storm_1254_1254_Cyan.png'
 };
 const INTERNAL={originX:50,originY:82,easing:'ease-in-out',baseWidthRatio:0.37,baseRot:0,waveBaseWidthRatio:1.0,rearWaveBaseWidthRatio:1.0};
-const DEFAULT_COMMON={x:80,y:12,scale:0.55,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:80,waveY:35,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:3,rearWaveScale:1.6,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7,uiX:0,uiY:6,uiScale:1,uiZIndex:60,symbolX:9,symbolY:4,symbolSize:38,brandX:7,syncX:13,syncY:48,retryX:172,retryY:42};
+const DEFAULT_COMMON={x:80,y:12,scale:0.55,zIndex:30,floatY:10,driftX:5,pitch:2,duration:3,waveX:80,waveY:35,waveScale:1,waveZIndex:40,waveDriftX:15,waveFloatY:2,wavePulse:0.01,waveDuration:5,rearWaveX:0,rearWaveY:3,rearWaveScale:1.6,rearWaveZIndex:20,rearWaveDriftX:8,rearWaveFloatY:1,rearWavePulse:0.005,rearWaveDuration:7,uiX:0,uiY:6,uiScale:1,uiZIndex:60,symbolX:9,symbolY:4,symbolSize:38,brandX:7,syncX:13,syncY:48,retryX:172,retryY:46};
 const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v5_4';
 const TREND_STORAGE_KEY='riverwatch.sceneLab.trendLayers.v6_0';
 const TRENDS=['STRONG_DOWN','DOWN','STABLE','UP','STRONG_UP'];
@@ -241,13 +277,15 @@ const TREND_LAYER_ASSETS={darkCloud:'assets/trends/Trend_DarkCloud.png',rain:'as
 const TREND_COMPOSITION={STRONG_DOWN:['darkCloud','rain','lightning'],DOWN:['darkCloud','rain'],STABLE:['darkCloud'],UP:['cloud'],STRONG_UP:['birds']};
 const TREND_LAYER_LABELS={darkCloud:'DARK CLOUD',rain:'RAIN',lightning:'LIGHTNING',cloud:'CLOUD',birds:'BIRDS'};
 const TREND_LAYER_DEFAULTS={
- darkCloud:{x:0,y:0,scale:0.8,zIndex:48,opacity:0.55,duration:8,driftX:4,floatY:1},
+ darkCloud:{x:-4,y:-1,scale:0.55,zIndex:5,opacity:0.55,duration:8,driftX:4,floatY:1},
  rain:{x:0,y:0,scale:0.8,zIndex:49,opacity:0.55,duration:5,driftX:2,floatY:10},
- lightning:{x:0,y:0,scale:0.55,zIndex:50,opacity:0.55,duration:1,driftX:0,floatY:0},
- cloud:{x:0,y:0,scale:0.7,zIndex:48,opacity:0.55,duration:10,driftX:5,floatY:1},
- birds:{x:0,y:0,scale:0.6,zIndex:50,opacity:0.8,duration:7,driftX:12,floatY:3}
+ lightning:{x:0,y:0,scale:0.55,zIndex:50,opacity:0.75,duration:1,driftX:0,floatY:0},
+ cloud:{x:-5,y:-1,scale:0.55,zIndex:5,opacity:0.55,duration:10,driftX:5,floatY:1},
+ birds:{x:5,y:15,scale:0.2,zIndex:50,opacity:0.8,duration:3,driftX:20,floatY:5}
 };
-const app={state:'CALM',trend:'STRONG_DOWN',width:390,paused:false,forceMotion:true,common:{...DEFAULT_COMMON},trendLayers:Object.fromEntries(Object.entries(TREND_LAYER_DEFAULTS).map(([k,v])=>[k,{...v}]))};
+const DEFAULT_INTRO={sceneY:36,sceneScale:1,sceneDuration:2.2,copyTop:58,copyScale:1,copyDelay:0.55,copyDuration:1.8,height:520};
+const INTRO_STORAGE_KEY='riverwatch.sceneLab.intro.v1';
+const app={state:'CALM',trend:'STRONG_DOWN',width:390,paused:false,forceMotion:true,previewMode:'header',common:{...DEFAULT_COMMON},trendLayers:Object.fromEntries(Object.entries(TREND_LAYER_DEFAULTS).map(([k,v])=>[k,{...v}])),intro:{...DEFAULT_INTRO}};
 const $=s=>document.querySelector(s);
 function makeButtons(el,items,type){el.innerHTML=items.map(v=>`<button class="btn" type="button" data-${type}="${v}">${v}</button>`).join('')}
 makeButtons($('#stateBtns'),STATES,'state');
@@ -280,27 +318,34 @@ function syncTrendFields(){
 function readTrendField(layer,key,val){const t=app.trendLayers[layer];const limits={x:[-800,800],y:[-500,500],scale:[.02,5],zIndex:[-100,1000],opacity:[0,1],duration:[.2,30],driftX:[0,100],floatY:[0,100]};const [min,max]=limits[key];t[key]=clampNum(val,min,max,t[key]);saveTrendConfigs()}
 function applyTrendLayer(k,visible){const c=app.trendLayers[k],cap=k[0].toUpperCase()+k.slice(1),layer=$('#trend'+cap+'Layer'),placement=$('#trend'+cap+'Placement'),motion=$('#trend'+cap+'Motion'),img=$('#trend'+cap+'Img');layer.style.display=visible?'block':'none';if(!visible)return;layer.style.zIndex=String(c.zIndex);placement.style.left='auto';placement.style.right='0px';placement.style.top='0px';placement.style.transformOrigin='100% 0';placement.style.transform=`translate3d(${-c.x}px,${c.y}px,0) scale(${c.scale})`;img.style.opacity=String(c.opacity);motion.style.animation='none';}
 function animationCss(){const c=app.common;return `@keyframes boatFloat{0%{transform:translate(${-c.driftX}px,0) rotate(${-c.pitch}deg)}50%{transform:translate(0,${-c.floatY}px) rotate(0deg)}100%{transform:translate(${c.driftX}px,0) rotate(${c.pitch}deg)}} @keyframes waveMove{0%{transform:translate(${-c.waveDriftX}px,0) scale(1)}50%{transform:translate(0,${-c.waveFloatY}px) scale(${1+c.wavePulse})}100%{transform:translate(${c.waveDriftX}px,0) scale(1)}} @keyframes rearWaveMove{0%{transform:translate(${-c.rearWaveDriftX}px,0) scale(1)}50%{transform:translate(0,${-c.rearWaveFloatY}px) scale(${1+c.rearWavePulse})}100%{transform:translate(${c.rearWaveDriftX}px,0) scale(1)}} @keyframes lightningPulse{0%,100%{opacity:.70;filter:brightness(.92)}18%{opacity:1;filter:brightness(1.25) drop-shadow(0 0 8px rgba(120,220,255,.45))}27%{opacity:.76;filter:brightness(.96)}38%{opacity:1;filter:brightness(1.12)}58%{opacity:.82;filter:brightness(1)}} @keyframes rainFall{0%{transform:translate3d(var(--dxn),var(--dyn),0)}100%{transform:translate3d(var(--dxp),var(--dyp),0)}} @keyframes skyDrift{0%{transform:translate3d(var(--dxn),0,0)}50%{transform:translate3d(0,var(--dyn),0)}100%{transform:translate3d(var(--dxp),0,0)}} @keyframes birdsFly{0%{transform:translate3d(var(--dxn),0,0)}50%{transform:translate3d(0,var(--dyn),0)}100%{transform:translate3d(var(--dxp),0,0)}}`}
+function loadIntro(){try{const raw=localStorage.getItem(INTRO_STORAGE_KEY);if(raw)app.intro={...DEFAULT_INTRO,...JSON.parse(raw)}}catch(e){}}
+function saveIntro(){try{localStorage.setItem(INTRO_STORAGE_KEY,JSON.stringify(app.intro))}catch(e){}}
+function renderIntro(){const i=app.intro,st=$('#introStage'),scene=$('#introScene'),copy=$('#introCopy');st.style.height=i.height+'px';scene.style.top=i.sceneY+'%';scene.style.transform=`translate(-50%,-50%) scale(${i.sceneScale})`;copy.style.top=i.copyTop+'%';copy.style.setProperty('--copy-scale',i.copyScale);copy.style.transform=`translateX(-50%) scale(${i.copyScale})`;st.style.setProperty('--intro-scene-duration',i.sceneDuration+'s');st.style.setProperty('--intro-copy-delay',i.copyDelay+'s');st.style.setProperty('--intro-copy-duration',i.copyDuration+'s');}
+function restartIntro(){const st=$('#introStage');st.classList.remove('play');void st.offsetWidth;if(!app.paused)st.classList.add('play')}
+function setPreviewMode(mode){app.previewMode=mode;$('#stage').classList.toggle('hidden',mode==='intro');$('#introStage').classList.toggle('active',mode==='intro');if(mode==='intro'){renderIntro();restartIntro()}}
 function render(){const c=app.common;const s=$('#stage'),img=$('#boatImg'),layer=$('#boatLayer'),placement=$('#boatPlacement'),motion=$('#boatMotion'),waveImg=$('#waveImg'),waveLayer=$('#waveLayer'),wavePlacement=$('#wavePlacement'),waveMotion=$('#waveMotion'),rearWaveImg=$('#rearWaveImg'),rearWaveLayer=$('#rearWaveLayer'),rearWavePlacement=$('#rearWavePlacement'),rearWaveMotion=$('#rearWaveMotion'),commonUiLayer=$('#commonUiLayer'),commonUiPlacement=$('#commonUiPlacement'),headerSymbol=$('#headerSymbol'),headerBrandCopy=$('#headerBrandCopy'),headerSyncRow=$('#headerSyncRow'),headerRetry=$('#headerRetry');const requestedW=app.width==='DEVICE'?Math.min(innerWidth,640):app.width;s.parentElement.style.width=requestedW+'px';const rect=s.getBoundingClientRect(),stageW=rect.width,stageH=rect.height,baseBoatW=stageW*INTERNAL.baseWidthRatio,renderedBoatW=baseBoatW*c.scale,baseWaveW=stageW*INTERNAL.waveBaseWidthRatio,renderedWaveW=baseWaveW*c.waveScale,baseRearWaveW=stageW*INTERNAL.rearWaveBaseWidthRatio,renderedRearWaveW=baseRearWaveW*c.rearWaveScale;$('#stageSize').textContent=`${Math.round(stageW)} × ${Math.round(stageH)} CSS px · BOAT ${Math.round(renderedBoatW)} px · FRONT ${Math.round(renderedWaveW)} px · REAR ${Math.round(renderedRearWaveW)} px`;img.style.width=baseBoatW+'px';layer.style.zIndex=String(c.zIndex);placement.style.transform=`translate(calc(-50% + ${c.x}px),calc(-50% + ${c.y}px)) scale(${c.scale}) rotate(${INTERNAL.baseRot}deg)`;motion.style.transformOrigin=`${INTERNAL.originX}% ${INTERNAL.originY}%`;waveImg.style.width=baseWaveW+'px';waveLayer.style.zIndex=String(c.waveZIndex);wavePlacement.style.transform=`translate(calc(-50% + ${c.waveX}px),calc(-50% + ${c.waveY}px)) scale(${c.waveScale})`;rearWaveImg.style.width=baseRearWaveW+'px';rearWaveLayer.style.zIndex=String(c.rearWaveZIndex);rearWavePlacement.style.transform=`translate(calc(-50% + ${c.rearWaveX}px),calc(-50% + ${c.rearWaveY}px)) scale(${c.rearWaveScale})`;commonUiLayer.style.zIndex=String(c.uiZIndex);commonUiPlacement.style.transform=`translate(${c.uiX}px,${c.uiY}px) scale(${c.uiScale})`;headerSymbol.style.width=c.symbolSize+'px';headerSymbol.style.height=c.symbolSize+'px';headerSymbol.style.transform=`translate(${c.symbolX}px,${c.symbolY}px)`;headerBrandCopy.style.transform=`translateX(${c.brandX}px)`;headerSyncRow.style.left=c.syncX+'px';headerSyncRow.style.top=c.syncY+'px';headerRetry.style.transform=`translate(${c.retryX}px,${c.retryY}px)`;
  const activeLayers=TREND_COMPOSITION[app.trend];for(const k of Object.keys(TREND_LAYER_DEFAULTS))applyTrendLayer(k,activeLayers.includes(k));$('#trendAssetName').textContent=`${app.trend} → ${activeLayers.map(k=>TREND_LAYER_LABELS[k]).join(' + ')}`;
  let st=$('#boatMotionStyle');if(!st){st=document.createElement('style');st.id='boatMotionStyle';document.head.appendChild(st)}st.textContent=animationCss();motion.style.animation=waveMotion.style.animation=rearWaveMotion.style.animation='none';const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;if(!app.paused&&(app.forceMotion||!reduced)){void motion.offsetWidth;motion.style.animation=`boatFloat ${c.duration}s ${INTERNAL.easing} infinite alternate`;waveMotion.style.animation=`waveMove ${c.waveDuration}s ${INTERNAL.easing} infinite alternate`;rearWaveMotion.style.animation=`rearWaveMove ${c.rearWaveDuration}s ${INTERNAL.easing} infinite alternate`;for(const k of activeLayers){const cfg=app.trendLayers[k],cap=k[0].toUpperCase()+k.slice(1),m=$('#trend'+cap+'Motion');m.style.setProperty('--dxn',`${-cfg.driftX}px`);m.style.setProperty('--dxp',`${cfg.driftX}px`);m.style.setProperty('--dyn',`${-cfg.floatY}px`);m.style.setProperty('--dyp',`${cfg.floatY}px`);void m.offsetWidth;if(k==='lightning')m.style.animation=`lightningPulse ${cfg.duration}s ease-in-out infinite`;else if(k==='rain')m.style.animation=`rainFall ${cfg.duration}s linear infinite`;else if(k==='birds')m.style.animation=`birdsFly ${cfg.duration}s ease-in-out infinite alternate`;else m.style.animation=`skyDrift ${cfg.duration}s ease-in-out infinite alternate`;}}
  $('#readout').textContent=JSON.stringify({scope:'COMMON',state:app.state,trend:app.trend,trendComposition:activeLayers,trendLayers:app.trendLayers,requestedStageWidth:requestedW,actualStageWidth:Number(stageW.toFixed(2)),...c},null,2);active()}
 function syncFields(){fields.forEach(id=>{$('#'+id).value=app.common[id]});render()}
 function readField(id,val){const c=app.common;const limits={x:[-300,300],y:[-300,300],scale:[.05,3],zIndex:[-100,1000],floatY:[0,40],driftX:[0,40],pitch:[0,10],duration:[.5,30],waveX:[-500,500],waveY:[-300,300],waveScale:[.05,3],waveZIndex:[-100,1000],waveDriftX:[0,40],waveFloatY:[0,40],wavePulse:[0,.2],waveDuration:[.5,30],rearWaveX:[-500,500],rearWaveY:[-300,300],rearWaveScale:[.05,3],rearWaveZIndex:[-100,1000],rearWaveDriftX:[0,40],rearWaveFloatY:[0,40],rearWavePulse:[0,.2],rearWaveDuration:[.5,30],uiX:[-500,500],uiY:[-300,300],uiScale:[.5,2],uiZIndex:[-100,1000],symbolX:[-200,200],symbolY:[-200,200],symbolSize:[10,100],brandX:[-200,200],syncX:[-300,500],syncY:[-300,300],retryX:[-300,500],retryY:[-300,300]};const [min,max]=limits[id];c[id]=clampNum(val,min,max,c[id])}
-document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('[data-panel]').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));}));
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{const tab=btn.dataset.tab;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('[data-panel]').forEach(p=>p.classList.toggle('active',p.dataset.panel===tab));setPreviewMode(tab==='intro'?'intro':'header');}));
 $('#headerRetry').addEventListener('click',()=>{const g=$('#headerRetryGlyph');g.animate([{transform:'rotate(0deg)'},{transform:'rotate(360deg)'}],{duration:450,easing:'ease-out'});});
 document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.state){app.state=b.dataset.state;setBoatAsset(true);setWaveAsset(true);render()}if(b.dataset.trend){app.trend=b.dataset.trend;syncTrendFields();render()}if(b.dataset.width){app.width=b.dataset.width==='DEVICE'?'DEVICE':Number(b.dataset.width);render()}});
 fields.forEach(id=>$('#'+id).addEventListener('input',e=>{readField(id,e.target.value);saveCommon(false);render()}));
 $('#guideBtn').addEventListener('click',()=>$('#stage').classList.toggle('guides-on'));
 $('#pauseBtn').addEventListener('click',()=>{app.paused=!app.paused;$('#pauseBtn').textContent=app.paused?'PLAY':'PAUSE';render()});
-$('#restartBtn').addEventListener('click',()=>{const motion=$('#boatMotion');motion.style.animation='none';void motion.offsetWidth;render()});
+$('#restartBtn').addEventListener('click',()=>{if(app.previewMode==='intro'){restartIntro();return}const motion=$('#boatMotion');motion.style.animation='none';void motion.offsetWidth;render()});
 $('#forceMotionBtn').addEventListener('click',()=>{app.forceMotion=!app.forceMotion;$('#forceMotionBtn').classList.toggle('active',app.forceMotion);$('#forceMotionBtn').textContent=app.forceMotion?'FORCE MOTION':'SYSTEM MOTION';render()});
+['introSceneY','introSceneScale','introSceneDuration','introCopyTop','introCopyScale','introCopyDelay','introCopyDuration','introHeight'].forEach(id=>{const el=$('#'+id);el.addEventListener('input',()=>{const map={introSceneY:'sceneY',introSceneScale:'sceneScale',introSceneDuration:'sceneDuration',introCopyTop:'copyTop',introCopyScale:'copyScale',introCopyDelay:'copyDelay',introCopyDuration:'copyDuration',introHeight:'height'};app.intro[map[id]]=Number(el.value);saveIntro();renderIntro();restartIntro()})});
+function syncIntroFields(){const i=app.intro;$('#introSceneY').value=i.sceneY;$('#introSceneScale').value=i.sceneScale;$('#introSceneDuration').value=i.sceneDuration;$('#introCopyTop').value=i.copyTop;$('#introCopyScale').value=i.copyScale;$('#introCopyDelay').value=i.copyDelay;$('#introCopyDuration').value=i.copyDuration;$('#introHeight').value=i.height;renderIntro()}
 $('#saveBtn').addEventListener('click',()=>saveCommon(true));
-$('#resetBtn').addEventListener('click',()=>{clearCommon();app.common={...DEFAULT_COMMON};app.trendLayers=Object.fromEntries(Object.entries(TREND_LAYER_DEFAULTS).map(([k,v])=>[k,{...v}]));syncTrendFields();$('#saveStatus').textContent='Reset to defaults';$('#saveStatus').classList.remove('saved');syncFields();saveCommon(false)});
+$('#resetBtn').addEventListener('click',()=>{clearCommon();app.common={...DEFAULT_COMMON};app.trendLayers=Object.fromEntries(Object.entries(TREND_LAYER_DEFAULTS).map(([k,v])=>[k,{...v}]));app.intro={...DEFAULT_INTRO};try{localStorage.removeItem(INTRO_STORAGE_KEY)}catch(e){}syncTrendFields();syncIntroFields();$('#saveStatus').textContent='Reset to defaults';$('#saveStatus').classList.remove('saved');syncFields();saveCommon(false)});
 $('#copyBtn').addEventListener('click',async()=>{const text=$('#readout').textContent;try{await navigator.clipboard.writeText(text);$('#copyBtn').textContent='COPIED';setTimeout(()=>$('#copyBtn').textContent='COPY CONFIG',900)}catch{const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');$('#copyBtn').textContent='COPIED'}catch{$('#copyBtn').textContent='COPY FAILED'}ta.remove();setTimeout(()=>$('#copyBtn').textContent='COPY CONFIG',1200)}});
 function meta(){const dpr=window.devicePixelRatio||1;const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;$('#deviceMeta').textContent=`viewport ${innerWidth}×${innerHeight} · DPR ${dpr} · reduced-motion ${reduced?'ON':'OFF'}`;render()}
 addEventListener('resize',meta);
 Object.values(ASSETS).forEach(src=>{const p=new Image();p.src=src});Object.values(WAVE_ASSETS).forEach(src=>{const p=new Image();p.src=src});
-loadCommon();loadTrendConfigs();setBoatAsset(false);setWaveAsset(false);syncTrendFields();syncFields();meta();
+loadCommon();loadTrendConfigs();loadIntro();setBoatAsset(false);setWaveAsset(false);syncTrendFields();syncIntroFields();syncFields();meta();
 </script>
 </body>
 </html>
