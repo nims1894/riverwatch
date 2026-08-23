@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="rw_cyan">#6DEBFF</color>
+    <color name="rw_white">#F5FBFF</color>
+    <color name="rw_muted">#94A8BD</color>
+    <color name="rw_bg">#E60A1420</color>
+</resources>

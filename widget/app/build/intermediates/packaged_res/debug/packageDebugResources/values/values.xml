@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="rw_bg">#E60A1420</color>
+    <color name="rw_cyan">#6DEBFF</color>
+    <color name="rw_muted">#94A8BD</color>
+    <color name="rw_white">#F5FBFF</color>
+    <string name="app_name">RiverWatch Widget Lab</string>
+    <string name="widget_description">RiverWatch 2×2 voyage status widget</string>
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#56E6FF</item>
+    </style>
+</resources>

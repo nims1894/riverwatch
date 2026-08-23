@@ -1,0 +1,26 @@
+R_DEF: Internal format may change without notice
+local
+color rw_bg
+color rw_cyan
+color rw_muted
+color rw_white
+drawable boat_calm
+drawable boat_headwind
+drawable boat_rough
+drawable boat_storm
+drawable boat_tailwind
+drawable widget_bg
+drawable widget_preview
+id boat_image
+id brand_text
+id dday_text
+id eta_text
+id last_update_text
+id state_text
+id trend_text
+id widget_root
+layout riverwatch_widget
+string app_name
+string widget_description
+style AppTheme
+xml riverwatch_widget_info
