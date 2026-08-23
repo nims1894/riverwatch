@@ -144,7 +144,7 @@ body{margin:0;background:var(--bg);color:var(--text);font:13px/1.35 system-ui,-a
       </div>
 
       <div class="section"><h2>TREND · SKY ASSET</h2><div class="statebar" id="trendBtns"></div><div id="trendAssetName" class="statusline"></div></div>
-      <div class="section"><div class="scope">STATE controls Boat + Front Wave. TREND is independent and composed from reusable effect layers. STRONG_DOWN = Dark Cloud + Rain + Lightning / DOWN = Dark Cloud + Rain / STABLE = Dark Cloud / UP = Cloud / STRONG_UP = Birds.</div></div>
+      <div class="section"><div class="scope">STATE controls Boat + Front Wave. TREND is independent and composed from reusable effect layers. STRONG_DOWN = Dark Cloud + Rain + Lightning / DOWN = Dark Cloud + Rain / STABLE = Dark Cloud / UP = Cloud / STRONG_UP = Cloud + Birds.</div></div>
     </section>
 
     <section class="controls">
@@ -275,7 +275,7 @@ const STORAGE_KEY='riverwatch.sceneLab.sceneCommon.v5_4';
 const TREND_STORAGE_KEY='riverwatch.sceneLab.trendLayers.v6_0';
 const TRENDS=['STRONG_DOWN','DOWN','STABLE','UP','STRONG_UP'];
 const TREND_LAYER_ASSETS={darkCloud:'assets/trends/Trend_DarkCloud.png',rain:'assets/trends/Trend_Rain.png',lightning:'assets/trends/Trend_Lightning.png',cloud:'assets/trends/Trend_Cloud.png',birds:'assets/trends/Trend_Birds.png'};
-const TREND_COMPOSITION={STRONG_DOWN:['darkCloud','rain','lightning'],DOWN:['darkCloud','rain'],STABLE:['darkCloud'],UP:['cloud'],STRONG_UP:['birds']};
+const TREND_COMPOSITION={STRONG_DOWN:['darkCloud','rain','lightning'],DOWN:['darkCloud','rain'],STABLE:['darkCloud'],UP:['cloud'],STRONG_UP:['cloud','birds']};
 const TREND_LAYER_LABELS={darkCloud:'DARK CLOUD',rain:'RAIN',lightning:'LIGHTNING',cloud:'CLOUD',birds:'BIRDS'};
 const TREND_LAYER_DEFAULTS={
  darkCloud:{x:-4,y:-1,scale:0.55,zIndex:5,opacity:0.55,duration:8,driftX:4,floatY:1},
