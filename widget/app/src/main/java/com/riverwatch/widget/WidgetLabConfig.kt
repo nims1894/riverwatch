@@ -13,13 +13,13 @@ object WidgetLabConfig {
     }
 
     /**
-     * Apps Script dailyTrendPct 값을 그대로 사용하되 위젯에서는 항상 소수점 2자리.
-     * 양수에는 + 부호를 붙이고 0은 0.00으로 표시한다.
+     * Apps Script dailyTrendPct 값을 그대로 사용하되 위젯에서는 항상 소수점 1자리.
+     * 양수에는 + 부호를 붙이고 0은 0.0으로 표시한다.
      */
     fun dailyTrendDisplay(value: Double?): String = when {
         value == null || !value.isFinite() -> "—"
-        value > 0.0 -> String.format(Locale.US, "+%.2f", value)
-        else -> String.format(Locale.US, "%.2f", value)
+        value > 0.0 -> String.format(Locale.US, "+%.1f", value)
+        else -> String.format(Locale.US, "%.1f", value)
     }
 
     fun etaDateDisplay(etaDate: String?): String {
