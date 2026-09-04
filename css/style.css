@@ -5443,6 +5443,7 @@ body{
     .rw-intro-stars,.rw-intro-wave,.rw-sailboat-bob,.intro-animate>.rw-intro-scene,.intro-animate>.intro-brand-lockup{animation:none!important;opacity:1;transform:none;}
 }
 
+
 /* CAB-062 · Approved mobile intro art direction */
 .rw-intro-scene{height:clamp(190px,25vh,255px);background:none!important;border-radius:0!important;overflow:hidden!important}
 .rw-voyage-art{display:block;width:100%;height:100%;overflow:visible}
@@ -8514,4 +8515,53 @@ body{
     .rw-intro-lightning-motion{animation:rwIntroSceneLightningPulse 1s ease-in-out infinite !important}
     .rw-intro-cloud-motion{animation:rwIntroSceneCloudDrift 10s ease-in-out infinite alternate !important}
     .rw-intro-birds-motion{animation:rwIntroSceneBirdsFly 3s ease-in-out infinite alternate !important}
+}
+
+/* RiverWatch FX overlay · 2026-09-04
+   FX uses an internal independent scale; both vertical value axes remain hidden. */
+:root{
+    --voyage-series-fx:#d6a84b;
+}
+.snapshot-fx i,
+.snapshot-fx b,
+.voyage-peak-field.peak-fx b{
+    color:var(--voyage-series-fx) !important;
+}
+.legend-line.fx{
+    border-color:var(--voyage-series-fx) !important;
+    border-top-width:2px !important;
+}
+.journey-line.fx{
+    fill:none !important;
+    stroke:var(--voyage-series-fx) !important;
+    stroke-width:1.75 !important;
+    opacity:.88 !important;
+}
+.journey-fx-point{
+    fill:var(--voyage-series-fx) !important;
+    opacity:.9 !important;
+}
+.voyage-track-peak{
+    grid-template-columns:.95fr .9fr 1.25fr .9fr .9fr !important;
+}
+.voyage-peak-cell.voyage-peak-brand{
+    gap:0 !important;
+    padding-left:4px !important;
+}
+.voyage-peak-title,
+.voyage-peak-title strong{
+    align-items:center !important;
+}
+@media(max-width:520px){
+    .journey-legend{
+        gap:8px !important;
+        font-size:11px !important;
+    }
+    .legend-line{
+        width:20px !important;
+    }
+    .voyage-peak-cell{
+        padding-left:3px !important;
+        padding-right:3px !important;
+    }
 }

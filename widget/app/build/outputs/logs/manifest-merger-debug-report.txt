@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-24:12
-INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-24:12
-INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-24:12
-INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-24:12
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-36:12
+INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:2:1-36:12
 	package
 		INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml
 	android:versionName
@@ -20,41 +20,69 @@ uses-permission#android.permission.RECEIVE_BOOT_COMPLETED
 ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:4:5-81
 	android:name
 		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:4:22-78
+queries
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:6:5-16:15
+intent#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:7:9-10:18
+action#android.intent.action.MAIN
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:13-65
+	android:name
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:21-62
+category#android.intent.category.LAUNCHER
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:13-73
+	android:name
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:23-70
+intent#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+data:host:nims1894.github.io+data:scheme:https
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:11:9-15:18
+action#android.intent.action.VIEW
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:13-65
+	android:name
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:21-62
+category#android.intent.category.BROWSABLE
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:13-74
+	android:name
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:23-71
+data
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:13-78
+	android:host
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:42-75
+	android:scheme
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:19-41
 application
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:6:5-23:19
-INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:6:5-23:19
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:18:5-35:19
+INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:18:5-35:19
 	android:extractNativeLibs
 		INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml
 	android:supportsRtl
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:9-35
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:21:9-35
 	android:label
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:9-46
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:20:9-46
 	android:allowBackup
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:7:9-35
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:19:9-35
 	android:theme
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:10:9-40
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:22:9-40
 receiver#com.riverwatch.widget.RiverWatchWidgetProvider
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:9-22:20
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:24:9-34:20
 	android:exported
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:13-36
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:26:13-36
 	android:name
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:13-53
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:25:13-53
 intent-filter#action:name:android.appwidget.action.APPWIDGET_UPDATE+action:name:android.intent.action.BOOT_COMPLETED
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:15:13-18:29
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:27:13-30:29
 action#android.appwidget.action.APPWIDGET_UPDATE
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:16:17-84
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:28:17-84
 	android:name
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:16:25-81
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:28:25-81
 action#android.intent.action.BOOT_COMPLETED
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:17:17-79
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:29:17-79
 	android:name
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:17:25-76
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:29:25-76
 meta-data#android.appwidget.provider
-ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:19:13-21:66
+ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:31:13-33:66
 	android:resource
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:21:17-63
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:33:17-63
 	android:name
-		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:20:17-58
+		ADDED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:32:17-58
 uses-sdk
 INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\RiverWatch\widget\app\src\main\AndroidManifest.xml

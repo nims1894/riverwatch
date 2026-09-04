@@ -16,7 +16,10 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Typeface
 import android.os.Build
+import android.app.KeyguardManager
+import android.os.PowerManager
 import android.net.Uri
+import android.util.Log
 import android.widget.RemoteViews
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -31,7 +34,7 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        scheduleHourlyRepeatingCheck(context)
+        ensureRepeatingSchedule(context)
     }
 
     override fun onUpdate(
@@ -43,10 +46,9 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
             appWidgetManager.updateAppWidget(widgetId, buildViews(context, widgetId))
         }
 
-        // 위젯이 살아나는 시점에 현재 시간대(예: 21:00~21:59)에서
-        // 아직 자동 갱신을 시도하지 않았다면 딱 한 번만 시도한다.
-        autoRefreshIfNeededAsync(context)
-        scheduleHourlyRepeatingCheck(context)
+        // 최초 자동 실행 전에는 1분 repeating으로 실행 기회를 확보하고,
+        // 한 번이라도 실제 갱신 트리거가 들어온 뒤에는 10분 repeating을 유지한다.
+        ensureRepeatingSchedule(context)
     }
 
     override fun onAppWidgetOptionsChanged(
@@ -63,46 +65,65 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
 
         when (intent.action) {
-            ACTION_HOURLY_SYNC -> {
-                autoRefreshIfNeededAsync(context)
+
+            ACTION_USER_PRESENT_FALLBACK -> {
+                Log.i(DIAG_TAG, "RW_ALARM RECEIVED")
+
+                // repeating Alarm Broadcast가 실제 RiverWatch까지 도착한 순간
+                // bootstrap 1분 반복을 종료하고 다음 10분 벽시계 슬롯부터 다시 반복 예약한다.
+                enterSteadyRepeatingMode(context)
+
+                // 화면 ON/OFF 상태는 진단 로그로만 남긴다.
+                // 자동 갱신 여부에는 사용하지 않으며, 10분 Alarm 수신 시 항상 API를 시도한다.
+                val active = isDeviceInActiveUse(context)
+                Log.i(DIAG_TAG, "RW_ALARM ACTIVE=$active")
+                autoRefreshAsync(context)
             }
 
-            ACTION_MANUAL_SYNC -> manualRefreshAsync(context)
+            ACTION_MANUAL_SYNC -> {
+                Log.i(DIAG_TAG, "RW_MANUAL RECEIVED")
+                // 수동 REFRESH도 RiverWatch가 실제 실행된 것이므로
+                // 기존 자동 스케줄을 지우고 다음 10분 벽시계 슬롯부터 반복 예약한다.
+                enterSteadyRepeatingMode(context)
+                manualRefreshAsync(context)
+            }
 
             Intent.ACTION_BOOT_COMPLETED -> {
-                scheduleHourlyRepeatingCheck(context)
+                ensureRepeatingSchedule(context)
             }
         }
     }
 
     /**
      * Automatic refresh policy
-     * - 한 시간 구간당 자동 시도는 최대 1회.
-     * - 성공/실패와 관계없이 같은 시간 구간에서는 자동 재시도하지 않음.
-     * - 실패 시 다음 정각 이후 새 시간 구간에서 다시 시도.
-     * - Manual refresh는 이 제한을 무시함.
+     * - 신규/초기 상태: 다음 1분 벽시계 경계부터 1분 setInexactRepeating(RTC, non-wakeup) 등록.
+     * - 첫 자동 Broadcast가 실제 도착하거나 수동 REFRESH가 실행되면 bootstrap 완료로 기록.
+     * - 그 즉시 기존 자동 알람을 취소하고 다음 10분 벽시계 슬롯부터 10분 repeating 재등록.
+     * - 이후 자동 Broadcast가 올 때마다 기존 repeating을 취소하고 다음 10분 슬롯으로 다시 정렬.
+     * - 화면 ON/OFF 상태는 진단만 하며, 자동 Broadcast 수신 시 항상 API 갱신을 시도함.
+     * - API 성공/실패와 스케줄 유지 여부는 분리함. API 실패는 UPDATED의 ':'를 '!'로 표시.
+     * - non-wakeup + inexact이므로 목표 벽시계 시각과 실제 전달 시각은 다를 수 있음.
      */
-    private fun autoRefreshIfNeededAsync(context: Context) {
+    private fun autoRefreshAsync(context: Context) {
         val appContext = context.applicationContext
-        val p = prefs(appContext)
-        val bucket = currentHourBucket()
-
-        if (p.getString(KEY_LAST_AUTO_ATTEMPT_BUCKET, null) == bucket) {
-            return
-        }
-
-        // 중복 이벤트가 겹쳐도 같은 시간대에 두 번 호출되지 않도록 Fetch 전에 기록한다.
-        p.edit().putString(KEY_LAST_AUTO_ATTEMPT_BUCKET, bucket).apply()
-
         val pendingResult = goAsync()
+
         EXECUTOR.execute {
             try {
+                Log.i(DIAG_TAG, "RW_API START")
                 val snapshot = fetchSnapshot()
                 saveSnapshot(appContext, snapshot)
+                markAutoAttempt(appContext, success = true)
                 renderAll(appContext)
-            } catch (_: Exception) {
-                // 기존 LAST_GOOD UI 유지. 같은 시간대 자동 재시도는 하지 않고 다음 시간대에 재시도.
+                Log.i(DIAG_TAG, "RW_API SUCCESS")
+            } catch (e: Exception) {
+                Log.e(DIAG_TAG, "RW_API FAIL", e)
+                // 데이터는 기존 LAST_GOOD를 유지하되,
+                // UPDATED 시간은 실패한 API 시도 시각으로 바꾸고 ':' 대신 '!'로 표시한다.
+                markAutoAttempt(appContext, success = false)
+                renderAll(appContext)
             } finally {
+                // 다음 기회는 이미 AlarmManager의 repeating schedule에 등록되어 있다.
                 pendingResult.finish()
             }
         }
@@ -116,16 +137,13 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
             try {
                 val snapshot = fetchSnapshot()
                 saveSnapshot(appContext, snapshot)
-
-                // 수동 갱신에 성공했으면 현재 시간대에는 이미 최신값이 있으므로
-                // 이후 자동 갱신은 생략한다.
-                prefs(appContext).edit()
-                    .putString(KEY_LAST_AUTO_ATTEMPT_BUCKET, currentHourBucket())
-                    .apply()
-
+                markAutoAttempt(appContext, success = true)
                 renderAll(appContext)
             } catch (_: Exception) {
-                // 기존 정상값 유지
+                // '!'는 트리거 실패가 아니라 API 호출 실패만 의미한다.
+                // 기존 LAST_GOOD 데이터는 그대로 유지한다.
+                markAutoAttempt(appContext, success = false)
+                renderAll(appContext)
             } finally {
                 pendingResult.finish()
             }
@@ -187,6 +205,13 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         editor.apply()
     }
 
+    private fun markAutoAttempt(context: Context, success: Boolean) {
+        prefs(context).edit()
+            .putLong(KEY_LAST_AUTO_ATTEMPT_AT, System.currentTimeMillis())
+            .putBoolean(KEY_LAST_AUTO_ATTEMPT_OK, success)
+            .apply()
+    }
+
     private fun buildViews(context: Context, appWidgetId: Int): RemoteViews {
         val p = prefs(context)
         val hasData = p.getBoolean(KEY_HAS_DATA, false)
@@ -202,6 +227,8 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
             null
         }
         val lastGoodAt = if (hasData) p.getLong(KEY_LAST_GOOD_AT, 0L) else 0L
+        val lastAutoAttemptAt = p.getLong(KEY_LAST_AUTO_ATTEMPT_AT, 0L)
+        val lastAutoAttemptOk = p.getBoolean(KEY_LAST_AUTO_ATTEMPT_OK, true)
 
         val views = RemoteViews(context.packageName, R.layout.riverwatch_widget)
 
@@ -219,16 +246,18 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
                 trend = trend,
                 dailyTrendPct = dailyTrendPct,
                 lastGoodAt = lastGoodAt,
+                lastAutoAttemptAt = lastAutoAttemptAt,
+                lastAutoAttemptOk = lastAutoAttemptOk,
                 outputSize = widgetBitmapSize(context, appWidgetId)
             )
         )
 
-        // Tapping the widget body (including the Koru symbol) opens RiverWatch.
-        // REFRESH remains a separate overlay and keeps manual-refresh priority.
-        val openRiverWatchIntent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse(RIVERWATCH_URL)
-        )
+        // Tapping the widget body opens the installed RiverWatch PWA/WebAPK first.
+        // This mirrors launching RiverWatch from its home-screen icon: if its task is
+        // already alive Android brings that task back to the foreground, preserving
+        // the current page. Only when no dedicated installed web app can be found do
+        // we fall back to opening the root URL in the browser.
+        val openRiverWatchIntent = buildOpenRiverWatchIntent(context)
         val openRiverWatchPendingIntent = PendingIntent.getActivity(
             context,
             REQUEST_OPEN_RIVERWATCH,
@@ -275,6 +304,8 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         trend: String?,
         dailyTrendPct: Double?,
         lastGoodAt: Long,
+        lastAutoAttemptAt: Long,
+        lastAutoAttemptOk: Boolean,
         outputSize: Pair<Int, Int>
     ): Bitmap {
         val outputWidth = outputSize.first
@@ -403,7 +434,15 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         val headerRvPaint = paint(32f, white, bold)
         val updatedBold = paint(27f, muted, bold)
         val updatedRegular = paint(27f, muted, regular)
-        val updatedTime = lastUpdateTimeOnly(lastGoodAt)
+        val showFailedAutoAttempt = !lastAutoAttemptOk && lastAutoAttemptAt > 0L
+        val updatedBaseTime = lastUpdateTimeOnly(
+            if (showFailedAutoAttempt) lastAutoAttemptAt else lastGoodAt
+        )
+        val updatedTime = if (showFailedAutoAttempt) {
+            updatedBaseTime.replace(':', '!')
+        } else {
+            updatedBaseTime
+        }
         val updatedGapX = 4f
 
         val labelPaint = paint(27f, muted, bold)
@@ -606,6 +645,65 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         return bitmap
     }
 
+
+    private fun buildOpenRiverWatchIntent(context: Context): Intent {
+        val pm = context.packageManager
+
+        // Resolve RiverWatch from the same MAIN + LAUNCHER surface used by the
+        // home-screen icon. This is more reliable than looking for a URL handler:
+        // Chrome WebAPKs do not always expose themselves as generic handlers for
+        // their own start URL, which previously caused us to fall back to ACTION_VIEW.
+        val launcherQuery = Intent(Intent.ACTION_MAIN).apply {
+            addCategory(Intent.CATEGORY_LAUNCHER)
+        }
+
+        val launcherCandidates = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            pm.queryIntentActivities(
+                launcherQuery,
+                android.content.pm.PackageManager.ResolveInfoFlags.of(0)
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            pm.queryIntentActivities(launcherQuery, 0)
+        }
+
+        val riverWatchLauncher = launcherCandidates.firstOrNull { resolveInfo ->
+            val packageName = resolveInfo.activityInfo?.packageName.orEmpty()
+            val label = resolveInfo.loadLabel(pm)?.toString().orEmpty()
+            val isWebApk = packageName.startsWith("org.chromium.webapk.") ||
+                packageName.contains("webapk", ignoreCase = true)
+            isWebApk && label.contains("RiverWatch", ignoreCase = true)
+        } ?: launcherCandidates.firstOrNull { resolveInfo ->
+            // Fallback for WebAPK launchers whose visible label is localized or
+            // slightly different. Prefer a WebAPK whose launcher label contains
+            // the RiverWatch brand token.
+            val packageName = resolveInfo.activityInfo?.packageName.orEmpty()
+            val label = resolveInfo.loadLabel(pm)?.toString().orEmpty()
+            (packageName.startsWith("org.chromium.webapk.") || packageName.contains("webapk", true)) &&
+                label.contains("River", ignoreCase = true)
+        }
+
+        val activityInfo = riverWatchLauncher?.activityInfo
+        if (activityInfo != null) {
+            Log.i(DIAG_TAG, "RW_OPEN launcher=${activityInfo.packageName}/${activityInfo.name}")
+            return Intent(Intent.ACTION_MAIN).apply {
+                addCategory(Intent.CATEGORY_LAUNCHER)
+                component = ComponentName(activityInfo.packageName, activityInfo.name)
+                // Match launcher semantics: bring an existing task forward when it
+                // exists; otherwise create the normal first-run task.
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+            }
+        }
+
+        // Last-resort fallback only. If this line is reached the installed WebAPK
+        // was not visible to the widget package, so ACTION_VIEW will enter '/'.
+        Log.w(DIAG_TAG, "RW_OPEN launcher not found; falling back to URL")
+        return Intent(Intent.ACTION_VIEW, Uri.parse(RIVERWATCH_URL)).apply {
+            addCategory(Intent.CATEGORY_BROWSABLE)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+    }
+
     private fun readDailyTrendPct(json: JSONObject): Double? {
         fun parseValue(key: String): Double? {
             if (!json.has(key) || json.isNull(key)) return null
@@ -719,32 +817,65 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         return "UPDATED $time"
     }
 
-    private fun currentHourBucket(nowMillis: Long = System.currentTimeMillis()): String {
-        return SimpleDateFormat("yyyy-MM-dd-HH", Locale.US).format(Date(nowMillis))
+    private fun ensureRepeatingSchedule(context: Context) {
+        val bootstrapComplete = prefs(context).getBoolean(KEY_BOOTSTRAP_COMPLETE, false)
+        if (bootstrapComplete) {
+            scheduleSteadyRepeating(context)
+        } else {
+            scheduleBootstrapRepeating(context)
+        }
     }
 
-    private fun scheduleHourlyRepeatingCheck(context: Context) {
-        val now = Calendar.getInstance()
-        val nextHour = Calendar.getInstance().apply {
-            timeInMillis = now.timeInMillis
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-            add(Calendar.HOUR_OF_DAY, 1)
-        }
+    private fun enterSteadyRepeatingMode(context: Context) {
+        prefs(context).edit()
+            .putBoolean(KEY_BOOTSTRAP_COMPLETE, true)
+            .apply()
+        scheduleSteadyRepeating(context)
+    }
 
+    private fun scheduleBootstrapRepeating(context: Context) {
+        scheduleAlignedRepeating(
+            context = context,
+            slotMs = BOOTSTRAP_INTERVAL_MS
+        )
+    }
+
+    private fun scheduleSteadyRepeating(context: Context) {
+        scheduleAlignedRepeating(
+            context = context,
+            slotMs = REFRESH_INTERVAL_MS
+        )
+    }
+
+    private fun scheduleAlignedRepeating(context: Context, slotMs: Long) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pendingIntent = alarmPendingIntent(context, ACTION_HOURLY_SYNC, REQUEST_HOURLY)
 
-        // Register one persistent hourly repeating alarm instead of chaining
-        // one-shot alarms. Android may still batch/defer delivery in Doze,
-        // but a delayed delivery does not break the following hourly schedule.
+        // 과거 버전의 예약이 남아 있어도 현재 RiverWatch 자동 스케줄 하나만 유지한다.
+        alarmManager.cancel(alarmPendingIntent(context, ACTION_HOURLY_SYNC_LEGACY, REQUEST_HOURLY))
+
+        val pendingIntent = alarmPendingIntent(context, ACTION_USER_PRESENT_FALLBACK, REQUEST_FALLBACK)
+        alarmManager.cancel(pendingIntent)
+
+        // 현재 시각의 '다음' 벽시계 슬롯으로 올림.
+        // 예: 07:37:23 + 1분 슬롯 -> 07:38:00
+        //     07:41:22 + 10분 슬롯 -> 07:50:00
+        val now = System.currentTimeMillis()
+        val nextSlot = ((now / slotMs) + 1L) * slotMs
+
+        // RTC(non-wakeup) repeating.
+        // Android의 inexact/batching 정책 때문에 실제 Broadcast 전달은 목표 시각보다 늦을 수 있다.
         alarmManager.setInexactRepeating(
-            AlarmManager.RTC_WAKEUP,
-            nextHour.timeInMillis,
-            AlarmManager.INTERVAL_HOUR,
+            AlarmManager.RTC,
+            nextSlot,
+            slotMs,
             pendingIntent
         )
+    }
+
+    private fun isDeviceInActiveUse(context: Context): Boolean {
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+        return powerManager.isInteractive && !keyguardManager.isKeyguardLocked
     }
 
     private fun alarmPendingIntent(context: Context, action: String, requestCode: Int): PendingIntent {
@@ -777,6 +908,7 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
 
     companion object {
         private const val PREFS_NAME = "riverwatch_widget_snapshot"
+        private const val DIAG_TAG = "RiverWatchDiag"
 
         private const val KEY_HAS_DATA = "has_data"
         private const val KEY_SNAPSHOT_DATE = "snapshot_date"
@@ -788,14 +920,20 @@ class RiverWatchWidgetProvider : AppWidgetProvider() {
         private const val KEY_DAILY_TREND_PCT = "daily_trend_pct"
         private const val KEY_ETA_DATE = "eta_date"
         private const val KEY_LAST_GOOD_AT = "last_good_at"
-        private const val KEY_LAST_AUTO_ATTEMPT_BUCKET = "last_auto_attempt_bucket"
+        private const val KEY_LAST_AUTO_ATTEMPT_AT = "last_auto_attempt_at"
+        private const val KEY_LAST_AUTO_ATTEMPT_OK = "last_auto_attempt_ok"
+        private const val KEY_BOOTSTRAP_COMPLETE = "bootstrap_complete"
 
-        private const val ACTION_HOURLY_SYNC = "com.riverwatch.widget.HOURLY_SYNC"
+        private const val ACTION_HOURLY_SYNC_LEGACY = "com.riverwatch.widget.HOURLY_SYNC"
+        private const val ACTION_USER_PRESENT_FALLBACK = "com.riverwatch.widget.USER_PRESENT_FALLBACK"
         private const val ACTION_MANUAL_SYNC = "com.riverwatch.widget.MANUAL_SYNC"
 
         private const val REQUEST_HOURLY = 2200
+        private const val REQUEST_FALLBACK = 2201
         private const val REQUEST_MANUAL = 2190
         private const val REQUEST_OPEN_RIVERWATCH = 2180
+        private const val BOOTSTRAP_INTERVAL_MS = 1L * 60L * 1000L
+        private const val REFRESH_INTERVAL_MS = 10L * 60L * 1000L
         private const val RIVERWATCH_URL = "https://nims1894.github.io/riverwatch/"
 
         private val EXECUTOR = Executors.newSingleThreadExecutor()

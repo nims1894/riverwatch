@@ -1,75 +1,55 @@
 [
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_koru_watermark.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\koru_watermark.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_widget_preview.xml.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/widget_preview.xml"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_state_storm.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/state_storm.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_state_tailwind.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\state_tailwind.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/layout_riverwatch_widget.xml.flat",
+        "source": "com.riverwatch.widget.app-main-6:/layout/riverwatch_widget.xml"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_boat_tailwind.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\boat_tailwind.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_widget_bg.xml.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\widget_bg.xml"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_boat_tailwind.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/boat_tailwind.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_wind_stable.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/wind_stable.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_indicator_stable.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\indicator_stable.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_state_calm.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\state_calm.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_wind_down.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\wind_down.png"
-    },
-    {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_wind_up.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/wind_up.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_boat_headwind.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\boat_headwind.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_wind_str_up.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/wind_str_up.png"
     },
     {
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_boat_calm.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/boat_calm.png"
+    },
+    {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_indicator_str_down.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/indicator_str_down.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_state_rough.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\state_rough.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_widget_bg.xml.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/widget_bg.xml"
+    },
+    {
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_koru_watermark.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/koru_watermark.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_state_tailwind.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/state_tailwind.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_boat_rough.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\boat_rough.png"
-    },
-    {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_state_calm.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/state_calm.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\xml_riverwatch_widget_info.xml.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\xml\\riverwatch_widget_info.xml"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_state_rough.png.flat",
@@ -80,80 +60,40 @@
         "source": "com.riverwatch.widget.app-main-6:/drawable/indicator_str_up.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_indicator_str_up.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\indicator_str_up.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/xml_riverwatch_widget_info.xml.flat",
+        "source": "com.riverwatch.widget.app-main-6:/xml/riverwatch_widget_info.xml"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_wind_str_down.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\wind_str_down.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_wind_str_up.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\wind_str_up.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_boat_storm.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/boat_storm.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_indicator_down.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/indicator_down.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_boat_calm.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\boat_calm.png"
-    },
-    {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_indicator_stable.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/indicator_stable.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_indicator_down.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\indicator_down.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_state_storm.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\state_storm.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_boat_rough.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/boat_rough.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_state_headwind.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/state_headwind.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_state_headwind.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\state_headwind.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_wind_stable.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\wind_stable.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_wind_up.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\wind_up.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_widget_preview.xml.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\widget_preview.xml"
-    },
-    {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_indicator_up.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/indicator_up.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_indicator_up.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\indicator_up.png"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\layout_riverwatch_widget.xml.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\layout\\riverwatch_widget.xml"
-    },
-    {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_boat_storm.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\boat_storm.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_wind_str_down.png.flat",
         "source": "com.riverwatch.widget.app-main-6:/drawable/wind_str_down.png"
     },
     {
-        "merged": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-debug-4:\\drawable_indicator_str_down.png.flat",
-        "source": "C:\\Users\\nanim\\.gradle\\daemon\\9.3.0\\com.riverwatch.widget.app-main-6:\\drawable\\indicator_str_down.png"
+        "merged": "com.riverwatch.widget.app-debug-4:/drawable_boat_headwind.png.flat",
+        "source": "com.riverwatch.widget.app-main-6:/drawable/boat_headwind.png"
     },
     {
         "merged": "com.riverwatch.widget.app-debug-4:/drawable_wind_down.png.flat",

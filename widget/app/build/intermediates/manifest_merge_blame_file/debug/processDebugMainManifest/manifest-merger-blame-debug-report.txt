@@ -1,8 +1,8 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 3    package="com.riverwatch.widget"
-4    android:versionCode="3"
-5    android:versionName="0.3.0-golden-binderfix" >
+4    android:versionCode="5"
+5    android:versionName="0.5.0-launcher-resume" >
 6
 7    <uses-sdk
 8        android:minSdkVersion="26"
@@ -15,42 +15,73 @@
 12-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:4:5-81
 12-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:4:22-78
 13
-14    <application
-14-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:6:5-23:19
-15        android:allowBackup="true"
-15-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:7:9-35
-16        android:debuggable="true"
-17        android:extractNativeLibs="false"
-18        android:label="RiverWatch Widget Lab"
-18-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:9-46
-19        android:supportsRtl="true"
-19-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:9-35
-20        android:testOnly="true"
-21        android:theme="@style/AppTheme" >
-21-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:10:9-40
-22        <receiver
-22-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:9-22:20
-23            android:name="com.riverwatch.widget.RiverWatchWidgetProvider"
-23-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:13-53
-24            android:exported="true" >
-24-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:13-36
-25            <intent-filter>
-25-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:15:13-18:29
-26                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-26-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:16:17-84
-26-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:16:25-81
-27                <action android:name="android.intent.action.BOOT_COMPLETED" />
-27-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:17:17-79
-27-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:17:25-76
-28            </intent-filter>
-29
-30            <meta-data
-30-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:19:13-21:66
-31                android:name="android.appwidget.provider"
-31-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:20:17-58
-32                android:resource="@xml/riverwatch_widget_info" />
-32-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:21:17-63
-33        </receiver>
-34    </application>
-35
-36</manifest>
+14    <queries>
+14-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:6:5-16:15
+15        <intent>
+15-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:7:9-10:18
+16            <action android:name="android.intent.action.MAIN" />
+16-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:13-65
+16-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:8:21-62
+17
+18            <category android:name="android.intent.category.LAUNCHER" />
+18-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:13-73
+18-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:9:23-70
+19        </intent>
+20        <intent>
+20-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:11:9-15:18
+21            <action android:name="android.intent.action.VIEW" />
+21-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:13-65
+21-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:12:21-62
+22
+23            <category android:name="android.intent.category.BROWSABLE" />
+23-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:13-74
+23-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:13:23-71
+24
+25            <data
+25-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:13-78
+26                android:host="nims1894.github.io"
+26-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:42-75
+27                android:scheme="https" />
+27-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:14:19-41
+28        </intent>
+29    </queries>
+30
+31    <application
+31-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:18:5-35:19
+32        android:allowBackup="true"
+32-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:19:9-35
+33        android:debuggable="true"
+34        android:extractNativeLibs="false"
+35        android:label="RiverWatch Widget Lab"
+35-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:20:9-46
+36        android:supportsRtl="true"
+36-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:21:9-35
+37        android:testOnly="true"
+38        android:theme="@style/AppTheme" >
+38-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:22:9-40
+39        <receiver
+39-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:24:9-34:20
+40            android:name="com.riverwatch.widget.RiverWatchWidgetProvider"
+40-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:25:13-53
+41            android:exported="true" >
+41-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:26:13-36
+42            <intent-filter>
+42-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:27:13-30:29
+43                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+43-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:28:17-84
+43-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:28:25-81
+44                <action android:name="android.intent.action.BOOT_COMPLETED" />
+44-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:29:17-79
+44-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:29:25-76
+45            </intent-filter>
+46
+47            <meta-data
+47-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:31:13-33:66
+48                android:name="android.appwidget.provider"
+48-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:32:17-58
+49                android:resource="@xml/riverwatch_widget_info" />
+49-->C:\RiverWatch\widget\app\src\main\AndroidManifest.xml:33:17-63
+50        </receiver>
+51    </application>
+52
+53</manifest>

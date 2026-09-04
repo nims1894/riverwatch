@@ -257,6 +257,7 @@ const RiverWatchMarketEngine = (() => {
         const dailyTrendIdx = idx("DailyTrend");
         const voyageStateIdx = idx("VoyageState");
         const trendIdx = idx("Trend");
+        const fxIdx = idx("FX");
         const titleIdx = idx("Title");
         const messageIdx = idx("Message");
         const logbookIdx = idx("Logbook");
@@ -298,6 +299,7 @@ const RiverWatchMarketEngine = (() => {
             const trend = trendIdx >= 0
                 ? String(cols[trendIdx] || "").trim().toUpperCase()
                 : "";
+            const fxRaw = fxIdx >= 0 ? parseNumber(cols[fxIdx], NaN) : NaN;
             const message = messageIdx >= 0
                 ? String(cols[messageIdx] || "").trim()
                 : (memoIdx >= 0
@@ -322,6 +324,7 @@ const RiverWatchMarketEngine = (() => {
                 dailyTrend: dailyTrendIdx >= 0 ? parsePercent(cols[dailyTrendIdx], 0) : 0,
                 voyageState,
                 trend,
+                fx: Number.isFinite(fxRaw) && fxRaw > 0 ? fxRaw : null,
                 title,
                 message,
                 logbook,
@@ -350,16 +353,20 @@ const RiverWatchMarketEngine = (() => {
 
     function parseMarketPeakCsv(text) {
         const rows = parseRows(text);
+        const headers = (rows?.[0] || []).map(h => String(h).trim().toUpperCase());
         const row = rows?.[1] || [];
         const date = String(row?.[0] || "").trim();       // A2
         const marketValueKRW = parseNumber(row?.[2], NaN); // C2
         const planGap = parsePercentPoints(row?.[4], null); // E2
+        const fxIdx = headers.indexOf("FX_1");
+        const fxRaw = fxIdx >= 0 ? parseNumber(row?.[fxIdx], NaN) : NaN;
 
         if (!date && !Number.isFinite(marketValueKRW) && !Number.isFinite(planGap)) return null;
         return {
             date,
             marketValueKRW: Number.isFinite(marketValueKRW) ? marketValueKRW : null,
-            planGap: Number.isFinite(planGap) ? planGap : null
+            planGap: Number.isFinite(planGap) ? planGap : null,
+            fx: Number.isFinite(fxRaw) && fxRaw > 0 ? fxRaw : null
         };
     }
 

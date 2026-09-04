@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-pwa-intro-scene-roundrobin-20260823";
+const CACHE_NAME = "riverwatch-v1.1-fx-overlay-20260904";
 const APP_SHELL = [
   "./",
   "./index.html",

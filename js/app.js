@@ -2535,6 +2535,7 @@ function normalizeLogbookRows(rows) {
             eventType: String(row.eventType || row.marker || "").trim().toUpperCase(),
             voyageState: String(row.voyageState || "").trim().toUpperCase(),
             trend: String(row.trend || "").trim().toUpperCase(),
+            fx: Number.isFinite(Number(row.fx)) && Number(row.fx) > 0 ? Number(row.fx) : null,
             title: row.title || row.note || "Log Entry",
             message: row.message || row.memo || row.note || "",
             memo: row.message || row.memo || row.note || "",
@@ -2631,11 +2632,18 @@ function gapToneClass(value) {
     return amount > 0 ? "gap-positive" : "gap-negative";
 }
 
-function snapshotMetricsHTML(market, plan, gap) {
+function formatFX(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount <= 0) return "-";
+    return Math.round(amount).toLocaleString("en-US");
+}
+
+function snapshotMetricsHTML(market, plan, gap, fx) {
     return `
         <span class="snapshot-metric snapshot-market"><i>Market</i><b>${formatKRWM(market)}</b></span>
         <span class="snapshot-metric snapshot-plan"><i>Plan</i><b>${formatKRWM(plan)}</b></span>
         <span class="snapshot-metric snapshot-gap"><i>Gap</i><b class="${gapToneClass(gap)}">${formatSignedPercent2(gap)}</b></span>
+        <span class="snapshot-metric snapshot-fx"><i>FX</i><b>${formatFX(fx)}</b></span>
     `;
 }
 
@@ -2661,7 +2669,7 @@ function renderVoyageTrackLatest(rows) {
             </span>
         </div>
         <div class="snapshot-metrics voyage-track-latest-metrics">
-            ${snapshotMetricsHTML(latest.marketValueKRW, latest.targetValueKRW, latest.planGap)}
+            ${snapshotMetricsHTML(latest.marketValueKRW, latest.targetValueKRW, latest.planGap, latest.fx)}
         </div>
     `;
 }
@@ -2672,6 +2680,7 @@ function renderVoyageTrackPeak() {
     const peak = riverwatch.marketPeak || {};
     const market = Number(peak.marketValueKRW);
     const gap = Number(peak.planGap);
+    const fx = Number(peak.fx);
     const date = formatDisplayDate(peak.date) || String(peak.date || "-");
     if (!Number.isFinite(market) && !peak.date && !Number.isFinite(gap)) {
         el.innerHTML = `<div class="voyage-peak-unavailable">MARKET PEAK unavailable</div>`;
@@ -2679,17 +2688,11 @@ function renderVoyageTrackPeak() {
     }
     el.innerHTML = `
         <div class="voyage-peak-cell voyage-peak-brand">
-            <span class="voyage-peak-icon" aria-hidden="true">
-                <svg viewBox="0 0 32 32" focusable="false">
-                    <circle cx="16" cy="16" r="14"></circle>
-                    <path d="M7.5 22.5 13 10.5l4.2 7.2 2.4-4.1 4.9 8.9Z"></path>
-                    <path d="m11.5 17.5 2.7-2.3 2.4 1.9"></path>
-                </svg>
-            </span>
             <span class="voyage-peak-title"><strong><span>MARKET</span><span>PEAK</span></strong></span>
         </div>
         <span class="voyage-peak-cell voyage-peak-field peak-market"><i>Peak</i><b>${formatKRWM(market)}</b></span>
         <span class="voyage-peak-cell voyage-peak-field peak-date"><i>Date</i><b>${date}</b></span>
+        <span class="voyage-peak-cell voyage-peak-field peak-fx"><i>FX</i><b>${formatFX(fx)}</b></span>
         <span class="voyage-peak-cell voyage-peak-field peak-gap"><i>Gap</i><b class="${gapToneClass(gap)}">${formatSignedPercent2(gap)}</b></span>
     `;
 }
@@ -2720,6 +2723,16 @@ function renderLogbookChart(rows) {
         Number(row.marketValueKRW || 0),
         Number(row.targetValueKRW || 0)
     )), 1);
+    const fxRows = enrichedRows.filter(row => Number.isFinite(row.fx) && row.fx > 0);
+    const fxValues = fxRows.map(row => row.fx);
+    const fxMinRaw = fxValues.length ? Math.min(...fxValues) : 0;
+    const fxMaxRaw = fxValues.length ? Math.max(...fxValues) : 0;
+    const fxRange = fxMaxRaw - fxMinRaw;
+    const fxMargin = fxValues.length
+        ? Math.max(fxRange * 0.1, fxRange === 0 ? Math.max(fxMaxRaw * 0.005, 5) : 2)
+        : 0;
+    const fxMin = fxMinRaw - fxMargin;
+    const fxMax = fxMaxRaw + fxMargin;
 
     const chartWidth = Math.max(300, el.clientWidth || 720);
     const chartHeight = 250;
@@ -2737,10 +2750,20 @@ function renderLogbookChart(rows) {
         return pad.left + ratio * plotW;
     };
     const yForValue = value => pad.top + (1 - (Number(value || 0) / maxValue)) * plotH;
+    const yForFx = value => {
+        if (!Number.isFinite(value) || !fxValues.length || fxMax <= fxMin) return null;
+        const ratio = Math.max(0, Math.min(1, (value - fxMin) / (fxMax - fxMin)));
+        return pad.top + (1 - ratio) * plotH;
+    };
 
     const linePath = (key) => enrichedRows.map((row, index) => {
         const x = xForDate(row.date);
         const y = yForValue(row[key]);
+        return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
+    }).join(" ");
+    const fxPath = fxRows.map((row, index) => {
+        const x = xForDate(row.date);
+        const y = yForFx(row.fx);
         return `${index === 0 ? "M" : "L"} ${x.toFixed(1)} ${y.toFixed(1)}`;
     }).join(" ");
 
@@ -2753,6 +2776,7 @@ function renderLogbookChart(rows) {
             <span><i class="legend-line market"></i>Market</span>
             <span><i class="legend-line course"></i>Plan</span>
             <span><i class="legend-line principal"></i>Principal</span>
+            <span><i class="legend-line fx"></i>FX</span>
         </div>
         <div class="journey-scroll-x">
             <svg class="journey-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}" role="img" aria-label="Portfolio journey line chart">
@@ -2762,6 +2786,8 @@ function renderLogbookChart(rows) {
                 <path class="journey-line principal" d="${linePath("principalKRW")}"></path>
                 <path class="journey-line course" d="${linePath("targetValueKRW")}"></path>
                 <path class="journey-line market" d="${linePath("marketValueKRW")}"></path>
+                ${fxPath ? `<path class="journey-line fx" d="${fxPath}"></path>` : ""}
+                ${fxRows.length === 1 ? `<circle class="journey-fx-point" cx="${xForDate(fxRows[0].date).toFixed(1)}" cy="${yForFx(fxRows[0].fx).toFixed(1)}" r="2.5"></circle>` : ""}
                 <text class="journey-edge-label start" x="${pad.left}" y="${chartHeight - 18}" text-anchor="start">${startLabel}</text>
                 <text class="journey-edge-label end" x="${chartWidth - pad.right}" y="${chartHeight - 18}" text-anchor="end">${endLabel}</text>
             </svg>
