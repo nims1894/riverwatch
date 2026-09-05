@@ -1,4 +1,4 @@
-const CACHE_NAME = "riverwatch-v1.1-fx-overlay-20260904";
+const CACHE_NAME = "riverwatch-v1.1-fx-log-fix-20260905";
 const APP_SHELL = [
   "./",
   "./index.html",

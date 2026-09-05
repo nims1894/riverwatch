@@ -2881,7 +2881,7 @@ function renderLogbookTimeline(rows) {
                     <div class="timeline-date">${row.date || "-"}</div>
                     <div class="timeline-title">${row.title || "Log Entry"}</div>
                     <div class="timeline-metric-line snapshot-metrics">
-                        ${snapshotMetricsHTML(market, planned, planGap)}
+                        ${snapshotMetricsHTML(market, planned, planGap, row.fx)}
                     </div>
                     <div class="timeline-note">${row.message || row.memo || "-"}</div>
                 </div>
