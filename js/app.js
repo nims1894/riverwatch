@@ -844,12 +844,12 @@ function buildCaptainNote() {
 
     const riverStatus = getRiverStatus(riverwatch.calc.riverHealth);
     const riverLineMap = {
-        "STRONG CURRENT": "The river remains strong.",
-        "FAVORABLE CURRENT": "The river remains favorable.",
-        "MIXED CURRENT": "The river is mixed; watch the current.",
-        "HEAD CURRENT": "The river is pushing against the course.",
-        "STORM WARNING": "The river is in a stress regime.",
-        "DATA N/A": "River data requires validation."
+        "TAILWIND": "The river offers a strong tailwind.",
+        "CALM": "The river remains calm and favorable.",
+        "HEADWIND": "The river presents a headwind; watch the current.",
+        "ROUGH": "The river is rough; navigate with caution.",
+        "STORM": "The river is in a storm regime.",
+        "PENDING": "River data requires validation."
     };
     const riverLine = riverLineMap[riverStatus] || "The river requires observation.";
 
@@ -2148,30 +2148,46 @@ function formatPhaseLabel(value) {
 
 function buildOrderRationale() {
     const phase = String(riverwatch.calc.voyagePhase || "").toUpperCase();
-    const boat = Number(riverwatch.calc.boatHealth ?? 0);
-    const voyage = Number(riverwatch.calc.voyageHealth ?? 0);
+    const order = String(riverwatch.calc.recommendedAction || "").trim().toUpperCase();
+    const river = riverwatch.calc.riverHealth;
+    const boat = riverwatch.calc.boatHealth;
+    const voyage = riverwatch.calc.voyageHealth;
 
-    if (phase === "BUILD_PHASE") {
-        return "Boat Health remains below threshold. Prioritize alignment over optimization.";
+    // The actual Order takes precedence over the Phase so the rationale cannot
+    // recommend holding course when the decision engine requires intervention.
+    if (order === "PRESERVE COURSE") {
+        return "Open Sea objective achieved. Maintain discipline and preserve the course.";
     }
-    if (phase === "EARLY_VOYAGE") {
-        return "Current course remains viable. No immediate adjustment required.";
+    if (order === "RECALCULATE COURSE") {
+        return "Planned voyage ended before reaching Open Sea. Recalculate the course and assess additional time required.";
     }
-    if (phase === "MID_VOYAGE") {
-        return "Progress toward Open Sea continues. Maintain current heading.";
+    if (order === "CONTINUE BUILDING") {
+        return Number.isFinite(boat) && boat < 70
+            ? "The boat is in Build Phase and Boat Health remains below threshold. Prioritize alignment over optimization."
+            : "The boat is in Build Phase. Continue building and verify readiness before advancing.";
     }
-    if (phase === "OPEN_SEA_APPROACH") {
-        return "Open Sea is now within reach. Preserve current course.";
+    if (order === "INCREASE EFFORT") {
+        return "Voyage Health is below the recovery threshold. Review the gap to Open Sea and assess additional effort.";
     }
-    if (phase === "OPEN_SEA_REACHED") {
-        return "Open Sea objective achieved. Maintain current allocation.";
+    if (order === "REBALANCE") {
+        return "Boat Health is below the operating threshold. Rebalance the boat before pressing forward.";
     }
-    if (phase === "TARGET_DATE_REACHED") {
-        return "Planned voyage ended before reaching Open Sea. Additional time is required.";
+    if (order === "REVIEW") {
+        return Number.isFinite(river) && river < 70
+            ? "River Health is below the watch threshold. Review external conditions and reassess the course."
+            : "Conditions require continued observation. Review the current course before making adjustments.";
     }
-    if (boat < 70) return "Boat Health remains below threshold. Prioritize alignment over optimization.";
-    if (voyage < 70) return "Open Sea target remains beyond current projection. Continue disciplined accumulation.";
-    return "Current course remains viable. No immediate adjustment required.";
+    if (order === "HOLD COURSE") {
+        return phase === "OPEN_SEA_APPROACH"
+            ? "Open Sea is now within reach. Hold the current course and monitor progress."
+            : "Hold the current course and monitor progress.";
+    }
+    if (order === "NO ACTION") {
+        return "River, Boat, and Voyage Health support the current course. No immediate adjustment required.";
+    }
+
+    // Unknown or not-yet-calculated orders must not imply that all is well.
+    return "Captain's Order is pending. Validate the current assessment.";
 }
 
 function renderAction() {
